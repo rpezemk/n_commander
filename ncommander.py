@@ -3,10 +3,21 @@ from curses import endwin
 from enum import Enum
 import signal
 import os
+import time
 from typing import Callable
 stdscr = None
 
+hello = """
 
+::::    :::  ::::::::   ::::::::  ::::    ::::  ::::    ::::      :::     ::::    ::: :::::::::  :::::::::: ::::::::: 
+:+:+:   :+: :+:    :+: :+:    :+: +:+:+: :+:+:+ +:+:+: :+:+:+   :+: :+:   :+:+:   :+: :+:    :+: :+:        :+:    :+:
+:+:+:+  +:+ +:+        +:+    +:+ +:+ +:+:+ +:+ +:+ +:+:+ +:+  +:+   +:+  :+:+:+  +:+ +:+    +:+ +:+        +:+    +:+
++#+ +:+ +#+ +#+        +#+    +:+ +#+  +:+  +#+ +#+  +:+  +#+ +#++:++#++: +#+ +:+ +#+ +#+    +:+ +#++:++#   +#++:++#: 
++#+  +#+#+# +#+        +#+    +#+ +#+       +#+ +#+       +#+ +#+     +#+ +#+  +#+#+# +#+    +#+ +#+        +#+    +#+
+#+#   #+#+# #+#    #+# #+#    #+# #+#       #+# #+#       #+# #+#     #+# #+#   #+#+# #+#    #+# #+#        #+#    #+#
+###    ####  ########   ########  ###       ### ###       ### ###     ### ###    #### #########  ########## ###    ###
+
+"""
 
         
         
@@ -34,14 +45,6 @@ class VPosEnum(Enum):
     BOTTOM = 2
     STRETCH = 3
     AUTO = 4
-
-class Drawable():
-    def __init__(self):
-        pass
-    
-class Button(Drawable):
-    def __init__(self, label: str, onClickFunc: Callable[[], None]):
-        pass
 
 class MyWindow():
     def __init__(self, title: str, x0, y0, x1, y1):
@@ -82,13 +85,12 @@ class TiledView():
         
     
 def main(stdscr_local):
-    
     global stdscr
     stdscr = stdscr_local
     signal.signal(signal.SIGWINCH, resize_handler) 
-    
     stdscr_local.clear()
     redraw_stdscreen()
+    
     while True:
 
         if curses.has_colors():
@@ -100,5 +102,6 @@ def main(stdscr_local):
         key = stdscr.getch()
         if key == ord('q'):
             break
-        
+
+     
 curses.wrapper(main)
