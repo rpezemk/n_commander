@@ -51,7 +51,7 @@ def draw_menu(stdscr):
 
         # Declaration of strings
         title = "Curses example"[:width-1]
-        subtitle = "Written by Clay McLeod"[:width-1]
+        subtitle = "OOPSSSS"[:width-1]
         keystr = "Last key pressed: {}".format(k)[:width-1]
         statusbarstr = "Press 'q' to exit | STATUS BAR | Pos: {}, {}".format(cursor_x, cursor_y)
         if k == 0:
