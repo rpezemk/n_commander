@@ -53,7 +53,7 @@ def draw_menu(stdscr):
         y = min(height-1, y)
 
         title = "Curses example"[:width-1]
-        subtitle = "Written by Clay McLeod"[:width-1]
+        subtitle = "ABC ABC"[:width-1]
         keystr = "Last key pressed: {}".format(k)[:width-1]
         statusbarstr = "Press 'q' to exit | STATUS BAR | Pos: {}, {}".format(x, y)
         if k == 0:
