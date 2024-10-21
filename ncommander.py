@@ -6,6 +6,7 @@ import os
 import time
 from typing import Callable
 stdscr = None
+helloWashShown = False;
 
 hello = """
 
@@ -84,19 +85,30 @@ class TiledView():
         stdscr.refresh()
         
     
+
 def main(stdscr_local):
     global stdscr
     stdscr = stdscr_local
     signal.signal(signal.SIGWINCH, resize_handler) 
     stdscr_local.clear()
+    # curses.mousemask(curses.ALL_MOUSE_EVENTS)
+    if curses.has_colors():
+        curses.start_color()
+        curses.use_default_colors()
     redraw_stdscreen()
     
+    global helloWashShown
+    if not helloWashShown:
+        lines = hello.splitlines()
+        for idx, line in enumerate(lines):
+            stdscr.addstr(idx, 2, line)  
+            
+        stdscr.refresh()  
+        stdscr.getch() 
+        pass
+    helloWashShown = True;
+    
     while True:
-
-        if curses.has_colors():
-            curses.start_color()
-            curses.use_default_colors()
-        # curses.mousemask(curses.ALL_MOUSE_EVENTS)
         tiled = TiledView(stdscr_local)
         tiled.StartQuad()
         key = stdscr.getch()
