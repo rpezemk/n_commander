@@ -10,5 +10,5 @@ pip install -r requirements.txt
 ```
 To start ncommander:
 ```
-(.venv) john@localjohn:~/.../$ python ncommander
+(.venv) john@localjohn:~/.../$ python ncommander.py
 ```
