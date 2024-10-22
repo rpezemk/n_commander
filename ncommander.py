@@ -20,13 +20,27 @@ hello = """
 
 """
 
-        
-        
+class ColorHelper():
+
+    def WrapColor(self, idx: int, fgdColor, bkgColor) -> int:
+        curses.init_pair(idx, fgdColor, bkgColor)
+        color = curses.color_pair(idx)
+        return color
+    
+    
+
+class MainStyles():
+    def __init__(self):
+        colorHelper = ColorHelper()
+        self.red_on_black = colorHelper.WrapColor(1, curses.COLOR_RED, curses.COLOR_BLACK)
+        self.green_on_black = colorHelper.WrapColor(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        self.yellow_on_black = colorHelper.WrapColor(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+    
 def redraw_stdscreen():
     rows, cols = stdscr.getmaxyx()
     stdscr.clear()
-    stdscr.border()
-    stdscr.hline(2, 1, '_', cols-2)
+    # stdscr.border()
+    # stdscr.hline(2, 1, '_', cols-2)
     stdscr.refresh()
 
 def resize_handler(signum, frame):
@@ -47,6 +61,31 @@ class VPosEnum(Enum):
     STRETCH = 3
     AUTO = 4
 
+
+class Button():
+    def __init__(self, title: str):
+        self.title = title
+        self.realTitle = f"[{self.title}]"
+        pass
+    def draw(self, x0):
+        stdscr.addstr(0, x0, self.realTitle) 
+    
+    def getWidth(self):
+        return len(self.realTitle)
+    
+class HStackPanel():
+    def __init__(self, list):
+        self.items = list
+        
+    def addItem(self, item):
+        self.items.append(item)
+
+    def draw(self):
+        currX = 1
+        for item in self.items:
+            item.draw(currX)
+            currX += item.getWidth() + 1
+            
 class MyWindow():
     def __init__(self, title: str, x0, y0, x1, y1):
         self.title = title
@@ -54,12 +93,17 @@ class MyWindow():
         self.y0 = y0
         self.x1 = x1
         self.y1 = y1
-        
+    
     def getContent(self) -> str:
         pass
     def interact(self, ch: int):
         pass
-    
+    def draw(self):
+        win = curses.newwin(self.y1 - self.y0,self.x1 - self.x0, self.y0, self.x0)  
+        win.border()
+        win.addstr(0, 1, self.title)
+        win.refresh()
+        
 class MainView():
     def __init__(self, stdscr):
         
@@ -72,16 +116,24 @@ class MainView():
         x2 = xMax 
         y1 = int(yMax/2)
         y2 = yMax
-        self.windows.append(MyWindow("/dev/", 0, 0, x1, y1))
-        self.windows.append(MyWindow("/home/kojaja/", x1, 0, x2, y1))
+                
+        self.menuPanel = HStackPanel([
+            Button("edit"),
+            Button("view"),
+            Button("settings"),
+            Button("help"),
+            Button("about")])
+         
+        self.menuPanel.draw()
+        y0 = 2
+        self.windows.append(MyWindow("/dev/", 0, y0, x1, y1))
+        self.windows.append(MyWindow("/home/kojaja/", x1, y0, x2, y1))
         self.windows.append(MyWindow("/var/", 0, y1, x1, y2))
         self.windows.append(MyWindow("/opt/", x1, y1, x2, y2))
         
+        self.menuPanel.draw()
         for myWin in self.windows:
-            win = curses.newwin(myWin.y1 - myWin.y0,myWin.x1 - myWin.x0, myWin.y0, myWin.x0)  
-            win.border()
-            win.addstr(0, 1, myWin.title)
-            win.refresh()
+            myWin.draw()
         stdscr.refresh()
         
     
@@ -95,18 +147,21 @@ def main(stdscr_local):
     if curses.has_colors():
         curses.start_color()
         curses.use_default_colors()
-    redraw_stdscreen()
-    
+    curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+    yellow_and_blue = curses.color_pair(2)
+    styles = MainStyles()
     global helloWashShown
     if not helloWashShown:
         lines = hello.splitlines()
+        
         for idx, line in enumerate(lines):
-            stdscr.addstr(idx, 2, line)  
+            stdscr.addstr(idx, 2, line, yellow_and_blue)  
             
         stdscr.refresh()  
         stdscr.getch() 
         pass
     helloWashShown = True;
+    redraw_stdscreen()
     
     while True:
         tiled = MainView(stdscr_local)
