@@ -60,7 +60,7 @@ class MyWindow():
     def interact(self, ch: int):
         pass
     
-class TiledView():
+class MainView():
     def __init__(self, stdscr):
         
         self.windows = []
@@ -109,7 +109,7 @@ def main(stdscr_local):
     helloWashShown = True;
     
     while True:
-        tiled = TiledView(stdscr_local)
+        tiled = MainView(stdscr_local)
         tiled.StartQuad()
         key = stdscr.getch()
         if key == ord('q'):
