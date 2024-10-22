@@ -24,3 +24,8 @@ To start ncommander:
 ```
 (.venv) john@localjohn:~/.../$ python ncommander.py
 ```
+
+# Docker
+In docker environment installing using pip is not advised as python still enforce
+restrictions for package modification. So instead install necessary dependencies using
+distribution's package manager.
