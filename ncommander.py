@@ -33,8 +33,6 @@ class ListHelper():
 
 class StringHelper():
     @staticmethod
-
-    @staticmethod
     def ListToColumns(maxH: int, maxW: int, list):
         groups = ListHelper.group_by_n(list, max(1, maxH))
         nGroups = len(groups)
