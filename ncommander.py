@@ -80,12 +80,14 @@ def main(stdscr_local):
         y1 = int(yMax/2)
         y2 = yMax
         
-        
         currPath = os_utils.make_abs_path()
-        quadItems = [MyWindow(currPath, None, [], y0, 0, y1, x1),
-        MyWindow("/home/kojaja/", None, [], y0, x1, y1, x2),
-        MyWindow(currPath, None, [], y1, 0, y2, x1),
-        MyWindow(currPath, None, [], y1, x1, y2, x2)]
+        
+        quadItems = [
+            MyWindow(currPath, None, [], y0, 0, y1, x1),
+            MyWindow("/home/kojaja/", None, [], y0, x1, y1, x2),
+            MyWindow(currPath, None, [], y1, 0, y2, x1),
+            MyWindow(currPath, None, [], y1, x1, y2, x2)
+        ]
         
         tiled = QuadView(
             stdscr_local, None, quadItems, 
