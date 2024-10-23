@@ -13,26 +13,13 @@ from utils import string_utils
 
 from tui import signal_resolver
 from tui.controls import VisualHierarchy, FillMethod
-
+from tui.splash import splashContent
 
 
 
 
 stdscr = None
 helloWashShown = False;
-
-hello = """
-
-::::    :::  ::::::::   ::::::::  ::::    ::::  ::::    ::::      :::     ::::    ::: :::::::::  :::::::::: ::::::::: 
-:+:+:   :+: :+:    :+: :+:    :+: +:+:+: :+:+:+ +:+:+: :+:+:+   :+: :+:   :+:+:   :+: :+:    :+: :+:        :+:    :+:
-:+:+:+  +:+ +:+        +:+    +:+ +:+ +:+:+ +:+ +:+ +:+:+ +:+  +:+   +:+  :+:+:+  +:+ +:+    +:+ +:+        +:+    +:+
-+#+ +:+ +#+ +#+        +#+    +:+ +#+  +:+  +#+ +#+  +:+  +#+ +#++:++#++: +#+ +:+ +#+ +#+    +:+ +#++:++#   +#++:++#: 
-+#+  +#+#+# +#+        +#+    +#+ +#+       +#+ +#+       +#+ +#+     +#+ +#+  +#+#+# +#+    +#+ +#+        +#+    +#+
-#+#   #+#+# #+#    #+# #+#    #+# #+#       #+# #+#       #+# #+#     #+# #+#   #+#+# #+#    #+# #+#        #+#    #+#
-###    ####  ########   ########  ###       ### ###       ### ###     ### ###    #### #########  ########## ###    ###
-
-"""
-
     
 
 def resize_handler(signum, frame):
@@ -161,7 +148,7 @@ def main(stdscr_local):
     global helloWashShown
     
     if not helloWashShown:
-        lines = hello.splitlines()
+        lines = splashContent.splitlines()
         
         for idx, line in enumerate(lines):
             stdscr.addstr(idx, 2, line)  
