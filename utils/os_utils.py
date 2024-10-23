@@ -7,6 +7,11 @@ def get_current_directory():
     current_directory = Path.cwd()  # or Path('.').resolve()
     return current_directory
 
+def make_abs_path(path = '.'):
+    corrPath = str(path)
+    if corrPath == ".":
+            corrPath = get_current_directory()
+    return str(corrPath)
 
 def list_directory_content(path='.'):
     """
