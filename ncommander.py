@@ -7,6 +7,10 @@ import os
 import time
 from typing import Callable
 
+from utils import enum_utils
+from utils import os_utils
+from utils import string_utils
+
 stdscr = None
 helloWashShown = False;
 
@@ -22,90 +26,6 @@ hello = """
 
 """
 
-
-class ListHelper():
-    @staticmethod
-    def group_by_n(input_list, n):
-        grouped = []
-        for i in range(0, len(input_list), n):
-            grouped.append(input_list[i:i + n])
-        return grouped
-
-class StringHelper():
-    @staticmethod
-    def ListToColumns(maxH: int, maxW: int, list):
-        groups = ListHelper.group_by_n(list, max(1, maxH))
-        nGroups = len(groups)
-        if nGroups == 0:
-            return []
-        
-        firstGroupLen = len(groups[0])
-        lastGroupLen = len(groups[-1])
-        resList = []
-        groupWidths = [max([len(s) for s in lst]) + 2 for lst in groups]
-        for i in range(lastGroupLen):
-            subRes = ""
-            subResList = []
-            for groupCnt in range(nGroups):
-                subResList.append(groups[groupCnt][i])
-            
-            for groupCnt in range(nGroups):
-                subRes += subResList[groupCnt].ljust(groupWidths[groupCnt])
-            resList.append(subRes)
-            
-            
-        for i in range(lastGroupLen, firstGroupLen):
-            subRes = ""
-            subResList = []
-            for groupCnt in range(nGroups - 1):
-                subResList.append(groups[groupCnt][i])
-                
-            for groupCnt in range(nGroups - 1):
-                subRes += subResList[groupCnt].ljust(groupWidths[groupCnt])
-            resList.append(subRes) 
-        return resList
-
-class OsHelper():
-    @staticmethod
-    def get_current_directory():
-        current_directory = Path.cwd()  # or Path('.').resolve()
-        return current_directory
-    
-    @staticmethod
-    def list_directory_content_scandir(path='.'):
-        """
-        List the contents of a directory using os.scandir, which is more efficient for large directories.
-        
-        :param path: Directory path to list the contents of. Default is the current directory.
-        :return: List of directory contents.
-        """
-        corrPath = path
-        try:
-            if corrPath == ".":
-                corrPath = OsHelper.get_current_directory()
-            with os.scandir(path) as entries:
-                return ([entry.name for entry in entries], corrPath)
-        except FileNotFoundError:
-            return (f"Directory '{path}' not found.", corrPath)
-        except PermissionError:
-            return (f"Permission denied to access '{path}'.", corrPath)
-
-
-class ColorHelper():
-
-    def WrapColor(self, idx: int, fgdColor, bkgColor) -> int:
-        curses.init_pair(idx, fgdColor, bkgColor)
-        color = curses.color_pair(idx)
-        return color
-    
-    
-
-class MainStyles():
-    def __init__(self):
-        colorHelper = ColorHelper()
-        self.red_on_black = colorHelper.WrapColor(1, curses.COLOR_RED, curses.COLOR_BLACK)
-        self.green_on_black = colorHelper.WrapColor(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        self.yellow_on_black = colorHelper.WrapColor(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
     
 def redraw_stdscreen():
     rows, cols = stdscr.getmaxyx()
@@ -167,8 +87,10 @@ class MyWindow():
     
     def getContent(self) -> str:
         pass
+    
     def interact(self, ch: int):
         pass
+    
     def draw(self):
         win = curses.newwin(self.y1 - self.y0,self.x1 - self.x0, self.y0, self.x0)  
         win.border()
@@ -178,14 +100,14 @@ class MyWindow():
 class DirWindow(MyWindow):
     def __init__(self, path: str, x0, y0, x1, y1):
         super().__init__(path, x0, y0, x1, y1)
-        self.content, corrPath = OsHelper.list_directory_content_scandir(path)
+        self.content, corrPath = os_utils.list_directory_content(path)
         self.title = str(corrPath)
         
     def draw(self):
         win = curses.newwin(self.y1 - self.y0,self.x1 - self.x0, self.y0, self.x0)  
         win.border()
         win.addstr(0, 1, self.title)
-        content = StringHelper.ListToColumns(self.y1 - self.y0 - 3, self.x1 - self.x0 - 1, self.content)
+        content = string_utils.list_to_columns(self.y1 - self.y0 - 3, self.x1 - self.x0 - 1, self.content)
         for idx, line in enumerate(content):
             if idx > self.y1 - self.y0 - 3:
                 break
@@ -242,7 +164,6 @@ def main(stdscr_local):
         curses.use_default_colors()
     curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK)
     yellow_and_blue = curses.color_pair(2)
-    styles = MainStyles()
     global helloWashShown
     if not helloWashShown:
         lines = hello.splitlines()
