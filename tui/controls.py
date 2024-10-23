@@ -14,7 +14,6 @@ class VPosEnum(Enum):
     STRETCH = 3
     AUTO = 4
     
-
 class FillMethod(Enum):
     """Fill methods
 
@@ -86,13 +85,15 @@ class HStackPanel(VisualHierarchy):
 class MyWindow(VisualHierarchy):
     def __init__(self, title: str, parent = None, children = [], 
                  y0 = 0, x0 = 0, y1 = 0, x1 = 0, 
-                 fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS):
+                 fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS,
+                 func: Callable[['MyWindow'], None] = None):
         super().__init__(parent, children, y0, x0, y1, x1, fillMethod)
         self.title = title
         self.x0 = x0
         self.y0 = y0
         self.x1 = x1
         self.y1 = y1
+        self.func = func
         # self.contentFunc = contentFunc
     
     def getContent(self) -> str:
@@ -101,22 +102,20 @@ class MyWindow(VisualHierarchy):
     def interact(self, ch: int):
         pass
     
-    def draw(self, func: Callable[['MyWindow'], None]):
-        func(self)
+    def draw(self):
+        self.func(self)
         
 class QuadView(VisualHierarchy):
     def __init__(self, stdscr, parent = None, children = [], 
                  y0 = 0, x0 = 0, y1: int = 0, x1: int = 0, 
-                 fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS, menuPanel: HStackPanel = None,
-                 func: Callable[['MyWindow'], None] = None):
+                 fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS, menuPanel: HStackPanel = None):
         
         super().__init__(parent, children, y0, x0, y1, x1, fillMethod)
         self.stdscr = stdscr
         self.menuPanel = menuPanel
-        self.func = func
         
     def StartQuad(self):                         
         self.menuPanel.draw()
         for myWin in self.children:
-            myWin.draw(self.func)
+            myWin.draw()
         self.stdscr.refresh()

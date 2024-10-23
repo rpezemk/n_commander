@@ -7,24 +7,14 @@ import os
 import time
 from typing import Callable
 
-from utils import enum_utils
-from utils import os_utils
-from utils import string_utils
+from utils import enum_utils, os_utils, string_utils
 
 from tui import signal_resolver
 from tui.controls import VisualHierarchy, FillMethod, Button, HStackPanel, MyWindow, QuadView
 from tui.splash import splashContent
 
-
-
-
-stdscr = None
 helloWashShown = False;
     
-
-def resize_handler(signum, frame):
-    signal_resolver.handle(stdscr)
-
 
 def fill_window(myWindow: MyWindow) -> None:
     win = curses.newwin(myWindow.y1 - myWindow.y0,myWindow.x1 - myWindow.x0, myWindow.y0, myWindow.x0)  
@@ -40,30 +30,21 @@ def fill_window(myWindow: MyWindow) -> None:
     win.refresh()
     
     
-def main(stdscr_local):
-    signal.signal(signal.SIGWINCH, resize_handler) 
-    global stdscr
-    stdscr = stdscr_local
-    stdscr_local.clear()
-    # curses.mousemask(curses.ALL_MOUSE_EVENTS)
-    if curses.has_colors():
-        curses.start_color()
-        curses.use_default_colors()
-        
+def main(stdscr):
+    signal_resolver.init_screen(stdscr)
     global helloWashShown
     
     if not helloWashShown:
         lines = splashContent.splitlines()
         
         for idx, line in enumerate(lines):
-            stdscr.addstr(idx, 2, line)  
+            signal_resolver.stdscr.addstr(idx, 2, line)  
             
-        stdscr.refresh()  
-        stdscr.getch() 
+        signal_resolver.stdscr.refresh()  
+        signal_resolver.stdscr.getch() 
         pass
     
     helloWashShown = True;
-    signal_resolver.redraw_stdscreen(stdscr)
     
     while True:
         menu = HStackPanel([
@@ -74,7 +55,7 @@ def main(stdscr_local):
             Button("about")])
         
         y0 = 1
-        yMax, xMax = stdscr.getmaxyx()
+        yMax, xMax = signal_resolver.stdscr.getmaxyx()
         x1 = int(xMax/2)
         x2 = xMax 
         y1 = int(yMax/2)
@@ -83,21 +64,20 @@ def main(stdscr_local):
         currPath = os_utils.make_abs_path()
         
         quadItems = [
-            MyWindow(currPath, None, [], y0, 0, y1, x1),
-            MyWindow("/home/kojaja/", None, [], y0, x1, y1, x2),
-            MyWindow(currPath, None, [], y1, 0, y2, x1),
-            MyWindow(currPath, None, [], y1, x1, y2, x2)
+            MyWindow(currPath, None, [], y0, 0, y1, x1, None, fill_window),
+            MyWindow("/home/kojaja/", None, [], y0, x1, y1, x2, None, fill_window),
+            MyWindow(currPath, None, [], y1, 0, y2, x1, None, fill_window),
+            MyWindow(currPath, None, [], y1, x1, y2, x2, None, fill_window)
         ]
         
         tiled = QuadView(
-            stdscr_local, None, quadItems, 
+            stdscr, None, quadItems, 
             0, 0, 0, 0, 
             FillMethod.ITEM_PANEL_ROWS_COLS, 
-            menu, 
-            fill_window)
+            menu)
 
         tiled.StartQuad()
-        key = stdscr.getch()
+        key = signal_resolver.stdscr.getch()
         if key == ord('q'):
             break
 
