@@ -12,7 +12,7 @@ from utils import os_utils
 from utils import string_utils
 
 from tui import signal_resolver
-from tui.controls import VisualHierarchy, FillMethod
+from tui.controls import VisualHierarchy, FillMethod, Button, HStackPanel, MyWindow, QuadView
 from tui.splash import splashContent
 
 
@@ -25,115 +25,6 @@ helloWashShown = False;
 def resize_handler(signum, frame):
     signal_resolver.handle(stdscr)
 
-
-
-
-class Button(VisualHierarchy):
-    def __init__(self, title: str, parent = None):
-        super().__init__(parent)
-        self.title = title
-        self.realTitle = f"[{self.title}]"
-        
-    def draw(self, x0):
-        win = curses.newwin(3 , len(self.realTitle), 0, x0)  
-        win.addstr(0, 0, self.realTitle)
-        win.refresh()
-
-    def getWidth(self):
-        return len(self.realTitle)
-    
-
-    
-class HStackPanel(VisualHierarchy):
-    def __init__(self, list, parent = None, children = []):
-        super().__init__(parent, children)
-        self.items = list
-        
-    def addItem(self, item):
-        self.items.append(item)
-
-    def draw(self):
-        currX = 1
-        for item in self.items:
-            item.draw(currX)
-            currX += item.getWidth() + 1
-            
-class MyWindow(VisualHierarchy):
-    def __init__(self, title: str, parent = None, children = [], y0 = 0, x0 = 0, y1 = 0, x1 = 0, fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS):
-        super().__init__(parent, children, y0, x0, y1, x1, fillMethod)
-        self.title = title
-        self.x0 = x0
-        self.y0 = y0
-        self.x1 = x1
-        self.y1 = y1
-        # self.contentFunc = contentFunc
-    
-    def getContent(self) -> str:
-        pass
-    
-    def interact(self, ch: int):
-        pass
-    
-    def draw(self):
-        win = curses.newwin(self.y1 - self.y0,self.x1 - self.x0, self.y0, self.x0)  
-        win.border()
-        win.addstr(0, 1, self.title)
-        win.refresh()
-       
-class DirWindow(MyWindow):
-    def __init__(self, path: str, parent = None, children = [], 
-                 y0 = 0, x0 = 0, y1 = 0, x1 = 0, 
-                 fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS):
-        super().__init__(path, parent, children, y0, x0, y1, x1, fillMethod)
-        self.content, corrPath = os_utils.list_directory_content(path)
-        self.title = str(corrPath)
-        
-    def draw(self):
-        win = curses.newwin(self.y1 - self.y0,self.x1 - self.x0, self.y0, self.x0)  
-        win.border()
-        win.addstr(0, 1, self.title)
-        content = string_utils.list_to_columns(self.y1 - self.y0 - 3, self.x1 - self.x0 - 1, self.content)
-        for idx, line in enumerate(content):
-            if idx > self.y1 - self.y0 - 3:
-                break
-            win.addstr(1 + idx, 3, line)  
-        win.refresh()
-
-    
-class MainView(VisualHierarchy):
-    def __init__(self, stdscr, parent = None, children = [], 
-                 y0 = 0, x0 = 0, y1: int = 0, x1: int = 0, 
-                 fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS):
-        super().__init__(parent, children, y0, x0, y1, x1, fillMethod)
-        self.stdscr = stdscr
-    
-    def StartQuad(self):
-        yMax, xMax = self.stdscr.getmaxyx()
-        x1 = int(xMax/2)
-        x2 = xMax 
-        y1 = int(yMax/2)
-        y2 = yMax
-                
-        self.menuPanel = HStackPanel([
-            Button("edit"),
-            Button("view"),
-            Button("settings"),
-            Button("help"),
-            Button("about")])
-         
-        self.menuPanel.draw()
-        y0 = 4
-        self.appendChild(DirWindow(".", self, [], y0, 0, y1, x1))
-        self.appendChild(DirWindow("/home/kojaja/", self, [], y0, x1, y1, x2))
-        self.appendChild(DirWindow(".", self, [], y1, 0, y2, x1))
-        self.appendChild(DirWindow(".", self, [], y1, x1, y2, x2))
-        
-        self.menuPanel.draw()
-        for myWin in self.children:
-            myWin.draw()
-        self.stdscr.refresh()
-        
-    
 
 def main(stdscr_local):
     signal.signal(signal.SIGWINCH, resize_handler) 
@@ -161,11 +52,49 @@ def main(stdscr_local):
     signal_resolver.redraw_stdscreen(stdscr)
     
     while True:
-        tiled = MainView(stdscr_local)
+        menu = HStackPanel([
+            Button("edit"),
+            Button("view"),
+            Button("settings"),
+            Button("help"),
+            Button("about")])
+        
+        y0 = 1
+        yMax, xMax = stdscr.getmaxyx()
+        x1 = int(xMax/2)
+        x2 = xMax 
+        y1 = int(yMax/2)
+        y2 = yMax
+        quadItems = [MyWindow(".", None, [], y0, 0, y1, x1),
+        MyWindow("/home/kojaja/", None, [], y0, x1, y1, x2),
+        MyWindow(".", None, [], y1, 0, y2, x1),
+        MyWindow(".", None, [], y1, x1, y2, x2)]
+        
+        tiled = QuadView(
+            stdscr_local, None, quadItems, 
+            0, 0, 0, 0, 
+            FillMethod.ITEM_PANEL_ROWS_COLS, 
+            menu, 
+            fill_window)
+
         tiled.StartQuad()
         key = stdscr.getch()
         if key == ord('q'):
             break
 
-     
+
+def fill_window(myWindow: MyWindow) -> None:
+    win = curses.newwin(myWindow.y1 - myWindow.y0,myWindow.x1 - myWindow.x0, myWindow.y0, myWindow.x0)  
+    win.border()
+    win.addstr(0, 1, myWindow.title)
+    inputContent, corrPath = os_utils.list_directory_content(myWindow.title)
+    content = string_utils.list_to_columns(myWindow.y1 - myWindow.y0 - 3, myWindow.x1 - myWindow.x0 - 1, inputContent)
+    myWindow.title = corrPath
+    for idx, line in enumerate(content):
+        if idx > myWindow.y1 - myWindow.y0 - 3:
+            break
+        win.addstr(1 + idx, 3, line)  
+    win.refresh()
+    
+    
 curses.wrapper(main)
