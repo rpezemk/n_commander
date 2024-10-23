@@ -10,6 +10,7 @@ from typing import Callable
 from utils import enum_utils
 from utils import os_utils
 from utils import string_utils
+from tui import signal_resolver
 
 stdscr = None
 helloWashShown = False;
@@ -27,19 +28,10 @@ hello = """
 """
 
     
-def redraw_stdscreen():
-    rows, cols = stdscr.getmaxyx()
-    stdscr.clear()
-    # stdscr.border()
-    # stdscr.hline(2, 1, '_', cols-2)
-    stdscr.refresh()
 
 def resize_handler(signum, frame):
-    endwin()
-    stdscr.refresh()
-    redraw_stdscreen()
+    signal_resolver.handle(stdscr)
 
-    
 class HPosEnum(Enum):
     LEFT = 1
     RIGHT = 2
@@ -57,8 +49,11 @@ class Button():
     def __init__(self, title: str):
         self.title = title
         self.realTitle = f"[{self.title}]"
-        pass
+    
     def draw(self, x0):
+        # win = curses.newwin(2 , 5, 1, 1)  
+        # win.addstr(1, 1, "abc")
+        # win.refresh()
         stdscr.addstr(0, x0, self.realTitle) 
     
     def getWidth(self):
@@ -112,10 +107,6 @@ class DirWindow(MyWindow):
             if idx > self.y1 - self.y0 - 3:
                 break
             win.addstr(1 + idx, 3, line)  
-        # for idx, line in enumerate(self.content):
-        #     if idx > self.y1 - self.y0 - 3:
-        #         break
-        #     win.addstr(1 + idx, 3, line)  
         win.refresh()
 
     
@@ -154,28 +145,29 @@ class MainView():
     
 
 def main(stdscr_local):
+    signal.signal(signal.SIGWINCH, resize_handler) 
     global stdscr
     stdscr = stdscr_local
-    signal.signal(signal.SIGWINCH, resize_handler) 
     stdscr_local.clear()
     # curses.mousemask(curses.ALL_MOUSE_EVENTS)
     if curses.has_colors():
         curses.start_color()
         curses.use_default_colors()
-    curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-    yellow_and_blue = curses.color_pair(2)
+        
     global helloWashShown
+    
     if not helloWashShown:
         lines = hello.splitlines()
         
         for idx, line in enumerate(lines):
-            stdscr.addstr(idx, 2, line, yellow_and_blue)  
+            stdscr.addstr(idx, 2, line)  
             
         stdscr.refresh()  
         stdscr.getch() 
         pass
+    
     helloWashShown = True;
-    redraw_stdscreen()
+    signal_resolver.redraw_stdscreen(stdscr)
     
     while True:
         tiled = MainView(stdscr_local)
