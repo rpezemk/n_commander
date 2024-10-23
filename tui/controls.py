@@ -53,10 +53,13 @@ class VisualHierarchy():
     
     
 class Button(VisualHierarchy):
-    def __init__(self, title: str, parent = None):
+    def __init__(self, title: str, colorb:int,colorw:int, parent = None):
         super().__init__(parent)
         self.title = title
         self.real_title = f"[{self.title}]"
+        # self.color = setColor(color)
+        # self.colorb = 
+        # self.colorw = 
         
     def draw(self, x0):
         win = curses.newwin(3 , len(self.real_title), 0, x0)  
@@ -65,6 +68,15 @@ class Button(VisualHierarchy):
 
     def getWidth(self):
         return len(self.real_title)
+    
+    def setColorOnBlackBG(number: int):
+        return
+    
+    def setColorOnWhiteBG(number: int):
+        return
+    
+
+        
     
     
 class HStackPanel(VisualHierarchy):
