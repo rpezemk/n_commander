@@ -7,7 +7,7 @@ def group_by_n(input_list, n):
 def list_to_columns(maxH: int, maxW: int, list) -> list[str]:
     groups = group_by_n(list, max(1, maxH))
     nGroups = len(groups)
-    if nGroups == 0:
+    if not nGroups:
         return []
     
     firstGroupLen = len(groups[0])

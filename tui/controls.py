@@ -41,14 +41,14 @@ class VisualHierarchy():
         self.y1 = y1
         self.x1 = x1
     
-    def appendChild(self, child: 'VisualHierarchy'):
+    def append_child(self, child: 'VisualHierarchy'):
         self.children.append(child)
         child.parent = self
     
-    def pointBelongsToThis(self, x: int, y: int):
-        checkH = self.x0 <= x <= self.x1
-        checkV = self.y0 <= y <= self.y1
-        return checkH and checkV
+    def check_point_belongs(self, x: int, y: int):
+        check_h = self.x0 <= x <= self.x1
+        check_v = self.y0 <= y <= self.y1
+        return check_h and check_v
     
     
     
@@ -56,15 +56,15 @@ class Button(VisualHierarchy):
     def __init__(self, title: str, parent = None):
         super().__init__(parent)
         self.title = title
-        self.realTitle = f"[{self.title}]"
+        self.real_title = f"[{self.title}]"
         
     def draw(self, x0):
-        win = curses.newwin(3 , len(self.realTitle), 0, x0)  
-        win.addstr(0, 0, self.realTitle)
+        win = curses.newwin(3 , len(self.real_title), 0, x0)  
+        win.addstr(0, 0, self.real_title)
         win.refresh()
 
     def getWidth(self):
-        return len(self.realTitle)
+        return len(self.real_title)
     
     
 class HStackPanel(VisualHierarchy):
@@ -112,10 +112,10 @@ class QuadView(VisualHierarchy):
         
         super().__init__(parent, children, y0, x0, y1, x1, fillMethod)
         self.stdscr = stdscr
-        self.menuPanel = menuPanel
+        self.menu_panel = menuPanel
         
-    def StartQuad(self):                         
-        self.menuPanel.draw()
+    def start_quad(self):                         
+        self.menu_panel.draw()
         for myWin in self.children:
             myWin.draw()
         self.stdscr.refresh()

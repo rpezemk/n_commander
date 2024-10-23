@@ -56,7 +56,7 @@ def draw_menu(stdscr):
         subtitle = "ABC ABC"[:width-1]
         keystr = "Last key pressed: {}".format(k)[:width-1]
         statusbarstr = "Press 'q' to exit | STATUS BAR | Pos: {}, {}".format(x, y)
-        if k == 0:
+        if k:
             keystr = "No key press detected..."[:width-1]
 
         start_x_title = int((width // 2) - (len(title) // 2) - len(title) % 2)
