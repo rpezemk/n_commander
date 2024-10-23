@@ -4,7 +4,7 @@ def group_by_n(input_list, n):
         grouped.append(input_list[i:i + n])
     return grouped
 
-def list_to_columns(maxH: int, maxW: int, list):
+def list_to_columns(maxH: int, maxW: int, list) -> list[str]:
     groups = group_by_n(list, max(1, maxH))
     nGroups = len(groups)
     if nGroups == 0:
