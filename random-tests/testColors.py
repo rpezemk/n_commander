@@ -1,23 +1,25 @@
 import curses
 
 def main(stdscr):
-    # Initialize curses color functionality
-    if curses.has_colors():
-        curses.start_color()
-        # Define a color pair with YELLOW text and BLACK background
-        curses.init_pair(2, 9, 9)
-
-    # Get the color pair for yellow on black
-    yellow_on_black = curses.color_pair(2)
-
-    # Clear the screen and display text with the specified color pair
-    stdscr.clear()
-    stdscr.addstr(0, 0, "This is yellow text on black background", yellow_on_black)
-
-    # Refresh to show the text on the screen
-    stdscr.refresh()
-    # Wait for a key press before exiting
+    curses.start_color()
+    curses.use_default_colors()
+    for i in range(0, curses.COLORS):
+        curses.init_pair(i + 1, i, -1)
+    try:
+        for i in range(0, 255):
+            stdscr.addstr(str(i), curses.color_pair(i))
+    except curses.ERR:
+        # End of screen reached
+        pass
     stdscr.getch()
-
-if __name__ == "__main__":
-    curses.wrapper(main)
+    
+    for i in range(0, curses.COLORS):
+        curses.init_pair(i + 1, -1, i)
+    try:
+        for i in range(0, 255):
+            stdscr.addstr(str(i), curses.color_pair(i))
+    except curses.ERR:
+        # End of screen reached
+        pass
+    stdscr.getch()
+curses.wrapper(main)
