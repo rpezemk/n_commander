@@ -13,8 +13,21 @@ class VPosEnum(Enum):
     STRETCH = 3
     AUTO = 4
     
+
+class FillMethod(Enum):
+    """Fill methods
+
+    Args:
+        Enum (FillMethod): methods of filling window
+    """     
+    ITEM_PANEL_COLS_ROWS = 1 # Fill by columns first, then rows
+    ITEM_PANEL_ROWS_COLS = 2 # Fill by rows first, then columns
+    
+
 class VisualHierarchy():
-    def __init__(self, parent: 'VisualHierarchy', children: list['VisualHierarchy'] = None, y0 = 0, x0 = 0, y1: int = 0, x1: int = 0):
+    def __init__(self, parent: 'VisualHierarchy', children: list['VisualHierarchy'] = None, 
+                 y0 = 0, x0 = 0, y1: int = 0, x1: int = 0, 
+                 fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS):
         self.parent = parent
         if children == None:
             self.children = []

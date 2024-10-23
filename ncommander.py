@@ -12,8 +12,7 @@ from utils import os_utils
 from utils import string_utils
 
 from tui import signal_resolver
-from tui.controls import VisualHierarchy
-
+from tui.controls import VisualHierarchy, FillMethod
 
 
 
@@ -73,8 +72,8 @@ class HStackPanel(VisualHierarchy):
             currX += item.getWidth() + 1
             
 class MyWindow(VisualHierarchy):
-    def __init__(self, title: str, parent = None, children = [], y0 = 0, x0 = 0, y1 = 0, x1 = 0):
-        super().__init__(parent, children, y0, x0, y1, x1)
+    def __init__(self, title: str, parent = None, children = [], y0 = 0, x0 = 0, y1 = 0, x1 = 0, fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS):
+        super().__init__(parent, children, y0, x0, y1, x1, fillMethod)
         self.title = title
         self.x0 = x0
         self.y0 = y0
@@ -95,8 +94,10 @@ class MyWindow(VisualHierarchy):
         win.refresh()
        
 class DirWindow(MyWindow):
-    def __init__(self, path: str, parent = None, children = [], y0 = 0, x0 = 0, y1 = 0, x1 = 0):
-        super().__init__(path, parent, children, y0, x0, y1, x1)
+    def __init__(self, path: str, parent = None, children = [], 
+                 y0 = 0, x0 = 0, y1 = 0, x1 = 0, 
+                 fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS):
+        super().__init__(path, parent, children, y0, x0, y1, x1, fillMethod)
         self.content, corrPath = os_utils.list_directory_content(path)
         self.title = str(corrPath)
         
@@ -113,8 +114,10 @@ class DirWindow(MyWindow):
 
     
 class MainView(VisualHierarchy):
-    def __init__(self, stdscr, parent = None, children = []):
-        super().__init__(parent, children)
+    def __init__(self, stdscr, parent = None, children = [], 
+                 y0 = 0, x0 = 0, y1: int = 0, x1: int = 0, 
+                 fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS):
+        super().__init__(parent, children, y0, x0, y1, x1, fillMethod)
         self.stdscr = stdscr
     
     def StartQuad(self):
@@ -134,7 +137,7 @@ class MainView(VisualHierarchy):
         self.menuPanel.draw()
         y0 = 4
         self.appendChild(DirWindow(".", self, [], y0, 0, y1, x1))
-        self.appendChild(MyWindow("/home/kojaja/", self, [], y0, x1, y1, x2))
+        self.appendChild(DirWindow("/home/kojaja/", self, [], y0, x1, y1, x2))
         self.appendChild(DirWindow(".", self, [], y1, 0, y2, x1))
         self.appendChild(DirWindow(".", self, [], y1, x1, y2, x2))
         
