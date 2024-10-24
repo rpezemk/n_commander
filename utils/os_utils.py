@@ -1,32 +1,18 @@
 from pathlib import Path
 import os
 
-
-
-def get_current_directory():
-    current_directory = Path.cwd()  # or Path('.').resolve()
-    return current_directory
-
-def make_abs_path(path = '.'):
-    corrPath = str(path)
-    if corrPath == ".":
-            corrPath = get_current_directory()
-    return str(corrPath)
-
-def list_directory_content(path='.'):
+def try_get_dir_content(path='.'):
     """
     List the contents of a directory using os.scandir, which is more efficient for large directories.
     
     :param path: Directory path to list the contents of. Default is the current directory.
     :return: List of directory contents.
     """
-    corrPath = path
+    absPath = os.path.abspath(path)
     try:
-        if corrPath == ".":
-            corrPath = get_current_directory()
         with os.scandir(path) as entries:
-            return ([entry.name for entry in entries], corrPath)
+            return (True, [entry.name for entry in entries], None)
     except FileNotFoundError:
-        return (f"Directory '{path}' not found.", corrPath)
+        return (False, [str], f"Directory '{path}' not found.")
     except PermissionError:
-        return (f"Permission denied to access '{path}'.", corrPath)
+        return (False, [str], f"Permission denied to access '{path}'.")

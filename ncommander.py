@@ -20,13 +20,16 @@ def fill_window(myWindow: MyWindow) -> None:
     win = curses.newwin(myWindow.y1 - myWindow.y0, myWindow.x1 - myWindow.x0, myWindow.y0, myWindow.x0)  
     win.border()
     win.addstr(0, 1, myWindow.title)
-    inputContent, corrPath = os_utils.list_directory_content(myWindow.title)
-    content = string_utils.list_to_columns(myWindow.y1 - myWindow.y0 - 3, myWindow.x1 - myWindow.x0 - 1, inputContent)
-    myWindow.title = corrPath
-    for idx, line in enumerate(content):
-        if idx > myWindow.y1 - myWindow.y0 - 3:
-            break
-        win.addstr(1 + idx, 3, line)  
+    dirOk, dirContent, errStr = os_utils.try_get_dir_content(myWindow.title)
+    if dirOk:
+        content = string_utils.list_to_columns(myWindow.y1 - myWindow.y0 - 3, myWindow.x1 - myWindow.x0 - 1, dirContent)
+        myWindow.title = os.path.abspath(myWindow.title)
+        for idx, line in enumerate(content):
+            if idx > myWindow.y1 - myWindow.y0 - 3:
+                break
+            win.addstr(1 + idx, 3, line)  
+    else:
+        pass
     win.refresh()
     
     
@@ -54,6 +57,8 @@ def main(stdscr):
             Button("help"),
             Button("about")])
         
+        
+        
         y0 = 1
         yMax, xMax = signal_resolver.stdscr.getmaxyx()
         x1 = int(xMax/2)
@@ -61,7 +66,7 @@ def main(stdscr):
         y1 = int(yMax/2)
         y2 = yMax
         
-        curr_path = os_utils.make_abs_path()
+        curr_path = os.path.abspath('.')
         
         quad_items = [
             MyWindow(curr_path, None, [], y0, 0, y1, x1, None, fill_window),
