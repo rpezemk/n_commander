@@ -17,7 +17,7 @@ hello_was_shown = False;
     
 
 def fill_window(myWindow: MyWindow) -> None:
-    win = curses.newwin(myWindow.y1 - myWindow.y0,myWindow.x1 - myWindow.x0, myWindow.y0, myWindow.x0)  
+    win = curses.newwin(myWindow.y1 - myWindow.y0, myWindow.x1 - myWindow.x0, myWindow.y0, myWindow.x0)  
     win.border()
     win.addstr(0, 1, myWindow.title)
     inputContent, corrPath = os_utils.list_directory_content(myWindow.title)
