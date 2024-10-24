@@ -11,9 +11,8 @@ from utils import enum_utils, os_utils, string_utils
 
 from tui import signal_resolver
 from tui.controls import VisualHierarchy, FillMethod, Button, HStackPanel, MyWindow, QuadView
-from tui.splash import splash_content
 
-hello_was_shown = False;
+
     
 
 def fill_window(myWindow: MyWindow) -> None:
@@ -35,19 +34,6 @@ def fill_window(myWindow: MyWindow) -> None:
     
 def main(stdscr):
     signal_resolver.init_screen(stdscr)
-    global hello_was_shown
-    
-    if not hello_was_shown:
-        lines = splash_content.splitlines()
-        
-        for idx, line in enumerate(lines):
-            signal_resolver.stdscr.addstr(idx, 2, line)  
-            
-        signal_resolver.stdscr.refresh()  
-        signal_resolver.stdscr.getch() 
-        pass
-    
-    hello_was_shown = True;
     
     while True:
         menu = HStackPanel([
@@ -65,19 +51,19 @@ def main(stdscr):
         x2 = xMax 
         y1 = int(yMax/2)
         y2 = yMax
-        
+        kojaja = "/home/kojaja/"
         curr_path = os.path.abspath('.')
         
         quad_items = [
-            MyWindow(curr_path, None, [], y0, 0, y1, x1, None, fill_window),
-            MyWindow("/home/kojaja/", None, [], y0, x1, y1, x2, None, fill_window),
-            MyWindow(curr_path, None, [], y1, 0, y2, x1, None, fill_window),
-            MyWindow(curr_path, None, [], y1, x1, y2, x2, None, fill_window)
+            MyWindow(curr_path, None, [], 0, 0, 0, 0, None, fill_window),
+            MyWindow(kojaja,    None, [], 0, 0, 0, 0, None, fill_window),
+            MyWindow(curr_path, None, [], 0, 0, 0, 0, None, fill_window),
+            MyWindow(curr_path, None, [], 0, 0, 0, 0, None, fill_window)
         ]
         
         tiled = QuadView(
             stdscr, None, quad_items, 
-            0, 0, 0, 0, 
+            0, 0, yMax, xMax, 
             FillMethod.ITEM_PANEL_ROWS_COLS, 
             menu)
 
@@ -86,6 +72,4 @@ def main(stdscr):
         if key == ord('q'):
             break
 
-
-    
 curses.wrapper(main)

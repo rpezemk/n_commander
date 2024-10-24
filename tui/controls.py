@@ -111,6 +111,42 @@ class QuadView(VisualHierarchy):
                  fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS, menuPanel: HStackPanel = None):
         
         super().__init__(parent, children, y0, x0, y1, x1, fillMethod)
+        y0 = 1
+        yMax, xMax = (self.y1, self.x1)
+        x1 = int(xMax/2)
+        x2 = xMax 
+        y1 = int(yMax/2)
+        y2 = yMax
+        
+        # y0, 0, y1, x1
+        lu = self.children[0]
+        lu.y0 = y0 
+        lu.x0 = 0
+        lu.y1 = y1
+        lu.x1 = x1
+        
+        # y0, x1, y1, x2
+        lu = self.children[1]
+        lu.y0 = y0
+        lu.x0 = x1
+        lu.y1 = y1
+        lu.x1 = x2
+        
+        # y1, 0, y2, x1
+        lu = self.children[2]
+        lu.y0 = y1
+        lu.x0 = 0
+        lu.y1 = y2
+        lu.x1 = x1
+        
+        # y1, x1, y2, x2
+        lu = self.children[3]
+        lu.y0 = y1
+        lu.x0 = x1
+        lu.y1 = y2
+        lu.x1 = x2
+        
+        
         self.stdscr = stdscr
         self.menu_panel = menuPanel
         

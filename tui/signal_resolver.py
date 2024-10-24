@@ -2,6 +2,19 @@ import signal
 import curses
 from curses import endwin
 
+splash_content = """
+
+::::    :::  ::::::::   ::::::::  ::::    ::::  ::::    ::::      :::     ::::    ::: :::::::::  :::::::::: ::::::::: 
+:+:+:   :+: :+:    :+: :+:    :+: +:+:+: :+:+:+ +:+:+: :+:+:+   :+: :+:   :+:+:   :+: :+:    :+: :+:        :+:    :+:
+:+:+:+  +:+ +:+        +:+    +:+ +:+ +:+:+ +:+ +:+ +:+:+ +:+  +:+   +:+  :+:+:+  +:+ +:+    +:+ +:+        +:+    +:+
++#+ +:+ +#+ +#+        +#+    +:+ +#+  +:+  +#+ +#+  +:+  +#+ +#++:++#++: +#+ +:+ +#+ +#+    +:+ +#++:++#   +#++:++#: 
++#+  +#+#+# +#+        +#+    +#+ +#+       +#+ +#+       +#+ +#+     +#+ +#+  +#+#+# +#+    +#+ +#+        +#+    +#+
+#+#   #+#+# #+#    #+# #+#    #+# #+#       #+# #+#       #+# #+#     #+# #+#   #+#+# #+#    #+# #+#        #+#    #+#
+###    ####  ########   ########  ###       ### ###       ### ###     ### ###    #### #########  ########## ###    ###
+
+"""
+
+hello_was_shown = False;
 stdscr = None
 
 
@@ -28,4 +41,16 @@ def init_screen(scr):
     if curses.has_colors():
         curses.start_color()
         curses.use_default_colors()
+    
+    global hello_was_shown
+    if not hello_was_shown:
+        lines = splash_content.splitlines()
         
+        for idx, line in enumerate(lines):
+            stdscr.addstr(idx, 2, line)  
+            
+        stdscr.refresh()  
+        stdscr.getch() 
+        pass
+    
+    hello_was_shown = True;
