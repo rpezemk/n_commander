@@ -1,11 +1,22 @@
 import curses
 import os
 from utils import os_utils, string_utils
-
+import asyncio
+from asyncio import TaskGroup
+from datetime import datetime
 from tui import signal_resolver
-from tui.controls import FillMethod, Button, HStackPanel, MyWindow, QuadView, ItemPanel, ClockButton
+from tui.controls import FillMethod, Button, HStackPanel, MyWindow, QuadView, ItemPanel
 
+now = "<init now>"
 
+class ClockButton(Button):
+    def __init__(self, title, parent=None):
+        super().__init__(title, parent)
+
+    def draw(self, x0):
+        self.title = now # datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.real_title = f"[{self.title}]"
+        super().draw(x0)
     
 
 def fill_window(myWindow: MyWindow) -> None:
@@ -54,4 +65,31 @@ def main(stdscr):
         if key == ord('q'):
             break
         
-curses.wrapper(main)
+async def background_task():
+    global now
+    while True:
+        await asyncio.sleep(1)  # Non-blocking sleep
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"Background task updated: {now}")
+
+# Async function to wrap the curses application
+async def async_main():
+    curses.wrapper(main)
+
+# Async function to run both the curses app and background task concurrently
+async def group_main():
+    # Create the background task outside the TaskGroup so it runs independently
+    background = asyncio.create_task(background_task())
+
+    # Now, run the curses interface
+    async with asyncio.TaskGroup() as group:
+        group.create_task(async_main())  # Start curses app
+    
+    # After the curses app exits, cancel the background task
+    background.cancel()
+    await background  # Ensure the background task is properly cancelled
+
+# Run the async wrapper
+if __name__ == "__main__":
+    # Start the group of tasks
+    asyncio.run(group_main())
