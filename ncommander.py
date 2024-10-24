@@ -10,7 +10,7 @@ from typing import Callable
 from utils import enum_utils, os_utils, string_utils
 
 from tui import signal_resolver
-from tui.controls import VisualHierarchy, FillMethod, Button, HStackPanel, MyWindow, QuadView
+from tui.controls import VisualHierarchy, FillMethod, Button, HStackPanel, MyWindow, QuadView, ItemPanel
 
 
     
@@ -47,10 +47,10 @@ def main(stdscr):
         curr_path = os.path.abspath('.')
 
         quad_items = [
-            MyWindow(curr_path, None, [], 0, 0, 0, 0, None, fill_window),
-            MyWindow(kojaja,    None, [], 0, 0, 0, 0, None, fill_window),
-            MyWindow(curr_path, None, [], 0, 0, 0, 0, None, fill_window),
-            MyWindow(curr_path, None, [], 0, 0, 0, 0, None, fill_window)
+            ItemPanel(curr_path, fill_window),
+            ItemPanel(kojaja, fill_window),
+            ItemPanel(curr_path, fill_window),
+            ItemPanel(curr_path, fill_window)
         ]
         
         yMax, xMax = signal_resolver.stdscr.getmaxyx()

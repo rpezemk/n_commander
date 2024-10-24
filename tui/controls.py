@@ -104,7 +104,12 @@ class MyWindow(VisualHierarchy):
     
     def draw(self):
         self.func(self)
-        
+     
+class ItemPanel(MyWindow):
+    def __init__(self, title, func: Callable[['MyWindow'], None]):
+        super().__init__(title, None, [], 0, 0, 0, 0, FillMethod.ITEM_PANEL_ROWS_COLS, func)
+
+   
 class QuadView(VisualHierarchy):
     def __init__(self, stdscr, parent = None, children = [], 
                  y0 = 0, x0 = 0, y1: int = 0, x1: int = 0, 
