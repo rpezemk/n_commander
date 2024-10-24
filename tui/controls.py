@@ -1,6 +1,7 @@
 from enum import Enum
 import curses
 from typing import Callable
+from datetime import datetime
 
 class HPosEnum(Enum):
     LEFT = 1
@@ -65,7 +66,16 @@ class Button(VisualHierarchy):
 
     def get_width(self):
         return len(self.real_title)
-    
+
+class ClockButton(Button):
+    def __init__(self, title, parent=None):
+        super().__init__(title, parent)
+
+    def draw(self, x0):
+        self.title = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.real_title = f"[{self.title}]"
+        super().draw(x0)
+
     
 class HStackPanel(VisualHierarchy):
     def __init__(self, list, parent = None, children = []):

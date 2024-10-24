@@ -3,7 +3,7 @@ import os
 from utils import os_utils, string_utils
 
 from tui import signal_resolver
-from tui.controls import FillMethod, Button, HStackPanel, MyWindow, QuadView, ItemPanel
+from tui.controls import FillMethod, Button, HStackPanel, MyWindow, QuadView, ItemPanel, ClockButton
 
 
     
@@ -41,15 +41,16 @@ menu = HStackPanel([
             Button("view"),
             Button("settings"),
             Button("help"),
-            Button("about")])     
+            Button("about"),
+            ClockButton("")
+            ])     
 
 def main(stdscr):
     signal_resolver.init_screen(stdscr)
     quad = QuadView(stdscr, quad_items, menu)
-    
     while True:    
         quad.refresh_quad()
-        key = signal_resolver.stdscr.getch()
+        key = stdscr.getch()
         if key == ord('q'):
             break
         
