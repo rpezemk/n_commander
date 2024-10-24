@@ -43,17 +43,9 @@ def main(stdscr):
             Button("help"),
             Button("about")])
         
-        
-        
-        y0 = 1
-        yMax, xMax = signal_resolver.stdscr.getmaxyx()
-        x1 = int(xMax/2)
-        x2 = xMax 
-        y1 = int(yMax/2)
-        y2 = yMax
         kojaja = "/home/kojaja/"
         curr_path = os.path.abspath('.')
-        
+
         quad_items = [
             MyWindow(curr_path, None, [], 0, 0, 0, 0, None, fill_window),
             MyWindow(kojaja,    None, [], 0, 0, 0, 0, None, fill_window),
@@ -61,6 +53,7 @@ def main(stdscr):
             MyWindow(curr_path, None, [], 0, 0, 0, 0, None, fill_window)
         ]
         
+        yMax, xMax = signal_resolver.stdscr.getmaxyx()
         tiled = QuadView(
             stdscr, None, quad_items, 
             0, 0, yMax, xMax, 
