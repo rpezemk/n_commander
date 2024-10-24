@@ -63,7 +63,7 @@ class Button(VisualHierarchy):
         win.addstr(0, 0, self.real_title)
         win.refresh()
 
-    def getWidth(self):
+    def get_width(self):
         return len(self.real_title)
     
     
@@ -79,7 +79,7 @@ class HStackPanel(VisualHierarchy):
         currX = 1
         for item in self.items:
             item.draw(currX)
-            currX += item.getWidth() + 1
+            currX += item.get_width() + 1
             
             
 class MyWindow(VisualHierarchy):
@@ -95,15 +95,10 @@ class MyWindow(VisualHierarchy):
         self.y1 = y1
         self.func = func
         # self.contentFunc = contentFunc
-    
-    def getContent(self) -> str:
-        pass
-    
-    def interact(self, ch: int):
-        pass
-    
+        
     def draw(self):
-        self.func(self)
+        if self.func:
+            self.func(self)
      
 class ItemPanel(MyWindow):
     def __init__(self, title, func: Callable[['MyWindow'], None]):
