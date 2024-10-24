@@ -20,9 +20,9 @@ def fill_window(myWindow: MyWindow) -> None:
     win = curses.newwin(myWindow.y1 - myWindow.y0, myWindow.x1 - myWindow.x0, myWindow.y0, myWindow.x0)  
     win.border()
     win.addstr(0, 1, myWindow.title)
-    dirOk, dirContent, errStr = os_utils.try_get_dir_content(myWindow.title)
+    dirOk, dirs, files, errStr = os_utils.try_get_dir_content(myWindow.title)
     if dirOk:
-        content = string_utils.list_to_columns(myWindow.y1 - myWindow.y0 - 3, myWindow.x1 - myWindow.x0 - 1, dirContent)
+        content = string_utils.list_to_columns(myWindow.y1 - myWindow.y0 - 3, myWindow.x1 - myWindow.x0 - 1, dirs + files)
         myWindow.title = os.path.abspath(myWindow.title)
         for idx, line in enumerate(content):
             if idx > myWindow.y1 - myWindow.y0 - 3:

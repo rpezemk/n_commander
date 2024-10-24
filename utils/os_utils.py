@@ -1,7 +1,7 @@
 from pathlib import Path
 import os
 
-def try_get_dir_content(path='.'):
+def try_get_dir_content(path='.') -> tuple[bool, list[str], list[str], str]:
     """
     List the contents of a directory using os.scandir, which is more efficient for large directories.
     
@@ -10,9 +10,12 @@ def try_get_dir_content(path='.'):
     """
     absPath = os.path.abspath(path)
     try:
-        with os.scandir(path) as entries:
-            return (True, [entry.name for entry in entries], None)
+        entries = list(os.scandir(path))
+        files = [entry.name for entry in entries if entry.is_file()]
+        dirs = [entry.name + "/" for entry in entries if entry.is_dir()]
+        return (True, dirs, files, None)
+    
     except FileNotFoundError:
-        return (False, [str], f"Directory '{path}' not found.")
+        return (False, [str], [str], f"Directory '{path}' not found.")
     except PermissionError:
-        return (False, [str], f"Permission denied to access '{path}'.")
+        return (False, [str], [str], f"Permission denied to access '{path}'.")
