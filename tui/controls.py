@@ -106,11 +106,11 @@ class ItemPanel(MyWindow):
 
    
 class QuadView(VisualHierarchy):
-    def __init__(self, stdscr, parent = None, children = [], 
-                 y0 = 0, x0 = 0, y1: int = 0, x1: int = 0, 
-                 fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS, menuPanel: HStackPanel = None):
-        
-        super().__init__(parent, children, y0, x0, y1, x1, fillMethod)
+    def __init__(self, stdscr, children = [], 
+                 menuPanel: HStackPanel = None):
+        self.stdscr = stdscr
+        yMax, xMax = self.stdscr.getmaxyx()
+        super().__init__(None, children, 0, 0, yMax, xMax, FillMethod.ITEM_PANEL_ROWS_COLS)
         y0 = 1
         yMax, xMax = (self.y1, self.x1)
         x1 = int(xMax/2)
@@ -149,9 +149,48 @@ class QuadView(VisualHierarchy):
         
         self.stdscr = stdscr
         self.menu_panel = menuPanel
+    
+    def refresh_quad(self):
+        self.y1, self.x1 = self.stdscr.getmaxyx()
+        y0 = 1
+        yMax, xMax = (self.y1, self.x1)
+        x1 = int(xMax/2)
+        x2 = xMax 
+        y1 = int(yMax/2)
+        y2 = yMax
         
-    def start_quad(self):                         
+        # y0, 0, y1, x1
+        lu = self.children[0]
+        lu.y0 = y0 
+        lu.x0 = 0
+        lu.y1 = y1
+        lu.x1 = x1
+        
+        # y0, x1, y1, x2
+        lu = self.children[1]
+        lu.y0 = y0
+        lu.x0 = x1
+        lu.y1 = y1
+        lu.x1 = x2
+        
+        # y1, 0, y2, x1
+        lu = self.children[2]
+        lu.y0 = y1
+        lu.x0 = 0
+        lu.y1 = y2
+        lu.x1 = x1
+        
+        # y1, x1, y2, x2
+        lu = self.children[3]
+        lu.y0 = y1
+        lu.x0 = x1
+        lu.y1 = y2
+        lu.x1 = x2
+        
         self.menu_panel.draw()
+        
         for myWin in self.children:
             myWin.draw()
-        self.stdscr.refresh()
+            
+        self.stdscr.refresh()   
+

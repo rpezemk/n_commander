@@ -26,38 +26,31 @@ def fill_window(myWindow: MyWindow) -> None:
         pass
     win.refresh()
     
-    
-def main(stdscr):
-    signal_resolver.init_screen(stdscr)
-    
-    while True:
-        menu = HStackPanel([
+kojaja = "/home/kojaja/"
+curr_path = os.path.abspath('.')
+
+quad_items = [
+    ItemPanel(curr_path, fill_window),
+    ItemPanel(kojaja, fill_window),
+    ItemPanel(curr_path, fill_window),
+    ItemPanel(curr_path, fill_window)
+]   
+
+menu = HStackPanel([
             Button("edit"),
             Button("view"),
             Button("settings"),
             Button("help"),
-            Button("about")])
-        
-        kojaja = "/home/kojaja/"
-        curr_path = os.path.abspath('.')
+            Button("about")])     
 
-        quad_items = [
-            ItemPanel(curr_path, fill_window),
-            ItemPanel(kojaja, fill_window),
-            ItemPanel(curr_path, fill_window),
-            ItemPanel(curr_path, fill_window)
-        ]
-        
-        yMax, xMax = signal_resolver.stdscr.getmaxyx()
-        tiled = QuadView(
-            stdscr, None, quad_items, 
-            0, 0, yMax, xMax, 
-            FillMethod.ITEM_PANEL_ROWS_COLS, 
-            menu)
-
-        tiled.start_quad()
+def main(stdscr):
+    signal_resolver.init_screen(stdscr)
+    quad = QuadView(stdscr, quad_items, menu)
+    
+    while True:    
+        quad.refresh_quad()
         key = signal_resolver.stdscr.getch()
         if key == ord('q'):
             break
-
+        
 curses.wrapper(main)
