@@ -1,55 +1,33 @@
-import curses
-import time
-import threading
+import asyncio
+from asyncio import TaskGroup
 
-class Clock:
-    def __init__(self):
-        self.running = True
+class TerminateTaskGroup(Exception):
+    """Exception raised to terminate a task group."""
 
-    def start(self):
-        while self.running:
-            self.update()
-            time.sleep(0.1)  # Wait for 100 ms
+async def force_terminate_task_group():
+    """Used to force termination of a task group."""
+    raise TerminateTaskGroup()
 
-    def update(self):
-        # Get the current time
-        now = time.strftime("%H:%M:%S") + f".{int((time.time() % 1) * 1000):03d}"
-        print(f"Current Time: {now}")  # Print to the console
+async def job(task_id, sleep_time):
+    while True:
+        print(f'Task {task_id} tick')
+        await asyncio.sleep(sleep_time)
 
-    def stop(self):
-        self.running = False
-
-def main(stdscr):
-    # Clear screen and prepare for the clock display
-    stdscr.clear()
-    curses.curs_set(0)  # Hide the cursor
-    stdscr.nodelay(1)   # Set getch() to non-blocking
-    stdscr.timeout(100) # Set a timeout for getch()
-
-    # Create an instance of the Clock class
-    clock = Clock()
-    
-    # Start the clock thread
-    clock_thread = threading.Thread(target=clock.start)
-    clock_thread.start()
-
+async def main():
     try:
-        while True:
-            # Display text on the curses screen
-            stdscr.clear()
-            stdscr.addstr(0, 0, "Press 'q' to exit...", curses.A_BOLD)
-            stdscr.refresh()
+        async with TaskGroup() as group:
+            # spawn some tasks
+            group.create_task(job(1, 0.5))
+            group.create_task(job(2, 1))
+            group.create_task(job(3, 0.8))
+            group.create_task(job(4, 0.3))
+            group.create_task(job(5, 4.4))
+            group.create_task(job(6, 2.5))
 
-            # Check for user input
-            key = stdscr.getch()
-            if key == ord('q'):  # Press 'q' to exit
-                break
-            curses.napms(10)  # Short nap to prevent busy waiting
-    finally:
-        # Stop the clock thread cleanly
-        clock.stop()
-        clock_thread.join()  # Wait for the thread to finish
+            await asyncio.sleep(4)
 
-if __name__ == "__main__":
-    # Start the curses application
-    curses.wrapper(main)
+            group.create_task(force_terminate_task_group())
+    except* TerminateTaskGroup:
+        pass
+
+asyncio.run(main())
