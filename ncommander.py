@@ -16,12 +16,14 @@ from tui.controls import VisualHierarchy, FillMethod, Button, HStackPanel, MyWin
     
 
 def fill_window(myWindow: MyWindow) -> None:
-    win = curses.newwin(myWindow.y1 - myWindow.y0, myWindow.x1 - myWindow.x0, myWindow.y0, myWindow.x0)  
+    height = myWindow.y1 - myWindow.y0
+    width = myWindow.x1 - myWindow.x0
+    win = curses.newwin(height, width, myWindow.y0, myWindow.x0)  
     win.border()
     win.addstr(0, 1, myWindow.title)
     dirOk, dirs, files, errStr = os_utils.try_get_dir_content(myWindow.title)
     if dirOk:
-        content = string_utils.list_to_columns(myWindow.y1 - myWindow.y0 - 3, myWindow.x1 - myWindow.x0 - 1, dirs + files)
+        content = string_utils.list_to_columns(height - 3, width - 1, dirs + files)
         myWindow.title = os.path.abspath(myWindow.title)
         for idx, line in enumerate(content):
             if idx > myWindow.y1 - myWindow.y0 - 3:
