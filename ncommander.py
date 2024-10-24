@@ -83,11 +83,11 @@ async def group_main():
 
     # Now, run the curses interface
     async with asyncio.TaskGroup() as group:
-        group.create_task(async_main())  # Start curses app
+        group.create_task(async_main())
     
-    # After the curses app exits, cancel the background task
+
     background.cancel()
-    await background  # Ensure the background task is properly cancelled
+    await background
 
 # Run the async wrapper
 if __name__ == "__main__":
