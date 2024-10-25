@@ -5,7 +5,7 @@ import asyncio
 from asyncio import TaskGroup
 from datetime import datetime
 from tui import signal_resolver
-from tui.controls import FillMethod, Button, HStackPanel, MyWindow, QuadView, ItemPanel
+from tui.controls import FillMethod, Button, HStackPanel, MyWindow, MainView, ItemPanel
 
 now = None
 
@@ -58,7 +58,7 @@ quad_items = [
         
 async def async_main(stdscr):
     signal_resolver.init_screen(stdscr)
-    quad = QuadView(stdscr, quad_items, menu)
+    quad = MainView(stdscr, quad_items, menu)
     while True:
         quad.refresh_quad()
         key = stdscr.getch()
@@ -68,12 +68,23 @@ async def async_main(stdscr):
 
 app_is_running = False
 
-async def background_task():
+
+bkg_tasks = []
+
+def update_slow():
     global now
-    while app_is_running:
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        await asyncio.sleep(0.1)  
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+def update_fast():
+    pass
         
+async def assign_recurrent(period_ms: int, func):
+    while app_is_running:
+        func()
+        await asyncio.sleep(period_ms/1000)  
+        
+        
+
 async def run_curses_and_tasks():
     stdscr = curses.initscr()
     curses.noecho()
@@ -81,7 +92,8 @@ async def run_curses_and_tasks():
     global app_is_running
     app_is_running = True
     try:
-        background = asyncio.create_task(background_task())
+        background = asyncio.create_task(assign_recurrent(100, update_slow))
+        background = asyncio.create_task(assign_recurrent(10, update_fast))
         await async_main(stdscr)
         app_is_running = False
         await background
