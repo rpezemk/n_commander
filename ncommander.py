@@ -62,20 +62,13 @@ kojaja = "/home/kojaja/"
 curr_path = os.path.abspath('.')
 
 
-menu = HStackPanel([
-            Button("edit"),
-            Button("view"),
-            Button("settings"),
-            Button("help"),
-            Button("about"),
-            ClockButton("", hPos= HPosEnum.RIGHT)
-            ])     
+menu = HStackPanel([ Button("edit"), Button("view"), 
+                    Button("settings"), Button("help"), 
+                    Button("about"), ClockButton("", hPos= HPosEnum.RIGHT)])     
 
 quad_items = [
-    ItemPanel(curr_path, fill_window),
-    ItemPanel(kojaja, fill_window),
-    ItemPanel(curr_path, fill_window),
-    ItemPanel(curr_path, fill_window)
+    ItemPanel(curr_path, fill_window), ItemPanel(kojaja, fill_window),
+    ItemPanel(curr_path, fill_window), ItemPanel(curr_path, fill_window)
 ]   
         
         
@@ -85,16 +78,9 @@ async def async_main(stdscr):
     quad = MainView(stdscr, quad_items, menu)
     while app_is_running:
         quad.refresh_quad()
-        # key = stdscr.getch()
-        # if key == ord('q'):
-        #     break
-        
         await asyncio.sleep(0.1)
         
-
-
         
-    
 async def run_curses_and_tasks():
     stdscr = curses.initscr()
     curses.noecho()
