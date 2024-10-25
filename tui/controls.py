@@ -2,6 +2,8 @@ from enum import Enum
 import curses
 from typing import Callable
 from typing import Tuple
+from utils import os_utils, string_utils
+import os
 
 
 class HPosEnum(Enum):
@@ -149,6 +151,72 @@ class ItemPanel(MyWindow):
         )
 
 
+def fill_window(myWindow: MyWindow) -> None:
+    height = myWindow.y1 - myWindow.y0
+    width = myWindow.x1 - myWindow.x0
+    win = curses.newwin(height, width, myWindow.y0, myWindow.x0)
+    win.border()
+    win.addstr(0, 1, myWindow.title)
+    dirOk, dirs, files, errStr = os_utils.try_get_dir_content(myWindow.title)
+    if dirOk:
+        content = string_utils.list_to_columns(height - 3, width - 1, dirs + files)
+        myWindow.title = os.path.abspath(myWindow.title)
+        for idx, line in enumerate(content):
+            if idx > myWindow.y1 - myWindow.y0 - 3:
+                break
+            win.addstr(1 + idx, 3, line)
+    else:
+        pass
+    win.refresh()
+
+
+class DirPanel(ItemPanel):
+    def __init__(self, title):
+        super().__init__(title, fill_window)
+
+
+def fill_log_window(logPanel: "LogPanel") -> None:
+    height = logPanel.y1 - logPanel.y0
+    width = logPanel.x1 - logPanel.x0
+    win = curses.newwin(height, width, logPanel.y0, logPanel.x0)
+    win.border()
+    win.addstr(0, 1, logPanel.title)
+    line_width = width - 3
+    max_total_lines = height - 3
+    nScrLines = height
+
+    if line_width < 3:
+        win.refresh()
+        return
+
+    curr_line_no = 0
+    last_lines = logPanel.logLines[-max_total_lines:]
+
+    for line in last_lines:
+        if curr_line_no > max_total_lines:
+            break
+        sub_lines = string_utils.split_by_n_chars_other_shorter(
+            line, width - 3, width - 7
+        )
+        if len(sub_lines) == 0:
+            continue
+        first_sub_line = sub_lines[0][:line_width]
+        win.addstr(1 + curr_line_no, 2, first_sub_line)
+        curr_line_no += 1
+
+        for sub_line in sub_lines[1:]:
+            win.addstr(1 + curr_line_no, 4, "\\ " + sub_line)
+            curr_line_no += 1
+
+    win.refresh()
+
+
+class LogPanel(ItemPanel):
+    def __init__(self, title):
+        super().__init__(title, fill_log_window)
+        self.logLines = []
+
+
 class MainView(VisualHierarchy):
     def __init__(self, stdscr, children=[], menuPanel: HStackPanel = None):
         self.stdscr = stdscr
@@ -176,15 +244,9 @@ class MainView(VisualHierarchy):
 
     def get_quad_points(self):
         self.y1, self.x1 = self.stdscr.getmaxyx()
-        x0 = 0
-        y0 = 1
         yMax, xMax = (self.y1, self.x1)
-        x1 = int(xMax / 2)
-        x2 = xMax
-        y1 = int(yMax / 2)
-        y2 = yMax
-
-        return [y0, x0, y1, x1, y2, x2]
+        y0, x0, y1, x1, y2, x2 = 1, 0, int(yMax / 2), int(xMax / 2), yMax, xMax
+        return y0, x0, y1, x1, y2, x2
 
     def quad_matrix(self, y0, x0, y1, x1, y2, x2):
         matrix = [

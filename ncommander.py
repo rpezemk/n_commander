@@ -12,11 +12,28 @@ from tui.controls import (
     MainView,
     ItemPanel,
     HPosEnum,
+    DirPanel,
+    LogPanel,
 )
 
 now = None
 app_is_running = False
 clock = ClockButton("", hPos=HPosEnum.RIGHT)
+log_panel = LogPanel("[LOGGER]")
+log_panel.logLines = [
+    "def",
+    "def",
+    "def",
+    "def",
+    "def",
+    "def",
+    "def",
+    "def",
+    "def",
+    "abc",
+    "def",
+    "some incredibly long line with many characters, so keep it.... :D KOJAJA, maybe try to read Norwid instead, or latin dictionary",
+]
 
 
 def update_slow():
@@ -43,30 +60,10 @@ async def assign_recurrent(period_ms: int, func):
         await asyncio.sleep(period_ms / 1000)
 
 
-def fill_window(myWindow: MyWindow) -> None:
-    height = myWindow.y1 - myWindow.y0
-    width = myWindow.x1 - myWindow.x0
-    win = curses.newwin(height, width, myWindow.y0, myWindow.x0)
-    win.border()
-    win.addstr(0, 1, myWindow.title)
-    dirOk, dirs, files, errStr = os_utils.try_get_dir_content(myWindow.title)
-    if dirOk:
-        content = string_utils.list_to_columns(height - 3, width - 1, dirs + files)
-        myWindow.title = os.path.abspath(myWindow.title)
-        for idx, line in enumerate(content):
-            if idx > myWindow.y1 - myWindow.y0 - 3:
-                break
-            win.addstr(1 + idx, 3, line)
-    else:
-        pass
-    win.refresh()
-
-
 def is_mouse_click(click) -> bool:
     return click == curses.KEY_MOUSE
 
 
-kojaja = "/home/kojaja/"
 curr_path = os.path.abspath(".")
 
 
@@ -82,10 +79,10 @@ menu = HStackPanel(
 )
 
 quad_items = [
-    ItemPanel(curr_path, fill_window),
-    ItemPanel(kojaja, fill_window),
-    ItemPanel(curr_path, fill_window),
-    ItemPanel(curr_path, fill_window),
+    DirPanel(curr_path),
+    log_panel,
+    DirPanel(curr_path),
+    DirPanel(curr_path),
 ]
 
 
