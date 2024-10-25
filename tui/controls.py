@@ -2,6 +2,7 @@ from enum import Enum
 import curses
 from typing import Callable
 from datetime import datetime
+from typing import Tuple
 
 class HPosEnum(Enum):
     LEFT = 1
@@ -164,3 +165,7 @@ class MainView(VisualHierarchy):
         ch.x0 = x0
         ch.y1 = y1
         ch.x1 = x1
+
+    def resolve_mouse_click(self, y0, x0) -> Tuple[bool, VisualHierarchy]:
+        
+        pass

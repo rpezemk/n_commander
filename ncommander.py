@@ -35,6 +35,9 @@ def fill_window(myWindow: MyWindow) -> None:
     else:
         pass
     win.refresh()
+
+def is_mouse_click(click) -> bool:
+    return click == curses.Middle
     
 kojaja = "/home/kojaja/"
 curr_path = os.path.abspath('.')
@@ -56,6 +59,8 @@ quad_items = [
     ItemPanel(curr_path, fill_window)
 ]   
         
+        
+        
 async def async_main(stdscr):
     signal_resolver.init_screen(stdscr)
     quad = MainView(stdscr, quad_items, menu)
@@ -64,7 +69,15 @@ async def async_main(stdscr):
         key = stdscr.getch()
         if key == ord('q'):
             break
-        await asyncio.sleep(0.1)
+        elif is_mouse_click(key):
+            _, x, y, _, _ = curses.getmouse()
+            stdscr.addstr(f"Mouse clicked at ({x}, {y})\n")
+            stdscr.refresh()
+            asyncio.sleep(2)
+        if key == None:            
+            await asyncio.sleep(0.1)
+        else:
+            await asyncio.sleep(0.001)
 
 app_is_running = False
 
