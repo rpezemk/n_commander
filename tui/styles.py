@@ -24,13 +24,13 @@ class MainStyles:
         # Normal
         cls.red = cls.wrap_color(curses.COLOR_RED, transp)
         cls.green = cls.wrap_color(curses.COLOR_GREEN, transp)
-        cls.blue =  cls.wrap_color(curses.COLOR_BLUE, transp)
+        cls.blue = cls.wrap_color(curses.COLOR_BLUE, transp)
         cls.yellow = cls.wrap_color(curses.COLOR_YELLOW, transp)
         cls.cyan = cls.wrap_color(curses.COLOR_CYAN, transp)
         cls.magenta = cls.wrap_color(curses.COLOR_MAGENTA, transp)
-        
+
         cls.white = cls.wrap_color(curses.COLOR_WHITE, transp)
-        
+
         # Inverted
         cls.red_inv = cls.wrap_color(transp, curses.COLOR_RED)
         cls.green_inv = cls.wrap_color(transp, curses.COLOR_GREEN)
@@ -38,9 +38,9 @@ class MainStyles:
         cls.yellow_inv = cls.wrap_color(transp, curses.COLOR_YELLOW)
         cls.cyan_inv = cls.wrap_color(transp, curses.COLOR_CYAN)
         cls.magenta_inv = cls.wrap_color(transp, curses.COLOR_MAGENTA)
-        
+
         cls.white_inv = cls.wrap_color(transp, curses.COLOR_WHITE)
-        
+
         cls.crazy = []
         cls.currNo += 5
         nColors = 100
@@ -62,6 +62,7 @@ class MainStyles:
         resColor = curses.color_pair(cls.currNo)
         cls.currNo += 1
         return resColor
+
 
 def main(stdscr):
     # Clear the screen
@@ -94,18 +95,18 @@ def main(stdscr):
         for lineNo, line in enumerate(lines):
             for colNo in range(0, min(width, len(line))):
                 currColor = palette[(colNo + iter) % palLen]
-                stdscr.addstr(lineNo, colNo, line[colNo], currColor)  
+                stdscr.addstr(lineNo, colNo, line[colNo], currColor)
         stdscr.refresh()
         key = stdscr.getch()
-        if key == ord('q'):  # If 'q' is pressed
+        if key == ord("q"):  # If 'q' is pressed
             break
 
-        
     # Refresh the screen to show the text
     stdscr.refresh()
 
     # Wait for user input
     MainStyles.initialize()
-    stdscr.getch()  
-curses.wrapper(main)
+    stdscr.getch()
 
+
+curses.wrapper(main)
