@@ -10,6 +10,24 @@ from tui.controls import FillMethod, Button, HStackPanel, MyWindow, MainView, It
 now = None
 app_is_running = False
 
+def update_slow():
+    global now
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+def update_fast():
+    pass
+   
+def resolve_input():
+    global app_is_running
+    key = signal_resolver.stdscr.getch()
+    if key == ord('q'):
+        app_is_running = False
+        
+async def assign_recurrent(period_ms: int, func):
+    while app_is_running:
+        func()
+        await asyncio.sleep(period_ms/1000)  
+
 class ClockButton(Button):
     def __init__(self, title, parent=None, hPos= HPosEnum.LEFT):
         super().__init__(title, parent, hPos= hPos)
@@ -61,7 +79,6 @@ quad_items = [
 ]   
         
         
-        
 async def async_main(stdscr):
     global app_is_running
     signal_resolver.init_screen(stdscr)
@@ -74,30 +91,8 @@ async def async_main(stdscr):
         
         await asyncio.sleep(0.1)
         
-        
-        
 
 
-
-bkg_tasks = []
-
-def update_slow():
-    global now
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-def update_fast():
-    pass
-   
-def resolve_input():
-    global app_is_running
-    key = signal_resolver.stdscr.getch()
-    if key == ord('q'):
-        app_is_running = False
-        
-async def assign_recurrent(period_ms: int, func):
-    while app_is_running:
-        func()
-        await asyncio.sleep(period_ms/1000)  
         
     
 async def run_curses_and_tasks():
