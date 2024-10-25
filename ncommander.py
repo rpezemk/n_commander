@@ -5,13 +5,13 @@ import asyncio
 from asyncio import TaskGroup
 from datetime import datetime
 from tui import signal_resolver
-from tui.controls import FillMethod, Button, HStackPanel, MyWindow, MainView, ItemPanel
+from tui.controls import FillMethod, Button, HStackPanel, MyWindow, MainView, ItemPanel, HPosEnum
 
 now = None
 
 class ClockButton(Button):
-    def __init__(self, title, parent=None):
-        super().__init__(title, parent)
+    def __init__(self, title, parent=None, hPos= HPosEnum.LEFT):
+        super().__init__(title, parent, hPos= hPos)
 
     def draw(self, x0):
         self.title = now 
@@ -46,7 +46,7 @@ menu = HStackPanel([
             Button("settings"),
             Button("help"),
             Button("about"),
-            ClockButton("")
+            ClockButton("", hPos= HPosEnum.RIGHT)
             ])     
 
 quad_items = [
