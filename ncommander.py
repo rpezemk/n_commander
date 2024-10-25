@@ -39,12 +39,6 @@ def fill_window(myWindow: MyWindow) -> None:
 kojaja = "/home/kojaja/"
 curr_path = os.path.abspath('.')
 
-quad_items = [
-    ItemPanel(curr_path, fill_window),
-    ItemPanel(kojaja, fill_window),
-    ItemPanel(curr_path, fill_window),
-    ItemPanel(curr_path, fill_window)
-]   
 
 menu = HStackPanel([
             Button("edit"),
@@ -55,6 +49,12 @@ menu = HStackPanel([
             ClockButton("")
             ])     
 
+quad_items = [
+    ItemPanel(curr_path, fill_window),
+    ItemPanel(kojaja, fill_window),
+    ItemPanel(curr_path, fill_window),
+    ItemPanel(curr_path, fill_window)
+]   
         
 async def async_main(stdscr):
     signal_resolver.init_screen(stdscr)
