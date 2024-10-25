@@ -50,6 +50,16 @@ def update_fast():
 def resolve_input():
     global app_is_running
     key = signal_resolver.stdscr.getch()
+    if key == -1:
+        return
+    if key == curses.KEY_MOUSE:
+        _, x, y, _, button_state = curses.getmouse()
+
+        if button_state & curses.REPORT_MOUSE_POSITION:
+            log_panel.log(f"MOUSE: got {key} key")
+
+    else:
+        log_panel.log(f"KBD: got {key} key")
     if key == ord("q"):
         app_is_running = False
 

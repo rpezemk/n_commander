@@ -4,6 +4,7 @@ from typing import Callable
 from typing import Tuple
 from utils import os_utils, string_utils
 import os
+from datetime import datetime
 
 
 class HPosEnum(Enum):
@@ -215,6 +216,12 @@ class LogPanel(ItemPanel):
     def __init__(self, title):
         super().__init__(title, fill_log_window)
         self.logLines = []
+
+    def log(self, message):
+        d = datetime.now()
+        ms = int(d.microsecond / 1000)
+        now = d.strftime("%Y-%m-%d %H:%M:%S") + "." + str(ms).rjust(3, "0")
+        self.logLines.append(f"[{now}] {message}")
 
 
 class MainView(VisualHierarchy):
