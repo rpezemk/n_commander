@@ -55,19 +55,9 @@ menu = HStackPanel([
             ClockButton("")
             ])     
 
-async def async_main(stdscr):
-    signal_resolver.init_screen(stdscr)
-    quad = QuadView(stdscr, quad_items, menu)
-    while True:    
-        quad.refresh_quad()
-        key = stdscr.getch()
-        if key == ord('q'):
-            break
+
         
 async def async_main(stdscr):
-    global now
-    stdscr.nodelay(True)  
-    stdscr.clear()
     signal_resolver.init_screen(stdscr)
     quad = QuadView(stdscr, quad_items, menu)
     while True:
@@ -77,10 +67,11 @@ async def async_main(stdscr):
             break
         await asyncio.sleep(0.1)
 
+app_is_running = False
 
 async def background_task():
     global now
-    while True:
+    while app_is_running:
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         await asyncio.sleep(0.1)  
         
@@ -88,9 +79,13 @@ async def run_curses_and_tasks():
     stdscr = curses.initscr()
     curses.noecho()
     curses.cbreak()
+    global app_is_running
+    app_is_running = True
     try:
         background = asyncio.create_task(background_task())
         await async_main(stdscr)
+        app_is_running = False
+        await background
     finally:
         curses.nocbreak()
         curses.echo()
@@ -100,7 +95,6 @@ async def run_curses_and_tasks():
 
 if __name__ == "__main__":
     try:
-        
         asyncio.run(run_curses_and_tasks())
     except Exception as e:
         print(f"Error: {e}")

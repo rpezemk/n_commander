@@ -56,3 +56,5 @@ def init_screen(scr):
     # 10 Hz refresh rate
     stdscr.timeout(100)
     hello_was_shown = True;
+    stdscr.nodelay(True)  
+    stdscr.clear()
