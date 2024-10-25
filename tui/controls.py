@@ -70,7 +70,16 @@ class Button(VisualHierarchy):
         return len(self.real_title)
 
 
+class ClockButton(Button):
+    def __init__(self, title, parent=None, hPos= HPosEnum.LEFT):
+        super().__init__(title, parent, hPos= hPos)
 
+    def draw(self, x0):
+        self.real_title = f"[{self.title}]"
+        super().draw(x0)
+        
+    def update_time(self, time_str: str):
+        self.title = time_str
     
 class HStackPanel(VisualHierarchy):
     def __init__(self, list, parent = None, children = []):

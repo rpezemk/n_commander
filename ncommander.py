@@ -5,14 +5,18 @@ import asyncio
 from asyncio import TaskGroup
 from datetime import datetime
 from tui import signal_resolver
-from tui.controls import FillMethod, Button, HStackPanel, MyWindow, MainView, ItemPanel, HPosEnum
+from tui.controls import FillMethod, Button, ClockButton, HStackPanel, MyWindow, MainView, ItemPanel, HPosEnum
 
 now = None
 app_is_running = False
+clock = ClockButton("", hPos= HPosEnum.RIGHT)
+
 
 def update_slow():
     global now
+    global clock
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    clock.update_time(now)
 
 def update_fast():
     pass
@@ -28,15 +32,6 @@ async def assign_recurrent(period_ms: int, func):
         func()
         await asyncio.sleep(period_ms/1000)  
 
-class ClockButton(Button):
-    def __init__(self, title, parent=None, hPos= HPosEnum.LEFT):
-        super().__init__(title, parent, hPos= hPos)
-
-    def draw(self, x0):
-        self.title = now 
-        self.real_title = f"[{self.title}]"
-        super().draw(x0)
-        
 def fill_window(myWindow: MyWindow) -> None:
     height = myWindow.y1 - myWindow.y0
     width = myWindow.x1 - myWindow.x0
@@ -62,9 +57,10 @@ kojaja = "/home/kojaja/"
 curr_path = os.path.abspath('.')
 
 
+
 menu = HStackPanel([ Button("edit"), Button("view"), 
                     Button("settings"), Button("help"), 
-                    Button("about"), ClockButton("", hPos= HPosEnum.RIGHT)])     
+                    Button("about"), clock])     
 
 quad_items = [
     ItemPanel(curr_path, fill_window), ItemPanel(kojaja, fill_window),
