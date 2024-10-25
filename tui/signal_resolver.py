@@ -42,13 +42,17 @@ def init_screen(scr):
     signal.signal(signal.SIGWINCH, resize_handler)
     global stdscr
     stdscr = scr
+    stdscr.refresh()
     stdscr.clear()
-    redraw_stdscreen(stdscr)
-    curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
+    curses.mousemask(curses.ALL_MOUSE_EVENTS)
 
-    if curses.has_colors():
-        curses.start_color()
-        curses.use_default_colors()
+    # if curses.has_colors():
+    #     curses.start_color()
+    #     curses.use_default_colors()
+    stdscr.nodelay(True)
+
+
+def show_hello():
     global hello_was_shown
     if not hello_was_shown:
         lines = splash_content.splitlines()
@@ -59,9 +63,3 @@ def init_screen(scr):
         stdscr.refresh()
         stdscr.getch()
         pass
-
-    # 10 Hz refresh rate
-    stdscr.timeout(100)
-    hello_was_shown = True
-    # stdscr.nodelay(True)
-    stdscr.clear()

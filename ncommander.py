@@ -113,7 +113,6 @@ async def run_curses_and_tasks():
     app_is_running = True
     try:
         background = asyncio.create_task(assign_recurrent(100, update_slow))
-        background = asyncio.create_task(assign_recurrent(10, update_fast))
         background = asyncio.create_task(assign_recurrent(1, resolve_input))
         await async_main(stdscr)
         app_is_running = False
