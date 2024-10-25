@@ -8,6 +8,7 @@ from tui import signal_resolver
 from tui.controls import FillMethod, Button, HStackPanel, MyWindow, MainView, ItemPanel, HPosEnum
 
 now = None
+app_is_running = False
 
 class ClockButton(Button):
     def __init__(self, title, parent=None, hPos= HPosEnum.LEFT):
@@ -37,7 +38,7 @@ def fill_window(myWindow: MyWindow) -> None:
     win.refresh()
 
 def is_mouse_click(click) -> bool:
-    return click == curses.Middle
+    return click == curses.KEY_MOUSE
     
 kojaja = "/home/kojaja/"
 curr_path = os.path.abspath('.')
@@ -62,24 +63,20 @@ quad_items = [
         
         
 async def async_main(stdscr):
+    global app_is_running
     signal_resolver.init_screen(stdscr)
     quad = MainView(stdscr, quad_items, menu)
-    while True:
+    while app_is_running:
         quad.refresh_quad()
-        key = stdscr.getch()
-        if key == ord('q'):
-            break
-        elif is_mouse_click(key):
-            _, x, y, _, _ = curses.getmouse()
-            stdscr.addstr(f"Mouse clicked at ({x}, {y})\n")
-            stdscr.refresh()
-            asyncio.sleep(2)
-        if key == None:            
-            await asyncio.sleep(0.1)
-        else:
-            await asyncio.sleep(0.001)
+        # key = stdscr.getch()
+        # if key == ord('q'):
+        #     break
+        
+        await asyncio.sleep(0.1)
+        
+        
+        
 
-app_is_running = False
 
 
 bkg_tasks = []
@@ -90,14 +87,19 @@ def update_slow():
 
 def update_fast():
     pass
+   
+def resolve_input():
+    global app_is_running
+    key = signal_resolver.stdscr.getch()
+    if key == ord('q'):
+        app_is_running = False
         
 async def assign_recurrent(period_ms: int, func):
     while app_is_running:
         func()
         await asyncio.sleep(period_ms/1000)  
         
-        
-
+    
 async def run_curses_and_tasks():
     stdscr = curses.initscr()
     curses.noecho()
@@ -107,6 +109,7 @@ async def run_curses_and_tasks():
     try:
         background = asyncio.create_task(assign_recurrent(100, update_slow))
         background = asyncio.create_task(assign_recurrent(10, update_fast))
+        background = asyncio.create_task(assign_recurrent(1, resolve_input))
         await async_main(stdscr)
         app_is_running = False
         await background
