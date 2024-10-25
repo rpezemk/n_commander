@@ -55,7 +55,6 @@ menu = HStackPanel([
             ClockButton("")
             ])     
 
-
         
 async def async_main(stdscr):
     signal_resolver.init_screen(stdscr)
