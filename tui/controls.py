@@ -36,6 +36,15 @@ class VisualHierarchy:
         self.children.append(child)
         child.parent = self
 
+    def get_all_objects(self) -> list['VisualHierarchy']:
+        res = [self]
+        for ch in self.children:
+            ch_objs = ch.get_all_objects()
+            for ch_ob in ch_objs:
+                res.append(ch_ob)
+        
+        return res
+    
     def draw(self):
         ...
         
@@ -78,20 +87,16 @@ class ClockButton(Button):
 
 
 class HStackPanel(VisualHierarchy):
-    def __init__(self, list: list[VisualHierarchy], parent=None, children=[],
+    def __init__(self, parent=None, children=[],
             grid_placement: GPlace = None, 
             panel_placement: PanelPlacement = PanelPlacement()):
         super().__init__(parent, children, panel_placement=panel_placement, grid_placement=grid_placement)
-        self.items = list
-
-    def addItem(self, item):
-        self.items.append(item)
 
     def draw(self):
         curr_x_left = 1
         curr_x_right = self.area.x1
 
-        for item in self.items:
+        for item in self.children:
             if item.panel_placement.hPos == HPosEnum.LEFT:
                 item.draw(curr_x_left)
                 curr_x_left += item.get_width() + 1
@@ -128,10 +133,6 @@ class ItemPanel(Panel):
         super().__init__(
             title, None, [], Area(), panel_placement=panel_placement, grid_placement=grid_placement, func=func
         )
-
-
-
-
 
 class DirPanel(ItemPanel):
     def __init__(self, title,
