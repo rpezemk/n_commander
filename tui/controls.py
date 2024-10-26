@@ -251,8 +251,7 @@ class MainView(VisualHierarchy):
 
     def get_quad_points(self):
         self.y1, self.x1 = self.stdscr.getmaxyx()
-        yMax, xMax = (self.y1, self.x1)
-        y0, x0, y1, x1, y2, x2 = 1, 0, int(yMax / 2), int(xMax / 2), yMax, xMax
+        y0, x0, y1, x1, y2, x2 = 1, 0, int(self.y1 / 2), int(self.x1 / 2), self.y1, self.x1
         return y0, x0, y1, x1, y2, x2
 
     def quad_matrix(self, y0, x0, y1, x1, y2, x2):
