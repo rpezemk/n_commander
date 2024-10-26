@@ -20,7 +20,7 @@ class PanelPlacement():
         self.hPos = hPos
         pass    
     
-class GridPlacement():
+class GPlace():
     def __init__(self, row_no: int, row_span: int, col_no: int, col_span: int):
         self.row_no = row_no
         self.row_span = row_span

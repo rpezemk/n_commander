@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Callable, Tuple
 
 from utils import os_utils, string_utils
-from tui.placements import GridPlacement, HPosEnum, PanelPlacement
+from tui.placements import GPlace, HPosEnum, PanelPlacement
 from tui.measures import Area
 
 
@@ -20,7 +20,7 @@ class VisualHierarchy:
         children: list["VisualHierarchy"] = None,
         
         area : Area = Area(),
-        grid_placement: GridPlacement = None, 
+        grid_placement: GPlace = None, 
         panel_placement: PanelPlacement = PanelPlacement()
     ):
         self.parent = parent
@@ -29,7 +29,7 @@ class VisualHierarchy:
         self.grid_placement = grid_placement
         self.panel_placement = panel_placement
         
-        for child in self.children:
+        for child in [ch for ch in self.children if ch is not None]:
             child.parent = self
         
     def append_child(self, child: "VisualHierarchy"):
@@ -47,7 +47,7 @@ class VisualHierarchy:
 class Button(VisualHierarchy):
     def __init__(
         self, title: str, parent: VisualHierarchy = None,
-            grid_placement: GridPlacement = None, 
+            grid_placement: GPlace = None, 
             panel_placement: PanelPlacement = PanelPlacement()
     ):
         super().__init__(parent, [], Area(), grid_placement, panel_placement)
@@ -65,7 +65,7 @@ class Button(VisualHierarchy):
 
 class ClockButton(Button):
     def __init__(self, title, parent=None,
-                grid_placement: GridPlacement = None, 
+                grid_placement: GPlace = None, 
                 panel_placement: PanelPlacement = PanelPlacement()):
         super().__init__(title, parent, grid_placement, panel_placement)
 
@@ -78,8 +78,10 @@ class ClockButton(Button):
 
 
 class HStackPanel(VisualHierarchy):
-    def __init__(self, list: list[VisualHierarchy], parent=None, children=[]):
-        super().__init__(parent, children)
+    def __init__(self, list: list[VisualHierarchy], parent=None, children=[],
+            grid_placement: GPlace = None, 
+            panel_placement: PanelPlacement = PanelPlacement()):
+        super().__init__(parent, children, panel_placement=panel_placement, grid_placement=grid_placement)
         self.items = list
 
     def addItem(self, item):
@@ -105,9 +107,11 @@ class Panel(VisualHierarchy):
         parent=None,
         children: list[VisualHierarchy] = [],
         area: Area = Area(),
+        grid_placement: GPlace = None, 
+        panel_placement: PanelPlacement = PanelPlacement(),
         func: Callable[["Panel"], None] = None,
     ):
-        super().__init__(parent, children, area)
+        super().__init__(parent, children, area, grid_placement=grid_placement, panel_placement=panel_placement)
         self.title = title
         self.func = func
 
@@ -117,9 +121,12 @@ class Panel(VisualHierarchy):
 
 
 class ItemPanel(Panel):
-    def __init__(self, title, func: Callable[["Panel"], None]):
+    def __init__(self, title, func: Callable[["Panel"], None],
+                    grid_placement: GPlace = None, 
+                    panel_placement: PanelPlacement = PanelPlacement(),
+                 ):
         super().__init__(
-            title, None, [], Area(), func
+            title, None, [], Area(), panel_placement=panel_placement, grid_placement=grid_placement, func=func
         )
 
 
@@ -127,8 +134,11 @@ class ItemPanel(Panel):
 
 
 class DirPanel(ItemPanel):
-    def __init__(self, title):
-        super().__init__(title, self.fill_window)
+    def __init__(self, title,
+                    g_plc: GPlace = None, 
+                    panel_placement: PanelPlacement = PanelPlacement()
+                    ):
+        super().__init__(title, self.fill_window, grid_placement=g_plc, panel_placement=panel_placement)
 
     def fill_window(self, myWindow: Panel) -> None:
         h, w = myWindow.area.get_dims()

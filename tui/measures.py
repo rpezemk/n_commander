@@ -21,27 +21,31 @@ class Area():
     def get_dims(self) -> Tuple[int, int]:
         return self.y1 - self.y0, self.x1 - self.x0
     
-class LengthType(Enum):
+class LenT(Enum):
     ABS = 1
     STAR = 2
 
-class Length():
-    def __init__(self, value: int, len_type: LengthType = LengthType.STAR):
+class Len():
+    def __init__(self, value: int, len_type: LenT = LenT.STAR):
         self.value = value
         self.len_type = len_type
         self.effective = 0
         
     
-def get_effective_lengths(len_coll: list[Length], outer_len: int) -> list[Segment]:
-    star_sum = sum([l.value for l in len_coll if l.len_type == LengthType.STAR])
+def get_effective_lengths(len_coll: list[Len], outer_len: int) -> list[Segment]:
+    star_sum = sum([l.value for l in len_coll if l.len_type == LenT.STAR])
     curr_effective = 0
-    res_lengths = []
+    res_lengths: list[Segment] = []
     
     for length in len_coll:
-        maybe_eff = length.value if length.len_type == LengthType.ABS else int(outer_len * (length.value / star_sum))
+        maybe_eff = length.value if length.len_type == LenT.ABS else int(outer_len * (length.value / star_sum))
         length.effective = min(max(0, outer_len - curr_effective), maybe_eff)
         segment = Segment(curr_effective, curr_effective + length.effective)
         res_lengths.append(segment)
         curr_effective += length.effective
-        
+    
+    v_sum = sum([s.v1 - s.v0 for s in res_lengths])
+    if outer_len > v_sum:
+        last = res_lengths[-1]
+        last.v1 += outer_len - v_sum
     return res_lengths
