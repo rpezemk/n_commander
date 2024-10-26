@@ -31,7 +31,38 @@ class FillMethod(Enum):
     ITEM_PANEL_COLS_ROWS = 1  # Fill by columns first, then rows
     ITEM_PANEL_ROWS_COLS = 2  # Fill by rows first, then columns
 
+class GridPlacement():
+    def __init__(self, row_no: int, row_span: int, col_no: int, col_span: int):
+        self.row_no = row_no
+        self.row_span = row_span
+        self.col_no = col_no
+        self.col_span = col_span
+        pass
 
+class LengthType(Enum):
+    ABS = 1
+    STAR = 2
+
+class Length():
+    def __init__(self, value: int, len_type: LengthType = LengthType.STAR):
+        self.value = value
+        self.len_type = len_type
+        self.effective = 0
+        pass
+
+def get_effective_lengths(len_coll, outer_len: int):
+    star_sum = sum([l.value for l in len_coll if l.len_type == LengthType.STAR])
+    curr_effective = 0
+    res_lengths = []
+    
+    for length in len_coll:
+        maybe_eff = length.value if length.len_type == LengthType.ABS else int(outer_len * (length.value / star_sum))
+        length.effective = min(max(0, outer_len - curr_effective), maybe_eff)
+        res_lengths.append(length.effective)
+        
+    return res_lengths
+        
+        
 class VisualHierarchy:
     def __init__(
         self,
@@ -43,6 +74,7 @@ class VisualHierarchy:
         x1: int = 0,
         fillMethod: FillMethod = FillMethod.ITEM_PANEL_ROWS_COLS,
         hPos=HPosEnum.LEFT,
+        grid_placement: GridPlacement = None
     ):
         self.parent = parent
         if children is None:
@@ -57,7 +89,8 @@ class VisualHierarchy:
         self.y1 = y1
         self.x1 = x1
         self.hPos = hPos
-
+        self.grid_placement = grid_placement
+        
     def append_child(self, child: "VisualHierarchy"):
         self.children.append(child)
         child.parent = self
