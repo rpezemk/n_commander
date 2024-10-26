@@ -123,7 +123,7 @@ class MyWindow(VisualHierarchy):
         self,
         title: str,
         parent=None,
-        children=[],
+        children: list[VisualHierarchy] = [],
         y0=0,
         x0=0,
         y1=0,
