@@ -46,9 +46,9 @@ def init_screen(scr):
     stdscr.clear()
     curses.mousemask(curses.ALL_MOUSE_EVENTS)
 
-    # if curses.has_colors():
-    #     curses.start_color()
-    #     curses.use_default_colors()
+    if curses.has_colors():
+        curses.start_color()
+        curses.use_default_colors()
     stdscr.nodelay(True)
 
 
