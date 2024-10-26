@@ -6,11 +6,14 @@ from datetime import datetime
 from tui import signal_resolver
 from tui.controls import (
     Button, ClockButton, HStackPanel, MainView,
-    ItemPanel, HPosEnum, DirPanel, LogPanel,
+    ItemPanel, DirPanel, LogPanel,
 )
 
+from tui.placements import PanelPlacement, VPosEnum, HPosEnum
+
 app_is_running = True
-clock = ClockButton("", hPos=HPosEnum.RIGHT)
+clock = ClockButton("", panel_placement=PanelPlacement(hPos=HPosEnum.RIGHT))
+
 log_panel = LogPanel("[LOGGER]")
 
 mouse_actions = [curses.BUTTON1_CLICKED, curses.BUTTON3_CLICKED,
@@ -51,13 +54,13 @@ quad_items = [
 
 async def async_tui_refresh(quad: MainView):
     while app_is_running:
-        quad.refresh_quad()
+        quad.draw()
         await asyncio.sleep(0.1)
 
 async def async_slow_refresh():
     while app_is_running:
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        clock.update_time(now)
+        clock.set_time(now)
         await asyncio.sleep(0.1)
         
 
