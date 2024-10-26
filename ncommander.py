@@ -15,10 +15,36 @@ from tui.controls import (
 
 from tui.placements import PanelPlacement, VPosEnum, HPosEnum
 
+
+###### GUI ELEMENTS ######
 app_is_running = True
 clock = ClockButton("", panel_placement=PanelPlacement(hPos=HPosEnum.RIGHT))
 
+menu = HStackPanel(
+        [
+            Button("edit"), Button("view"), Button("settings"),
+            Button("help"), Button("about"), clock
+        ], 
+        grid_placement=GPlace(0, 1, 0, 2)
+    )
+
+
 log_panel = LogPanel("[LOGGER]")
+log_panel.grid_placement = GPlace(1, 1, 1, 1)
+
+row_defs = [Len(1, LenT.ABS), Len(50, LenT.STAR), Len(50, LenT.STAR)]
+col_defs = [Len(50, LenT.STAR), Len(50, LenT.STAR)]
+
+curr_path = os.path.abspath(".")
+
+vg_children = [
+    menu,
+    DirPanel(curr_path, g_plc=GPlace(1, 1, 0, 1)),
+    log_panel,
+    DirPanel(curr_path, g_plc=GPlace(2, 1, 0, 1)),
+    DirPanel(curr_path, g_plc=GPlace(2, 1, 1, 1)),
+    ]
+
 
 async def resolve_input_continous(stdscr, log_panel: LogPanel):
     global app_is_running
@@ -41,25 +67,7 @@ async def resolve_input_continous(stdscr, log_panel: LogPanel):
         await asyncio.sleep(0.01)
 
 
-menu = HStackPanel(
-    [
-        Button("edit"), Button("view"), Button("settings"),
-        Button("help"), Button("about"), clock,
-    ], grid_placement=GPlace(0, 1, 0, 2)
-)
 
-curr_path = os.path.abspath(".")
-quad_items = [
-    DirPanel(curr_path), log_panel,
-    DirPanel(curr_path), DirPanel(curr_path),
-]
-
-
-
-async def async_main_view_refresh(quad: MainView):
-    while app_is_running:
-        quad.draw()
-        await asyncio.sleep(0.1)
 
 async def async_grid_refresh(grid: VisualGrid):
     while app_is_running:
@@ -74,31 +82,13 @@ async def async_slow_refresh():
         
 
 async def run_async_tasks(stdscr):
-    global app_is_running
     curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
     stdscr.nodelay(True)  # Non-blocking mode
-    main_view = MainView(stdscr, quad_items, menu)
-    y, x = stdscr.getmaxyx()
-    
-    row_defs = [Len(1, LenT.ABS), Len(50, LenT.STAR), Len(50, LenT.STAR)]
-    col_defs = [Len(50, LenT.STAR), Len(50, LenT.STAR)]
-    
-    vg_children = [
-        menu,
-        DirPanel(curr_path, g_plc=GPlace(1, 1, 0, 1)),
-        DirPanel(curr_path, g_plc=GPlace(2, 1, 0, 1)),
-        DirPanel(curr_path, g_plc=GPlace(1, 1, 1, 1)),
-        DirPanel(curr_path, g_plc=GPlace(2, 1, 1, 1)),
-        ]
-    
-    vg = VisualGrid(None, vg_children, Area(0, 0, y, x), row_defs=row_defs, col_defs=col_defs, stdscr=stdscr)
-    
+    vg = VisualGrid(None, vg_children, Area(0, 0, *stdscr.getmaxyx()), row_defs=row_defs, col_defs=col_defs, stdscr=stdscr)
     slow_task = asyncio.create_task(async_slow_refresh())
     input_task = asyncio.create_task(resolve_input_continous(stdscr, log_panel))
-    # tui_task = asyncio.create_task(async_main_view_refresh(main_view))
     tui_task = asyncio.create_task(async_grid_refresh(vg))
     await tui_task
-
 
 def main(stdscr):
     signal_resolver.init_screen(stdscr)
