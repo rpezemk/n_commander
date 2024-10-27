@@ -4,7 +4,7 @@ from utils import os_utils, string_utils
 import asyncio
 from datetime import datetime
 from tui import signal_resolver
-from tui.pzgrid import VisualGrid
+from tui.visual_grid import VisualGrid
 from tui.measures import Area, Segment, Len, LenT
 from tui.placements import GPlace
 from tui.text_box import TextBox
