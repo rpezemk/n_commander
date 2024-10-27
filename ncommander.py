@@ -1,5 +1,6 @@
 import curses
 import os
+from pathlib import Path
 from utils import os_utils, string_utils
 import asyncio
 from datetime import datetime
@@ -7,11 +8,11 @@ from tui import signal_resolver
 from tui.visual_grid import VisualGrid
 from tui.measures import Area, Segment, Len, LenT
 from tui.placements import GPlace
-from tui.text_box import TextBox
+from tui.text_box import TBox
 
 from tui.controls import (
-    Button, ClockButton, HStackPanel,
-    DirPanel, VisualHierarchy
+    Btn, Clock, HPanel,
+    DirP, BaseVisual
 )
 
 from tui.placements import PPlace, VPosEnum, HPosEnum
@@ -21,31 +22,26 @@ from tui.placements import PPlace, VPosEnum, HPosEnum
 app_is_running = True
 vg: VisualGrid = None 
 
-clock = ClockButton("", p_place=PPlace(hPos=HPosEnum.RIGHT))
+log_panel = TBox(g_place=(1, 1, 1, 1))
 
-menu = HStackPanel(None, 
-        children= [Button("edit"), Button("view"), Button("settings"),
-                   Button("help"), Button("about"), clock], 
-        g_place=GPlace(0, 1, 0, 2)
-    )
+################ SHITTY CODE #######################
 
-
-log_panel = TextBox("[LOGGER]")
-log_panel.g_place = GPlace(1, 1, 1, 1)
-
-row_defs = [Len(1, LenT.ABS), Len(50, LenT.STAR), Len(50, LenT.STAR)]
-col_defs = [Len(50, LenT.STAR), Len(50, LenT.STAR)]
+row_defs = [(1, "a"), (50, "*"), (50, "*")]
+col_defs = [(50, "*"), (50, "*")]
 
 vg_children = [
-    menu,
-    DirPanel(os.path.abspath("."), g_plc=GPlace(1, 1, 0, 1)),
-    log_panel,
-    DirPanel(os.path.abspath("."), g_plc=GPlace(2, 1, 0, 1)),
-    DirPanel(os.path.abspath("."), g_plc=GPlace(2, 1, 1, 1)),
+    HPanel(None, [Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
+                  Btn("about"), Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))
+                  ]).g_at((0, 1, 0, 2)),
+    
+    DirP(".").g_at((1, 0)),
+    log_panel.g_at((1, 1)),
+    DirP(".").g_at((2, 0)),
+    DirP(".").g_at((2, 1)),
     ]
 
 
-async def resolve_input_continous(stdscr, log_panel: TextBox, vg: VisualHierarchy = None):
+async def resolve_input_continous(stdscr, log_panel: TBox, vg: BaseVisual = None):
     global app_is_running
     if log_panel is None:
         while app_is_running:
@@ -70,26 +66,17 @@ async def resolve_input_continous(stdscr, log_panel: TextBox, vg: VisualHierarch
         await asyncio.sleep(0.01)
 
 
-
-
 async def async_grid_refresh(grid: VisualGrid):
     while app_is_running:
         grid.draw()
         await asyncio.sleep(0.1)
         
-async def async_slow_refresh():
-    while app_is_running:
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        clock.set_time(now)
-        await asyncio.sleep(0.1)
-        
-
+    
 async def run_async_tasks(stdscr):
     curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
     stdscr.nodelay(True)  # Non-blocking mode
     global vg
     vg = VisualGrid(None, vg_children, row_defs=row_defs, col_defs=col_defs, stdscr=stdscr)
-    slow_task = asyncio.create_task(async_slow_refresh())
     input_task = asyncio.create_task(resolve_input_continous(stdscr, log_panel, vg))
     tui_task = asyncio.create_task(async_grid_refresh(vg))
     await tui_task

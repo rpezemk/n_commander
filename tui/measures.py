@@ -33,11 +33,26 @@ class Len():
         
     
 def get_effective_lengths(len_coll: list[Len], outer_len: int) -> list[Segment]:
-    star_sum = sum([l.value for l in len_coll if l.len_type == LenT.STAR])
+    tmp_len_coll = []
+    for len in len_coll:
+        tmp_len = None
+        match len:
+            case _ if isinstance(len, Len):
+                tmp_len = len
+            case _ if isinstance(len, tuple):
+                v = len[0]
+                s = len[1]
+                eff_t = LenT.STAR if s == '*' else LenT.ABS
+                tmp_len = Len(v, eff_t)
+            case _:
+                tmp_len = len
+    
+        tmp_len_coll.append(tmp_len)
+    star_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.STAR])
     curr_effective = 0
     res_lengths: list[Segment] = []
     
-    for length in len_coll:
+    for length in tmp_len_coll:
         maybe_eff = length.value if length.len_type == LenT.ABS else int(outer_len * (length.value / star_sum))
         length.effective = min(max(0, outer_len - curr_effective), maybe_eff)
         segment = Segment(curr_effective, curr_effective + length.effective)

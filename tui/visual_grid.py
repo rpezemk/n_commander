@@ -1,12 +1,12 @@
 from enum import Enum
 from tui.measures import LenT, Len
-from tui.controls import VisualHierarchy, HPosEnum
+from tui.controls import BaseVisual, HPosEnum
 from tui.placements import GPlace, PPlace
 from tui.measures import Area, Segment
 import tui.measures
 
-class VisualGrid(VisualHierarchy):
-    def __init__(self, parent, children: list[VisualHierarchy] = None, 
+class VisualGrid(BaseVisual):
+    def __init__(self, parent, children: list[BaseVisual] = None, 
                  area: Area = Area(), 
                  g_place: GPlace = GPlace(0, 0, 0, 0), 
                  panel_placement: PPlace = PPlace(),
@@ -14,6 +14,9 @@ class VisualGrid(VisualHierarchy):
                  col_defs: list[Len] = [Len(100, LenT.STAR)],
                  stdscr = None
                  ):
+        # row_defs = [(1, "a"), (50, "*"), (50, "*")]
+        res_row_defs = []
+        
         super().__init__(parent, children, area, g_place, panel_placement)
         self.row_defs = row_defs
         self.col_defs = col_defs

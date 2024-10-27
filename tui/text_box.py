@@ -1,11 +1,11 @@
 import textwrap
 from datetime import datetime
-
+from tui.placements import GPlace
 from tui.controls import Panel
 
-class TextBox(Panel):
-    def __init__(self, title, wrap=True):
-        super().__init__(title)
+class TBox(Panel):
+    def __init__(self, title = "textBox", wrap=True, g_place=GPlace(0, 1, 0, 1)):
+        super().__init__(title, g_place=g_place)
         self.text = ""
         
     def log(self, message):

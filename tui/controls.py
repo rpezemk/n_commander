@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import curses
 from enum import Enum
 from datetime import datetime
@@ -6,12 +7,12 @@ from typing import Callable, Tuple
 from utils import os_utils, string_utils
 from tui.placements import GPlace, HPosEnum, PPlace
 from tui.measures import Area
-from tui.visual_hierarchy import VisualHierarchy
+from tui.base_visual import BaseVisual
 
 
-class Button(VisualHierarchy):
+class Btn(BaseVisual):
     def __init__(
-        self, title: str, parent: VisualHierarchy = None,
+        self, title: str, parent: BaseVisual = None,
             g_place: GPlace = None, 
             p_place: PPlace = PPlace()
     ):
@@ -28,21 +29,20 @@ class Button(VisualHierarchy):
         return len(self.real_title)
 
 
-class ClockButton(Button):
-    def __init__(self, title, parent=None,
+class Clock(Btn):
+    def __init__(self, parent=None,
                 g_place: GPlace = None, 
                 p_place: PPlace = PPlace()):
-        super().__init__(title, parent, g_place, p_place)
+        super().__init__("", parent, g_place, p_place)
 
     def draw(self):
+        self.title = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.real_title = f"[{self.title}]"
         super().draw()
 
-    def set_time(self, time_str: str):
-        self.title = time_str
 
 
-class HStackPanel(VisualHierarchy):
+class HPanel(BaseVisual):
     def __init__(self, parent=None, children=[],
             g_place: GPlace = None, 
             p_place: PPlace = PPlace()):
@@ -61,12 +61,12 @@ class HStackPanel(VisualHierarchy):
             item.draw()
 
 
-class Panel(VisualHierarchy):
+class Panel(BaseVisual):
     def __init__(
         self,
         title: str,
         parent=None,
-        children: list[VisualHierarchy] = [],
+        children: list[BaseVisual] = [],
         area: Area = Area(),
         g_place: GPlace = None, 
         p_place: PPlace = PPlace()
@@ -77,12 +77,15 @@ class Panel(VisualHierarchy):
     def draw(self):
         ...
 
-class DirPanel(Panel):
-    def __init__(self, title,
+class DirP(Panel):
+    def __init__(self, title = None,
                     g_plc: GPlace = None, 
                     p_place: PPlace = PPlace()
                     ):
-        super().__init__(title, g_place=g_plc, p_place=p_place)
+        absolute_path = title
+        if absolute_path is None or title == '' or title == '.':
+            absolute_path = str(Path(".").resolve())
+        super().__init__(absolute_path, g_place=g_plc, p_place=p_place)
 
     def draw(self) -> None:
         h, w = self.area.get_dims()
