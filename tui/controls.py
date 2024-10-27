@@ -21,8 +21,8 @@ class Button(VisualHierarchy):
         self.title = title
         self.real_title = f"[{self.title}]"
 
-    def draw(self, x0):
-        win = curses.newwin(3, len(self.real_title), 0, x0)
+    def draw(self):
+        win = curses.newwin(3, len(self.real_title), 0, self.area.x0)
         win.addstr(0, 0, self.real_title)
         win.refresh()
 
@@ -36,9 +36,9 @@ class ClockButton(Button):
                 panel_placement: PPlace = PPlace()):
         super().__init__(title, parent, grid_placement, panel_placement)
 
-    def draw(self, x0):
+    def draw(self):
         self.real_title = f"[{self.title}]"
-        super().draw(x0)
+        super().draw()
 
     def set_time(self, time_str: str):
         self.title = time_str
@@ -53,14 +53,14 @@ class HStackPanel(VisualHierarchy):
     def draw(self):
         curr_x_left = 1
         curr_x_right = self.area.x1
-
         for item in self.children:
             if item.panel_placement.hPos == HPosEnum.LEFT:
-                item.draw(curr_x_left)
+                item.area.x0 = curr_x_left
                 curr_x_left += item.get_width() + 1
             if item.panel_placement.hPos == HPosEnum.RIGHT:
                 curr_x_right -= item.get_width()
-                item.draw(curr_x_right)
+                item.area.x0 = curr_x_right
+            item.draw()
 
 
 class Panel(VisualHierarchy):
@@ -106,9 +106,9 @@ class DirPanel(ItemPanel):
         win.addstr(0, 1, myWindow.title)
         dirOk, dirs, files, errStr = os_utils.try_get_dir_content(myWindow.title)
         if dirOk:
-            content = string_utils.list_to_columns(h - 3, w - 1, dirs + files)
+            content = string_utils.list_to_columns(h - 2, w - 1, dirs + files)
             for idx, line in enumerate(content):
-                if idx <= h - 3:
+                if idx <= h - 2:
                     win.addstr(1 + idx, 3, line)
         win.refresh()
         
@@ -130,7 +130,7 @@ class LogPanel(ItemPanel):
         win.border()
         win.addstr(0, 1, logPanel.title)
         line_width = w - 3
-        v_capacity = h - 3
+        v_capacity = h - 2
 
         if line_width < 1:
             win.refresh()
