@@ -36,7 +36,7 @@ class VisualGrid(VisualHierarchy):
             
             v_seg = v_sub[0]
             h_seg = h_sub[0]
-            v_sum = sum([h.diff() for h in v_sub])
-            h_sum = sum([h.diff() for h in h_sub])
+            v_sum = sum([h.diff() for h in v_sub]) - 1
+            h_sum = sum([h.diff() for h in h_sub]) - 1
             ch.area = Area(v_seg.v0, h_seg.v0, v_seg.v0+v_sum, h_seg.v0+h_sum)
             ch.draw()

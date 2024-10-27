@@ -48,7 +48,7 @@ class VisualHierarchy:
     
     def emit_window(self):
         h, w = self.area.get_dims()        
-        win = curses.newwin(h, w, self.area.y0, self.area.x0)
+        win = curses.newwin(h + 1, w + 1, self.area.y0, self.area.x0)
         win.border(".", ".", ".", ".", ".", ".", ":", ":")
         win.addstr(0, 1, self.title)
         return win

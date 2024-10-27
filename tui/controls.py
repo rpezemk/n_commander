@@ -50,7 +50,7 @@ class HStackPanel(VisualHierarchy):
 
     def draw(self):
         curr_x_left = 1
-        curr_x_right = self.area.x1
+        curr_x_right = self.area.x1 + 1
         for item in self.children:
             if item.p_place.hPos == HPosEnum.LEFT:
                 item.area.x0 = curr_x_left
