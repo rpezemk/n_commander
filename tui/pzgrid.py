@@ -1,7 +1,7 @@
 from enum import Enum
 from tui.measures import LenT, Len
 from tui.controls import VisualHierarchy, HPosEnum
-from tui.placements import GPlace, PanelPlacement
+from tui.placements import GPlace, PPlace
 from tui.measures import Area, Segment
 import tui.measures
 
@@ -9,7 +9,7 @@ class VisualGrid(VisualHierarchy):
     def __init__(self, parent, children: list[VisualHierarchy] = None, 
                  area: Area = Area(), 
                  grid_placement: GPlace = GPlace(0, 0, 0, 0), 
-                 panel_placement: PanelPlacement = PanelPlacement(),
+                 panel_placement: PPlace = PPlace(),
                  row_defs: list[Len] = [Len(100, LenT.STAR)],
                  col_defs: list[Len] = [Len(100, LenT.STAR)],
                  stdscr = None
@@ -40,4 +40,3 @@ class VisualGrid(VisualHierarchy):
             h_sum = sum([h.diff() for h in h_sub])
             ch.area = Area(v_seg.v0, h_seg.v0, v_seg.v0+v_sum, h_seg.v0+h_sum)
             ch.draw()
-            

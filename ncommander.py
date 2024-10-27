@@ -9,18 +9,18 @@ from tui.measures import Area, Segment, Len, LenT
 from tui.placements import GPlace
 
 from tui.controls import (
-    Button, ClockButton, HStackPanel, MainView,
+    Button, ClockButton, HStackPanel,
     ItemPanel, DirPanel, LogPanel, VisualHierarchy
 )
 
-from tui.placements import PanelPlacement, VPosEnum, HPosEnum
+from tui.placements import PPlace, VPosEnum, HPosEnum
 
 
 ###### GUI ELEMENTS ######
 app_is_running = True
 vg: VisualGrid = None 
 
-clock = ClockButton("", panel_placement=PanelPlacement(hPos=HPosEnum.RIGHT))
+clock = ClockButton("", panel_placement=PPlace(hPos=HPosEnum.RIGHT))
 
 menu = HStackPanel(None, 
         children= [Button("edit"), Button("view"), Button("settings"),
@@ -35,14 +35,12 @@ log_panel.grid_placement = GPlace(1, 1, 1, 1)
 row_defs = [Len(1, LenT.ABS), Len(50, LenT.STAR), Len(50, LenT.STAR)]
 col_defs = [Len(50, LenT.STAR), Len(50, LenT.STAR)]
 
-curr_path = os.path.abspath(".")
-
 vg_children = [
     menu,
-    DirPanel(curr_path, g_plc=GPlace(1, 1, 0, 1)),
+    DirPanel(os.path.abspath("."), g_plc=GPlace(1, 1, 0, 1)),
     log_panel,
-    DirPanel(curr_path, g_plc=GPlace(2, 1, 0, 1)),
-    DirPanel(curr_path, g_plc=GPlace(2, 1, 1, 1)),
+    DirPanel(os.path.abspath("."), g_plc=GPlace(2, 1, 0, 1)),
+    DirPanel(os.path.abspath("."), g_plc=GPlace(2, 1, 1, 1)),
     ]
 
 
