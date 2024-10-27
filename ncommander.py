@@ -30,9 +30,10 @@ row_defs = [(1, "a"), (50, "*"), (50, "*")]
 col_defs = [(50, "*"), (50, "*")]
 
 vg_children = [
-    HPanel(None, [Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
-                  Btn("about"), Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))
-                  ]).g_at((0, 1, 0, 2)),
+    HPanel(None, 
+           [Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
+            Btn("about"), Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
+    .g_at((0, 1, 0, 2)),
     
     DirP(".").g_at((1, 0)),
     log_panel.g_at((1, 1)),
