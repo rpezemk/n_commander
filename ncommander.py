@@ -7,10 +7,11 @@ from tui import signal_resolver
 from tui.pzgrid import VisualGrid
 from tui.measures import Area, Segment, Len, LenT
 from tui.placements import GPlace
+from tui.text_box import TextBox
 
 from tui.controls import (
     Button, ClockButton, HStackPanel,
-    ItemPanel, DirPanel, LogPanel, VisualHierarchy
+    DirPanel, VisualHierarchy
 )
 
 from tui.placements import PPlace, VPosEnum, HPosEnum
@@ -20,17 +21,17 @@ from tui.placements import PPlace, VPosEnum, HPosEnum
 app_is_running = True
 vg: VisualGrid = None 
 
-clock = ClockButton("", panel_placement=PPlace(hPos=HPosEnum.RIGHT))
+clock = ClockButton("", p_place=PPlace(hPos=HPosEnum.RIGHT))
 
 menu = HStackPanel(None, 
         children= [Button("edit"), Button("view"), Button("settings"),
                    Button("help"), Button("about"), clock], 
-        grid_placement=GPlace(0, 1, 0, 2)
+        g_place=GPlace(0, 1, 0, 2)
     )
 
 
-log_panel = LogPanel("[LOGGER]")
-log_panel.grid_placement = GPlace(1, 1, 1, 1)
+log_panel = TextBox("[LOGGER]")
+log_panel.g_place = GPlace(1, 1, 1, 1)
 
 row_defs = [Len(1, LenT.ABS), Len(50, LenT.STAR), Len(50, LenT.STAR)]
 col_defs = [Len(50, LenT.STAR), Len(50, LenT.STAR)]
@@ -44,7 +45,7 @@ vg_children = [
     ]
 
 
-async def resolve_input_continous(stdscr, log_panel: LogPanel, vg: VisualHierarchy = None):
+async def resolve_input_continous(stdscr, log_panel: TextBox, vg: VisualHierarchy = None):
     global app_is_running
     if log_panel is None:
         while app_is_running:
@@ -58,7 +59,9 @@ async def resolve_input_continous(stdscr, log_panel: LogPanel, vg: VisualHierarc
             id, mx, my, mz, bs = curses.getmouse()
             log_panel.log(f"M: k:{key}, bs:{bs} ({my}, {mx}, {mz})")
             # (mx, my)
-            all_obj = vg.get_all_objects()
+            all_belonging = [x for x in vg.get_all_objects() if x.check_point_belongs(mx, my)]
+            for obj in all_belonging:
+                log_panel.log(f"{obj.area.y0}, {obj.area.x0}, {obj.area.y1}, {obj.area.x1},   {obj.get_name()}")
         elif key == ord("q"):
             app_is_running = False
         else:
@@ -103,3 +106,4 @@ if __name__ == "__main__":
         curses.wrapper(main)
     except Exception as e:
         print(f"Error: {e}")
+

@@ -1,4 +1,4 @@
-def split_by_n_chars_other_shorter(input_str: str, max_first_width, max_others_width):
+def wrap_lines(input_str: str, max_first_width, max_others_width):
     first = input_str[:max_first_width]
     others = input_str[max_first_width:]
 

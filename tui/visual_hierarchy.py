@@ -1,5 +1,6 @@
 from tui.measures import Area
 from tui.placements import GPlace, PPlace
+import curses
 
 class VisualHierarchy:
     def __init__(
@@ -8,14 +9,14 @@ class VisualHierarchy:
         children: list["VisualHierarchy"] = None,
         
         area : Area = Area(),
-        grid_placement: GPlace = None, 
-        panel_placement: PPlace = PPlace()
+        g_place: GPlace = None, 
+        p_place: PPlace = PPlace()
     ):
         self.parent = parent
         self.children = [] if children is None else children
         self.area = area
-        self.grid_placement = grid_placement
-        self.panel_placement = panel_placement
+        self.g_place = g_place
+        self.p_place = p_place
         
         for child in [ch for ch in self.children if ch is not None]:
             child.parent = self
@@ -40,3 +41,14 @@ class VisualHierarchy:
         check_h = self.area.x0 <= x <= self.area.x1
         check_v = self.area.y0 <= y <= self.area.y1
         return check_h and check_v
+    
+    def get_name(self):
+        name = type(self).__name__
+        return name
+    
+    def emit_window(self):
+        h, w = self.area.get_dims()        
+        win = curses.newwin(h, w, self.area.y0, self.area.x0)
+        win.border(".", ".", ".", ".", ".", ".", ":", ":")
+        win.addstr(0, 1, self.title)
+        return win

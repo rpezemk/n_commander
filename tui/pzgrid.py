@@ -8,13 +8,13 @@ import tui.measures
 class VisualGrid(VisualHierarchy):
     def __init__(self, parent, children: list[VisualHierarchy] = None, 
                  area: Area = Area(), 
-                 grid_placement: GPlace = GPlace(0, 0, 0, 0), 
+                 g_place: GPlace = GPlace(0, 0, 0, 0), 
                  panel_placement: PPlace = PPlace(),
                  row_defs: list[Len] = [Len(100, LenT.STAR)],
                  col_defs: list[Len] = [Len(100, LenT.STAR)],
                  stdscr = None
                  ):
-        super().__init__(parent, children, area, grid_placement, panel_placement)
+        super().__init__(parent, children, area, g_place, panel_placement)
         self.row_defs = row_defs
         self.col_defs = col_defs
         self.stdscr = stdscr
@@ -26,10 +26,10 @@ class VisualGrid(VisualHierarchy):
         h_lengths = tui.measures.get_effective_lengths(self.col_defs, n_cols)
         
         for ch in self.children:
-            row_no = ch.grid_placement.row_no
-            row_sp = ch.grid_placement.row_span
-            col_no = ch.grid_placement.col_no
-            col_sp = ch.grid_placement.col_span
+            row_no = ch.g_place.row_no
+            row_sp = ch.g_place.row_span
+            col_no = ch.g_place.col_no
+            col_sp = ch.g_place.col_span
             
             v_sub = v_lengths[row_no:row_no+row_sp]
             h_sub = h_lengths[col_no:col_no+col_sp]
