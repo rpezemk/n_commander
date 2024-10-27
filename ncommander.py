@@ -15,7 +15,7 @@ from tui.controls import (
     DirP, BaseVisual
 )
 
-from tui.placements import PPlace, VPosEnum, HPosEnum
+from tui.placements import PPlace, HPosEnum
 
 
 ###### GUI ELEMENTS ######
@@ -24,10 +24,11 @@ vg: VisualGrid = None
 
 log_panel = TBox(g_place=(1, 1, 1, 1))
 
-################ SHITTY CODE #######################
-
-row_defs = [(1, "a"), (50, "*"), (50, "*")]
 col_defs = [(50, "*"), (50, "*")]
+
+row_defs = [(1, "a"), 
+            (50, "*"), 
+            (50, "*")]
 
 vg_children = [
     HPanel(None, 
@@ -38,33 +39,34 @@ vg_children = [
     DirP(".").g_at((1, 0)),
     log_panel.g_at((1, 1)),
     DirP(".").g_at((2, 0)),
-    DirP(".").g_at((2, 1)),
-    ]
+    DirP(".").g_at((2, 1)),]
 
 
 async def resolve_input_continous(stdscr, log_panel: TBox, vg: BaseVisual = None):
     global app_is_running
-    if log_panel is None:
-        while app_is_running:
-            await asyncio.sleep(0.01)
-            
+    
     while app_is_running:
-        key = stdscr.getch()
-        if key == -1:
-            pass
-        elif key == curses.KEY_MOUSE:
-            id, mx, my, mz, bs = curses.getmouse()
-            log_panel.log(f"M: k:{key}, bs:{bs} ({my}, {mx}, {mz})")
-            # (mx, my)
-            all_belonging = [x for x in vg.get_all_objects() if x.check_point_belongs(mx, my)]
-            for obj in all_belonging:
-                log_panel.log(f"{obj.area.y0}, {obj.area.x0}, {obj.area.y1}, {obj.area.x1},   {obj.get_name()}")
-        elif key == ord("q"):
-            app_is_running = False
-        else:
-            log_panel.log(f"K: k:{key}")
-        
+        if log_panel is not None:
+            resolve_input(stdscr, log_panel, vg)
         await asyncio.sleep(0.01)
+
+def resolve_input(stdscr, log_panel, vg):
+    global app_is_running
+    key = stdscr.getch()
+    if key == -1:
+        pass
+    elif key == curses.KEY_MOUSE:
+        id, mx, my, mz, bs = curses.getmouse()
+        log_panel.log(f"M: k:{key}, bs:{bs} ({my}, {mx}, {mz})")
+            # (mx, my)
+        all_belonging = [x for x in vg.get_all_objects() if x.check_point_belongs(mx, my)]
+        for obj in all_belonging:
+            log_panel.log(f"{obj.area.y0}, {obj.area.x0}, {obj.area.y1}, {obj.area.x1},   {obj.get_name()}")
+    elif key == ord("q"):
+        app_is_running = False
+    else:
+        log_panel.log(f"K: k:{key}")
+        
 
 
 async def async_grid_refresh(grid: VisualGrid):
