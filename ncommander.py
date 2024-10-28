@@ -1,19 +1,17 @@
 import curses
 import os
 from pathlib import Path
-from utils import os_utils, string_utils
-import asyncio
 from datetime import datetime
+import asyncio
+
+from utils import os_utils, string_utils
 from tui import signal_resolver
 from tui.visual_grid import VisualGrid
 from tui.measures import Area, Segment, Len, LenT
 from tui.placements import GPlace
 from tui.text_box import TBox
+from tui.controls import Btn, Clock, HPanel, DirP, BaseVisual
 
-from tui.controls import (
-    Btn, Clock, HPanel,
-    DirP, BaseVisual
-)
 
 from tui.placements import PPlace, HPosEnum
 
