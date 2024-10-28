@@ -74,11 +74,7 @@ class BaseVisual:
                 temp_g_place = GPlace(1, 0, 1, 0)
         self.g_place = temp_g_place
         return self
-    
-    def pass_as(self, outer: list['BaseVisual']):
-        outer = [self]
-        return self
-    
+        
     def emit_window(self):
         h, w = self.area.get_dims()        
         win = curses.newwin(h + 1, w + 1, self.area.y0, self.area.x0)
