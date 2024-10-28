@@ -13,7 +13,8 @@ class Frame():
     """it's not what you think it is
     """
     def __init__(self, stdscr):
-        self.lines = []
+        max_y, max_x = signal_resolver.stdscr.getmaxyx()
+        self.lines:list[str] = max_x * [max_y * " "]
         self.stdscr = stdscr
         pass
     
@@ -40,6 +41,9 @@ class Frame():
         
     def draw_h_line(self, y0, x0, len, ch: str):
         signal_resolver.stdscr.addstr(y0, x0, ch*len)
+        line = self.lines[y0]
+        res = line[:x0] + ch*len
+        signal_resolver.stdscr.addstr(y0, 0, res)
         
     def draw_v_line(self, y0, x0, len, ch: str):
         for i in range(0, len):
