@@ -11,8 +11,6 @@ from tui.measures import Area, Segment, Len, LenT
 from tui.placements import GPlace
 from tui.text_box import TBox
 from tui.controls import Btn, Clock, HPanel, DirP, BaseVisual
-
-
 from tui.placements import PPlace, HPosEnum
 
 
