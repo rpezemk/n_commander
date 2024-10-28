@@ -7,7 +7,6 @@ class BaseVisual:
         self,
         parent: "BaseVisual",
         children: list["BaseVisual"] = None,
-        
         area : Area = Area(),
         g_place: GPlace = None, 
         p_place: PPlace = PPlace()
@@ -16,20 +15,7 @@ class BaseVisual:
         self.children = [] if children is None else children
         self.area = area
         
-        temp_g_place = None
-        match g_place:
-            case _ if isinstance(g_place, GPlace):
-                pass
-            case _ if isinstance(g_place, tuple):
-                if len(g_place) == 4:
-                    temp_g_place = GPlace(*g_place)
-                if len(g_place) == 2:
-                    temp_g_place = GPlace(g_place[0], 1, g_place[1], 1)
-            case _:
-                temp_g_place = GPlace(1, 0, 1, 0)
-        self.g_place = temp_g_place
-        
-        self.g_place = temp_g_place
+        self.g_at(g_place)
         self.p_place = p_place
         
         for child in [ch for ch in self.children if ch is not None]:
@@ -65,11 +51,10 @@ class BaseVisual:
         match g_place:
             case _ if isinstance(g_place, GPlace):
                 pass
-            case _ if isinstance(g_place, tuple):
-                if len(g_place) == 4:
+            case (x,y):
+                temp_g_place = GPlace(g_place[0], 1, g_place[1], 1)
+            case (k, l, m, n):
                     temp_g_place = GPlace(*g_place)
-                if len(g_place) == 2:
-                    temp_g_place = GPlace(g_place[0], 1, g_place[1], 1)
             case _:
                 temp_g_place = GPlace(1, 0, 1, 0)
         self.g_place = temp_g_place
