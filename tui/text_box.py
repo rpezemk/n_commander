@@ -1,5 +1,6 @@
 import textwrap
 from datetime import datetime
+
 from tui.placements import GPlace
 from tui.controls import Panel
 

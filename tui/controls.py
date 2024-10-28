@@ -4,6 +4,7 @@ import curses
 from enum import Enum
 from datetime import datetime
 from typing import Callable, Tuple
+
 from utils import os_utils, string_utils
 from tui.placements import GPlace, HPosEnum, PPlace
 from tui.measures import Area
