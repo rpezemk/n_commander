@@ -16,8 +16,8 @@ class TBox(Panel):
         
     def draw(self) -> None:
         h, w = self.area.get_dims()
-        line_width = w - 3
-        v_capacity = h - 0
+        line_width = w - 4
+        v_capacity = h - 1
         if line_width < 1 or v_capacity < 1:
             return
         

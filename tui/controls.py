@@ -94,10 +94,10 @@ class DirP(Panel):
         win = self.emit_window()
         
         dirOk, dirs, files, errStr = os_utils.try_get_dir_content(self.title)
-        if dirOk and h - 2 > 0:
-            content = string_utils.list_to_columns(h - 2, w - 1, dirs + files)
+        if dirOk and h - 3 > 0:
+            content = string_utils.list_to_columns(h - 3, w - 2, dirs + files)
             for idx, line in enumerate(content):
-                if idx <= h - 2:
+                if idx <= h - 3:
                     win.addstr(1 + idx, 3, line)
                     ...
         win.refresh()

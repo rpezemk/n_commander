@@ -19,7 +19,7 @@ class Area():
 
     
     def get_dims(self) -> Tuple[int, int]:
-        return self.y1 - self.y0, self.x1 - self.x0
+        return self.y1 - self.y0 + 1, self.x1 - self.x0 + 1
     
 class LenT(Enum):
     ABS = 1
