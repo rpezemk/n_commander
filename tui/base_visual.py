@@ -1,6 +1,7 @@
 from tui.measures import Area
 from tui.placements import GPlace, PPlace
 import curses
+from tui.n_window import NWindow
 
 class BaseVisual:
     def __init__(
@@ -60,9 +61,12 @@ class BaseVisual:
         self.g_place = temp_g_place
         return self
         
-    def emit_window(self):
+    def emit_window(self, title = ""):
+        h, w = self.get_dims()        
+        n_win = NWindow(h, w, self.area.y0, self.area.x0, self.title)
+        n_win.addstr(0, 1, self.title)
+        return n_win
+    
+    def get_dims(self):
         h, w = self.area.get_dims()        
-        win = curses.newwin(h, w, self.area.y0, self.area.x0)
-        win.border(".", ".", ".", ".", ".", ".", ":", ":")
-        win.addstr(0, 1, self.title)
-        return win
+        return h, w

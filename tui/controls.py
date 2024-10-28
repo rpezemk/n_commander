@@ -22,12 +22,17 @@ class Btn(BaseVisual):
         self.real_title = f"[{self.title}]"
 
     def draw(self):
-        win = curses.newwin(3, len(self.real_title), 0, self.area.x0)
-        win.addstr(0, 0, self.real_title)
-        win.refresh()
+        n_win = self.emit_window()
+        n_win.addstr(0, 0, self.real_title)
+        n_win.refresh()
 
     def get_width(self):
         return len(self.real_title)
+    
+    def get_dims(self):
+        self.area.x1 = self.area.x0 + len(self.real_title)
+        self.area.y1 = self.area.y0
+        return self.area.get_dims()
 
 
 class Clock(Btn):
@@ -40,7 +45,6 @@ class Clock(Btn):
         self.title = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.real_title = f"[{self.title}]"
         super().draw()
-
 
 
 class HPanel(BaseVisual):
@@ -89,10 +93,10 @@ class DirP(Panel):
         super().__init__(absolute_path, g_place=g_plc, p_place=p_place)
 
     def draw(self) -> None:
-        h, w = self.area.get_dims()
+        h, w = self.get_dims()
         if h < 1:
             return
-        win = self.emit_window()
+        win = self.emit_window(self.title).with_border()
         
         dirOk, dirs, files, errStr = os_utils.try_get_dir_content(self.title)
         if dirOk and h - 3 > 0:

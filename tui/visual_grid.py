@@ -24,7 +24,7 @@ class VisualGrid(BaseVisual):
         
     def draw(self):
         self.area = Area(0, 0, *self.stdscr.getmaxyx())
-        h, w = self.area.get_dims()
+        h, w = self.get_dims()
         v_lengths = tui.measures.get_effective_lengths(self.row_defs, h - 1)
         h_lengths = tui.measures.get_effective_lengths(self.col_defs, w - 1)
         

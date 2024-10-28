@@ -16,13 +16,13 @@ class TBox(Panel):
         self.text += f"[{now}] {message}\n"
         
     def draw(self) -> None:
-        h, w = self.area.get_dims()
+        h, w = self.get_dims()
         line_width = w - 4
         v_capacity = h - 1
         if line_width < 1 or v_capacity < 1:
             return
         
-        win = self.emit_window()
+        win = self.emit_window().with_border()
 
         maybe_last_lines = self.text.split("\n")[-v_capacity:]
         real_last_lines: list[str] = []

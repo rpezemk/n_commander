@@ -86,7 +86,6 @@ def main(stdscr):
     signal_resolver.init_screen(stdscr)
     asyncio.run(run_async_tasks(stdscr))
 
-
 if __name__ == "__main__":
     try:
         curses.wrapper(main)
