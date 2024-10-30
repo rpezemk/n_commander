@@ -24,7 +24,6 @@ class Btn(BaseVisual):
     def draw(self):
         n_win = self.emit_window()
         n_win.addstr(0, 0, self.real_title)
-        n_win.refresh()
 
     def get_width(self):
         return len(self.real_title)
@@ -96,8 +95,8 @@ class DirP(Panel):
         h, w = self.get_dims()
         if h < 1:
             return
-        win = self.emit_window(self.title).with_border()
-        
+        win = self.emit_window().draw_border()
+        win.addstr(0, 1, self.title)
         dirOk, dirs, files, errStr = os_utils.try_get_dir_content(self.title)
         if dirOk and h - 3 > 0:
             content = string_utils.list_to_columns(h - 3, w - 2, dirs + files)
@@ -105,6 +104,6 @@ class DirP(Panel):
                 if idx <= h - 3:
                     win.addstr(1 + idx, 3, line)
                     ...
-        win.refresh()
+
 
                

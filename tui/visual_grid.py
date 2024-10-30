@@ -29,6 +29,9 @@ class VisualGrid(BaseVisual):
         h_lengths = tui.measures.get_effective_lengths(self.col_defs, w - 1)
         
         for ch in self.children:
+            if ch == None:
+                continue
+            
             row_no = ch.g_place.row_no
             row_sp = ch.g_place.row_span
             col_no = ch.g_place.col_no

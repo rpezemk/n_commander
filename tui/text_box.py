@@ -17,13 +17,14 @@ class TBox(Panel):
         
     def draw(self) -> None:
         h, w = self.get_dims()
+        
         line_width = w - 4
         v_capacity = h - 1
         if line_width < 1 or v_capacity < 1:
             return
         
-        win = self.emit_window().with_border()
-
+        win = self.emit_window().draw_border()
+        win.addstr(0, 1, self.title)
         maybe_last_lines = self.text.split("\n")[-v_capacity:]
         real_last_lines: list[str] = []
         for line in maybe_last_lines:
@@ -40,4 +41,4 @@ class TBox(Panel):
         
         for idx, line in enumerate(real_last_lines[-v_capacity:]):
             win.addstr(1 + idx, 2, line)
-        win.refresh()
+

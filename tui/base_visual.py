@@ -29,6 +29,9 @@ class BaseVisual:
     def get_all_objects(self) -> list['BaseVisual']:
         res = [self] 
         for ch in self.children:
+            if ch is None:
+                continue
+            
             ch_objs = ch.get_all_objects()
             for ch_ob in ch_objs:
                 res.append(ch_ob)
@@ -61,10 +64,9 @@ class BaseVisual:
         self.g_place = temp_g_place
         return self
         
-    def emit_window(self, title = ""):
+    def emit_window(self):
         h, w = self.get_dims()        
-        n_win = NWindow(h, w, self.area.y0, self.area.x0, self.title)
-        n_win.addstr(0, 1, self.title)
+        n_win = NWindow(h, w, self.area.y0, self.area.x0)
         return n_win
     
     def get_dims(self):
