@@ -41,7 +41,12 @@ class DirBtn(Btn):
     def click(self):
         return super().click()
 
-
+class FileBtn(Btn):
+    def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
+        super().__init__(title, parent, g_place, p_place)
+        self.real_title = self.title
+    def click(self):
+        return super().click()
 
 class Clock(Btn):
     def __init__(self, parent=None,
@@ -105,18 +110,32 @@ class DirP(Panel):
         super().__init__(absolute_path, g_place=g_plc, p_place=p_place)
 
     def draw(self) -> None:
-        h, w = self.get_dims()
-        if h < 1:
-            return
+        height, width = self.get_dims()
         win = self.emit_window().draw_border()
         win.addstr(0, 1, self.title)
+        if height < 3:
+            return
         dirOk, dirs, files, errStr = os_utils.try_get_dir_content(self.title)
-        if dirOk and h - 3 > 0:
-            content = string_utils.list_to_columns(h - 3, w - 2, dirs + files)
-            for idx, line in enumerate(content):
-                if idx <= h - 3:
-                    win.addstr(1 + idx, 3, line)
-                    ...
-
-
-               
+        
+        self.children = [*list([DirBtn(dir) for dir in dirs]), *list([FileBtn(file) for file in files])]
+        y0 = 1 + self.area.y0 
+        x0 = self.area.x0 + 2
+        prev_x_offset = 0
+        children_to_draw = []
+        ch_groups = string_utils.group_elements_by_n(self.children, height - 2)
+        n_groups = len(ch_groups)
+        for idx, ch_group in enumerate(ch_groups):
+            for idx, ch in enumerate(ch_group):    
+                y_offset = y0 + (idx % (height - 2))
+                child_len = len(ch.real_title)
+                ch.area = Area(y_offset, x0, y_offset, x0 + child_len)
+                children_to_draw.append(ch)
+            
+            if x0 > width:
+                break
+            x0 += max([len(ch.real_title) for ch in ch_group]) + 1    
+            ...
+        for ch in children_to_draw:
+            ch.draw()
+        # for ch in self.children:
+        #     ch.draw()

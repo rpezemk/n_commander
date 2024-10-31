@@ -22,6 +22,13 @@ def group_by_n(input_list, n):
         grouped.append(input_list[i : i + n])
     return grouped
 
+def group_elements_by_n(input_list, n):
+    grouped = []
+    for i in range(0, len(input_list), n):
+        sub = list(input_list[i : i + n])
+        t = type(sub)
+        grouped.append(sub)
+    return grouped
 
 def list_to_columns(maxH: int, maxW: int, list) -> list[str]:
     groups = group_by_n(list, max(1, maxH))
