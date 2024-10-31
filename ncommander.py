@@ -60,6 +60,7 @@ def resolve_input(stdscr, log_panel, vg):
             # (mx, my)
         all_belonging = [x for x in vg.get_all_objects() if x is not None and x.check_point_belongs(mx, my)]
         for obj in all_belonging:
+            obj.click()
             log_panel.log(f"{obj.area.y0}, {obj.area.x0}, {obj.area.y1}, {obj.area.x1},   {obj.get_name()}")
     elif key == ord("q"):
         app_is_running = False
