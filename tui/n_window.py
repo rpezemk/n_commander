@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from tui import signal_resolver
 from tui.measures import Area
 from tui.frame import Frame
+import locale
 
 stdscr = None
 

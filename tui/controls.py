@@ -38,13 +38,17 @@ class Clock(Btn):
     def __init__(self, parent=None,
                 g_place: GPlace = None, 
                 p_place: PPlace = PPlace()):
-        super().__init__("", parent, g_place, p_place)
+        self.title = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.real_title = f"[{self.title}]"
+        super().__init__(self.title, parent, g_place, p_place)
 
     def draw(self):
         self.title = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.real_title = f"[{self.title}]"
         super().draw()
-
+        
+    def get_width(self):
+        return len(self.real_title)
 
 class HPanel(BaseVisual):
     def __init__(self, parent=None, children=[],

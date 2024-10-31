@@ -47,6 +47,8 @@ async def resolve_input_continous(stdscr, log_panel: TBox, vg: BaseVisual = None
             resolve_input(stdscr, log_panel, vg)
         await asyncio.sleep(0.01)
 
+
+
 def resolve_input(stdscr, log_panel, vg):
     global app_is_running
     key = stdscr.getch()
@@ -85,6 +87,7 @@ async def run_async_tasks(stdscr):
     stdscr.refresh()
     
 def main(stdscr):
+    curses.curs_set(0)
     signal_resolver.init_screen(stdscr)
     asyncio.run(run_async_tasks(stdscr))
 
