@@ -34,6 +34,15 @@ class Btn(BaseVisual):
         return self.area.get_dims()
 
 
+class DirBtn(Btn):
+    def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
+        super().__init__(title, parent, g_place, p_place)
+    
+    def click(self):
+        return super().click()
+
+
+
 class Clock(Btn):
     def __init__(self, parent=None,
                 g_place: GPlace = None, 

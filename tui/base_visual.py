@@ -38,6 +38,9 @@ class BaseVisual:
         
         return res
     
+    def click(self):
+        ...
+    
     def draw(self):
         ...
         
