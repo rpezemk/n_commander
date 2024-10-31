@@ -10,7 +10,7 @@ from tui.visual_grid import VisualGrid
 from tui.measures import Area, Segment, Len, LenT
 from tui.placements import GPlace
 from tui.text_box import TBox
-from tui.controls import Btn, Clock, HPanel, DirP, BaseVisual
+from tui.controls import Btn, Clock, HPanel, DirP, BaseVisual, ListView
 from tui.placements import PPlace, HPosEnum
 import tui.n_window
 from tui.n_window import NWindow
@@ -35,7 +35,7 @@ vg_children = [
     DirP(".").g_at((1, 0)),
     log_panel.g_at((1, 1)),
     DirP(".").g_at((2, 0)),
-    DirP(".").g_at((2, 1)),
+    ListView(".").g_at((2, 1)),
     ]
 
 

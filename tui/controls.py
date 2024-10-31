@@ -3,7 +3,7 @@ from pathlib import Path
 import curses
 from enum import Enum
 from datetime import datetime
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Any
 
 from utils import os_utils, string_utils
 from tui.placements import GPlace, HPosEnum, PPlace
@@ -38,7 +38,7 @@ class FileSystemBtn(Btn):
         
         super().__init__(title, parent, g_place, p_place)
         split = [s for s in title.split("/") if s != '']
-        self.title = "./" + split[-1]
+        self.title = title
         self.real_title = self.title
         
 class DirBtn(FileSystemBtn):
@@ -47,7 +47,11 @@ class DirBtn(FileSystemBtn):
     
     def click(self):
         if self.parent is not None:
-            self.parent.title = str(Path(self.title).resolve())
+            if self.title != "../":
+                p = os.path.join(self.parent.title, self.title)
+            else:
+                p = str(Path(self.parent.title).parent)
+            self.parent.title = p
         # return super().click()
 
 class FileBtn(FileSystemBtn):
@@ -107,7 +111,53 @@ class Panel(BaseVisual):
     def draw(self):
         ...
 
-class DirP(Panel):
+class ItemPanel(Panel):
+    def __init__(self, title, parent=None, children = [], area = Area(), 
+                 g_place = None, p_place = PPlace(), 
+                 get_items_func:Callable[[],list[Btn]]=None,
+                 get_item_width_func:Callable[[],int]=None):
+        super().__init__(title, parent, children, area, g_place, p_place)
+        self.get_items_func = get_items_func
+        
+    def draw(self) -> None:
+        self.real_title = self.title
+        height, width = self.get_dims()
+        win = self.emit_window().draw_border()
+        win.addstr(0, 1, self.title)
+        if self.get_items_func is None:
+            return
+        
+        if height - 3 < 0:
+            return
+        
+        self.children = self.get_items_func()
+        
+        y0 = 1 + self.area.y0 
+        x0 = self.area.x0 + 2
+        children_to_draw = []
+        
+        ch_groups: list[DirBtn | FileBtn] = string_utils.group_elements_by_n(self.children, height - 2)
+        
+        n_groups = len(ch_groups)
+        for idx, ch_group in enumerate(ch_groups):
+            gr_width = max([len(ch.real_title) for ch in ch_group]) + 1  
+            if x0 + gr_width > width:
+                break
+            
+            for idx, ch in enumerate(ch_group):    
+                y_offset = y0 + (idx % (height - 2))
+                ch.area = Area(y_offset, x0, y_offset, x0 + len(ch.real_title))
+                ch.parent = self
+                children_to_draw.append(ch)
+            
+            x0 += gr_width
+
+        for ch in children_to_draw:
+            ch.draw()
+
+
+            
+class DirP(ItemPanel):
     def __init__(self, title = None,
                     g_plc: GPlace = None, 
                     p_place: PPlace = PPlace()
@@ -116,50 +166,79 @@ class DirP(Panel):
         if absolute_path is None or title == '' or title == '.':
             absolute_path = str(Path(".").resolve())
         split = [s for s in title.split("/") if s != '']
-        self.title = str(Path("./" + split[-1]).resolve())
+        self.title = str(Path(split[-1]).resolve())
         self.real_title = self.title
-        super().__init__(absolute_path, g_place=g_plc, p_place=p_place)
+        super().__init__(absolute_path, g_place=g_plc, p_place=p_place, get_items_func=self.get_items)
 
-    def draw(self) -> None:
-        self.real_title = self.title
-        height, width = self.get_dims()
-        win = self.emit_window().draw_border()
-        win.addstr(0, 1, self.title)
-        if height < 3:
-            return
-        
+    def get_items(self):
         absolute_path = self.title
         if absolute_path is None or self.title == '' or self.title == '.':
             absolute_path = str(Path(".").resolve())
             
         dirOk, dirs, files, errStr = os_utils.try_get_dir_content(absolute_path)
         
-        self.children = [*list([DirBtn(dir) for dir in dirs]), *list([FileBtn(file) for file in files])]
+        return [*list([DirBtn(dir) for dir in dirs]), *list([FileBtn(file) for file in files])]
+    
+    
+class ListView(Panel):
+    def __init__(self, title, parent=None, children = [], area = Area(), g_place = None, p_place = PPlace(), get_items_func: Callable[[None],list[Any]]=None, columns=list[str]):
+        super().__init__(title, parent, children, area, g_place, p_place)
+        self.get_items_func = get_items_func
+        self.columns = columns
+    
+    def get_items(self):
+        absolute_path = self.title
+        if absolute_path is None or self.title == '' or self.title == '.':
+            absolute_path = str(Path(".").resolve())
+            
+        dirOk, dirs, files, errStr = os_utils.try_get_dir_content(absolute_path)
+        sub_res = [*dirs, *files] 
+        res = [dict(t="a", name=x) for x in sub_res]
+        return res
+    
+    def draw(self):
+        self.real_title = self.title
+        height, width = self.get_dims()
+        win = self.emit_window().draw_border()
+        
+        self.get_items_func = self.get_items
+        
+        if self.get_items_func is None:
+            return
+        
         y0 = 1 + self.area.y0 
         x0 = self.area.x0 + 2
-        prev_x_offset = 0
         children_to_draw = []
         
-        ch_groups:list[DirBtn] = string_utils.group_elements_by_n(self.children, height - 2)
+        items = self.get_items_func()
+        self.columns = ["t", "name"]
         
-        n_groups = len(ch_groups)
-        for idx, ch_group in enumerate(ch_groups):
-            for idx, ch in enumerate(ch_group):    
-                y_offset = y0 + (idx % (height - 2))
-                try:
-                    child_len = len(ch.real_title)
-                except:
-                    a = 234
-                    child_len = len(ch.real_title)
-                ch.area = Area(y_offset, x0, y_offset, x0 + child_len)
-                ch.parent = self
-                children_to_draw.append(ch)
+        table_data = []
+        for col in self.columns:
+            col_group = []
+            for item in items[:height-3]:
+                if isinstance(item, dict):
+                    attr = item[col]
+                else:
+                    attr = getattr(item, col, None)
+                col_group.append(attr)
+
+            table_data.append(col_group)
             
-            if x0 > width:
+            
+        # table_data = [[getattr(item, col, None) for item in items[:height-3]] for col in self.columns]
+        for col in table_data:
+            gr_width = max([*[len(d) for d in col], 0]) + 1  
+            if x0 + gr_width > width:
                 break
-            x0 += max([len(ch.real_title) for ch in ch_group]) + 1    
-            ...
+            
+            for idx, data in enumerate(col):
+                btn = Btn(data)
+                children_to_draw.append(btn)    
+                btn.area = Area(y0 + idx, x0, y0 + idx, x0 + len(data))
+                
+            x0 += gr_width + 1
+            
         for ch in children_to_draw:
-            ch.draw()
-        # for ch in self.children:
-        #     ch.draw()
+            ch.draw()    
+        

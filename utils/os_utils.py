@@ -15,7 +15,7 @@ def try_get_dir_content(path='.') -> tuple[bool, list[str], list[str], str]:
     try:
         entries = list(os.scandir(absPath))
         files = [entry.name for entry in entries if entry.is_file()]
-        dirs = [entry.name + "/" for entry in entries if entry.is_dir()]
+        dirs = ["../", *list([entry.name + "/" for entry in entries if entry.is_dir()])]
         return (True, dirs, files, None)
     
     except FileNotFoundError:
