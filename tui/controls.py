@@ -33,18 +33,26 @@ class Btn(BaseVisual):
         self.area.y1 = self.area.y0
         return self.area.get_dims()
 
-
-class DirBtn(Btn):
+class FileSystemBtn(Btn):
     def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
+        
         super().__init__(title, parent, g_place, p_place)
+        split = [s for s in title.split("/") if s != '']
+        self.title = "./" + split[-1]
+        self.real_title = self.title
+        
+class DirBtn(FileSystemBtn):
+    def __init__(self, in_path: str, parent = None, g_place = None, p_place = PPlace()):
+        super().__init__(in_path, parent, g_place, p_place)
     
     def click(self):
-        return super().click()
+        if self.parent is not None:
+            self.parent.title = str(Path(self.title).resolve())
+        # return super().click()
 
-class FileBtn(Btn):
+class FileBtn(FileSystemBtn):
     def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
         super().__init__(title, parent, g_place, p_place)
-        self.real_title = self.title
     def click(self):
         return super().click()
 
@@ -107,28 +115,44 @@ class DirP(Panel):
         absolute_path = title
         if absolute_path is None or title == '' or title == '.':
             absolute_path = str(Path(".").resolve())
+        split = [s for s in title.split("/") if s != '']
+        self.title = str(Path("./" + split[-1]).resolve())
+        self.real_title = self.title
         super().__init__(absolute_path, g_place=g_plc, p_place=p_place)
 
     def draw(self) -> None:
+        self.real_title = self.title
         height, width = self.get_dims()
         win = self.emit_window().draw_border()
         win.addstr(0, 1, self.title)
         if height < 3:
             return
-        dirOk, dirs, files, errStr = os_utils.try_get_dir_content(self.title)
+        
+        absolute_path = self.title
+        if absolute_path is None or self.title == '' or self.title == '.':
+            absolute_path = str(Path(".").resolve())
+            
+        dirOk, dirs, files, errStr = os_utils.try_get_dir_content(absolute_path)
         
         self.children = [*list([DirBtn(dir) for dir in dirs]), *list([FileBtn(file) for file in files])]
         y0 = 1 + self.area.y0 
         x0 = self.area.x0 + 2
         prev_x_offset = 0
         children_to_draw = []
-        ch_groups = string_utils.group_elements_by_n(self.children, height - 2)
+        
+        ch_groups:list[DirBtn] = string_utils.group_elements_by_n(self.children, height - 2)
+        
         n_groups = len(ch_groups)
         for idx, ch_group in enumerate(ch_groups):
             for idx, ch in enumerate(ch_group):    
                 y_offset = y0 + (idx % (height - 2))
-                child_len = len(ch.real_title)
+                try:
+                    child_len = len(ch.real_title)
+                except:
+                    a = 234
+                    child_len = len(ch.real_title)
                 ch.area = Area(y_offset, x0, y_offset, x0 + child_len)
+                ch.parent = self
                 children_to_draw.append(ch)
             
             if x0 > width:

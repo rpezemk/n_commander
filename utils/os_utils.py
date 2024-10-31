@@ -8,9 +8,12 @@ def try_get_dir_content(path='.') -> tuple[bool, list[str], list[str], str]:
     :param path: Directory path to list the contents of. Default is the current directory.
     :return: List of directory contents.
     """
-    absPath = os.path.abspath(path)
+    
+    # path = path + "/"
+    # path = path.replace("//", "/")
+    absPath = os.path.abspath(path) + "/"
     try:
-        entries = list(os.scandir(path))
+        entries = list(os.scandir(absPath))
         files = [entry.name for entry in entries if entry.is_file()]
         dirs = [entry.name + "/" for entry in entries if entry.is_dir()]
         return (True, dirs, files, None)

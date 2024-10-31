@@ -50,7 +50,7 @@ class BaseVisual:
         return check_h and check_v
     
     def get_name(self):
-        name = type(self).__name__
+        name = "abc"
         return name
     
     def g_at(self, g_place):

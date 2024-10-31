@@ -26,7 +26,6 @@ def group_elements_by_n(input_list, n):
     grouped = []
     for i in range(0, len(input_list), n):
         sub = list(input_list[i : i + n])
-        t = type(sub)
         grouped.append(sub)
     return grouped
 

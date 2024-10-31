@@ -93,8 +93,9 @@ def main(stdscr):
     asyncio.run(run_async_tasks(stdscr))
 
 if __name__ == "__main__":
-    try:
-        curses.wrapper(main)
-    except Exception as e:
-        print(f"Error: {e}")
+    curses.wrapper(main)
+    # try:
+    #     #curses.wrapper(main)
+    # except Exception as e:
+    #     print(f"Error: {e}")
 
