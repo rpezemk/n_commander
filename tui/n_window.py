@@ -47,7 +47,7 @@ def init_frame(stdscr):
 
 def render_frame():
     if frame is not None:
-        frame.render()
+        frame.render_frame()
         
 class NWindow(): #h + 1, w + 1, self.area.y0, self.area.x0
     def __init__(self, h: int, w: int, y0: int, x0: int, title = ""): 
