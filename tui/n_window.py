@@ -26,29 +26,25 @@ class TuiSet():
         self.bottom_right = args[5]
         self.upper_conn = args[6]
         self.lower_conn = args[7]
+        self.cross = args[8]
+        self.left_conn = args[9]
+        self.right_conn = args[10]
+        self.dash_h = args[11]
+        self.dash_v = args[12]
         pass
 
 
 @dataclass
 class TS():
-    d = TuiSet("\u2550",
-                    "\u2551",
-                    "\u2554",
-                    "\u2557",
-                    "\u255A",
-                    "\u255D",
-                    "\u2566",
-                    "\u2569")
+    d = TuiSet("\u2550", "\u2551", "\u2554", "\u2557", 
+               "\u255A", "\u255D", "\u2566", "\u2569", 
+               "\u256c", "\u2560", "\u2563", "\u2505", 
+               "\u2563")
     
-    s = TuiSet(
-                    "\u2500",
-                    "\u2502",
-                    "\u250C",
-                    "\u2510",
-                    "\u2514",
-                    "\u2518",
-                    "\u252c",
-                    "\u2534")
+    s = TuiSet("\u2500", "\u2502", "\u250C", "\u2510", 
+               "\u2514", "\u2518", "\u252c", "\u2534",  
+               "\u253c", "\u251c", "\u2524", "\u2504", 
+               "\u250a")
 
 def init_frame(stdscr):
     global frame
@@ -65,7 +61,7 @@ class NWindow(): #h + 1, w + 1, self.area.y0, self.area.x0
         pass
     
     
-    def draw_border(self):
+    def draw_table(self):
         h, w = self.area.get_dims()
         lines = [TS.s.top_left + (w-2) * TS.s.horizontal + TS.s.top_right, 
                 *( (h-2) * [TS.s.vertical + (w - 2) * " " + TS.s.vertical]), 
@@ -100,7 +96,7 @@ class TableWindow(NWindow):
         row = [*len(self.columns) * []]
         
         
-    def draw_border(self):
+    def draw_table(self):
         h, w = self.area.get_dims()
         n_cols = len(self.columns)
         
@@ -113,15 +109,24 @@ class TableWindow(NWindow):
         
         test_blank_sum = sum([w.v1 - w.v0 for w in segments])
         
+        res_title = "Files"
         
+        top_line = (TS.s.top_left + TS.s.dash_h * 2 + " " + res_title + " ").ljust(w-1, TS.s.dash_h) + TS.s.top_right
         
-        top_line = TS.s.top_left + TS.s.upper_conn.join([TS.s.horizontal * (seg.v1 - seg.v0) for seg in segments]) + TS.s.top_right
-        mid_line = TS.s.vertical + TS.s.vertical.join([" " * (seg.v1 - seg.v0) for seg in segments]) + TS.s.vertical
+        sec_line = TS.s.left_conn \
+                   + TS.s.upper_conn.join([(TS.s.horizontal + "[" + self.columns[idx].title + "]").ljust(seg.v1 - seg.v0, TS.s.horizontal) for idx, seg in enumerate(segments)]) \
+                   + TS.s.right_conn
+            
+            
+        mid_line = TS.s.vertical \
+            + TS.s.vertical.join([" " * (seg.v1 - seg.v0) for idx, seg in enumerate(segments)]) \
+            + TS.s.vertical
         btm_line = TS.s.bottom_left + TS.s.lower_conn.join([TS.s.horizontal * (seg.v1 - seg.v0) for seg in segments]) + TS.s.bottom_right
         
         top_len = len(top_line)
         lines = [top_line, 
-                *( (h-2) * [mid_line]), 
+                 sec_line,
+                *( (h-3) * [mid_line]), 
                 btm_line]
         frame.draw_area(area=self.area, sub_lines=lines)
         return self
@@ -129,9 +134,9 @@ class TableWindow(NWindow):
     def draw_row(self, row_no=0, row_data:list[str] = []):
         n_filled_cols = min(len(self.columns), len(row_data))
         x0 = self.area.x0 + 1
-        y0 = self.area.y0 + 1
+        y0 = self.area.y0 + 2
         h, w = self.area.get_dims()
-        if row_no > h - 3:
+        if row_no > h - 4:
             return 
         for i in range(0, n_filled_cols):
             seg = self.spacers[i]

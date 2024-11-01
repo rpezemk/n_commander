@@ -122,7 +122,7 @@ class ItemPanel(Panel):
     def draw(self) -> None:
         self.real_title = self.title
         height, width = self.get_dims()
-        win = self.emit_window().draw_border()
+        win = self.emit_window().draw_table()
         win.addstr(0, 1, self.title)
         if self.get_items_func is None:
             return
@@ -199,7 +199,7 @@ class ListView(Panel):
     def draw(self):
         self.real_title = self.title
         height, width = self.get_dims()
-        table = self.emit_table([ColInfo("a", (10, "*")), ColInfo("a", (10, "*")), ColInfo("b", (10, "*")), ColInfo("c", (10, "*"))]).draw_border()
+        table = self.emit_table(self.columns).draw_table()
         
         self.get_items_func = self.get_items
             

@@ -23,7 +23,7 @@ class TBox(Panel):
         if line_width < 1 or v_capacity < 1:
             return
         
-        win = self.emit_window().draw_border()
+        win = self.emit_window().draw_table()
         win.addstr(0, 1, self.title)
         maybe_last_lines = self.text.split("\n")[-v_capacity:]
         real_last_lines: list[str] = []
