@@ -1,14 +1,11 @@
 import curses
 import sys
-import os
-from pathlib import Path
-from datetime import datetime
 import asyncio
 
 from tui import signal_resolver
 from tui.visual_grid import VisualGrid
 from tui.text_box import TBox
-from tui.controls import Btn, Clock, HPanel, DirP, BaseVisual, ListView
+from tui.controls import Btn, Clock, HPanel, DirP, ListView
 from tui.placements import PPlace, HPosEnum
 import tui.n_window
 from tui.n_window import ColInfo

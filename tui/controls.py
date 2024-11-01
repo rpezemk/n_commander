@@ -1,15 +1,12 @@
 import os
 from pathlib import Path
-import curses
-from enum import Enum
 from datetime import datetime
-from typing import Callable, Tuple, Any
+from typing import Callable, Any
 
 from utils import os_utils, string_utils
 from tui.placements import GPlace, HPosEnum, PPlace
 from tui.measures import Area
 from tui.base_visual import BaseVisual
-from tui.n_window import ColInfo
 
 class Btn(BaseVisual):
     def __init__(
