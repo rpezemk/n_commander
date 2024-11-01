@@ -9,7 +9,7 @@ from utils import os_utils, string_utils
 from tui.placements import GPlace, HPosEnum, PPlace
 from tui.measures import Area
 from tui.base_visual import BaseVisual
-
+from tui.n_window import ColInfo
 
 class Btn(BaseVisual):
     def __init__(
@@ -199,46 +199,11 @@ class ListView(Panel):
     def draw(self):
         self.real_title = self.title
         height, width = self.get_dims()
-        win = self.emit_window().draw_border()
+        table = self.emit_table([ColInfo("a", (10, "*")), ColInfo("a", (10, "*")), ColInfo("b", (10, "*")), ColInfo("c", (10, "*"))]).draw_border()
         
         self.get_items_func = self.get_items
-        
-        if self.get_items_func is None:
-            return
-        
-        y0 = 1 + self.area.y0 
-        x0 = self.area.x0 + 2
-        children_to_draw = []
-        
-        items = self.get_items_func()
-        self.columns = ["t", "name"]
-        
-        table_data = []
-        for col in self.columns:
-            col_group = []
-            for item in items[:height-3]:
-                if isinstance(item, dict):
-                    attr = item[col]
-                else:
-                    attr = getattr(item, col, None)
-                col_group.append(attr)
-
-            table_data.append(col_group)
             
-            
-        # table_data = [[getattr(item, col, None) for item in items[:height-3]] for col in self.columns]
-        for col in table_data:
-            gr_width = max([*[len(d) for d in col], 0]) + 1  
-            if x0 + gr_width > width:
-                break
-            
-            for idx, data in enumerate(col):
-                btn = Btn(data)
-                children_to_draw.append(btn)    
-                btn.area = Area(y0 + idx, x0, y0 + idx, x0 + len(data))
-                
-            x0 += gr_width + 1
-            
-        for ch in children_to_draw:
-            ch.draw()    
-        
+        items = 4 * [["abc", "def", "ghi", "jkl"]]
+        for idx, item in enumerate(items):
+            table.draw_row(idx, item)
+            pass

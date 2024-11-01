@@ -1,7 +1,7 @@
 from tui.measures import Area
 from tui.placements import GPlace, PPlace
 import curses
-from tui.n_window import NWindow
+from tui.n_window import NWindow, TableWindow
 
 class BaseVisual:
     def __init__(
@@ -67,6 +67,11 @@ class BaseVisual:
         self.g_place = temp_g_place
         return self
         
+    def emit_table(self, cols):
+        h, w = self.get_dims()        
+        n_table = TableWindow(h, w, self.area.y0, self.area.x0, columns=cols)
+        return n_table
+    
     def emit_window(self):
         h, w = self.get_dims()        
         n_win = NWindow(h, w, self.area.y0, self.area.x0)

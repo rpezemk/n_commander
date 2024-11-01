@@ -1,5 +1,5 @@
 from enum import Enum
-from tui.measures import LenT, Len
+from tui.measures import LenT, Length
 from tui.controls import BaseVisual, HPosEnum
 from tui.placements import GPlace, PPlace
 from tui.measures import Area, Segment
@@ -10,8 +10,8 @@ class VisualGrid(BaseVisual):
                  area: Area = Area(), 
                  g_place: GPlace = GPlace(0, 0, 0, 0), 
                  panel_placement: PPlace = PPlace(),
-                 row_defs: list[Len] = [Len(100, LenT.STAR)],
-                 col_defs: list[Len] = [Len(100, LenT.STAR)],
+                 row_defs: list[Length] = [Length(100, LenT.STAR)],
+                 col_defs: list[Length] = [Length(100, LenT.STAR)],
                  stdscr = None
                  ):
         # row_defs = [(1, "a"), (50, "*"), (50, "*")]
@@ -25,8 +25,8 @@ class VisualGrid(BaseVisual):
     def draw(self):
         self.area = Area(0, 0, *self.stdscr.getmaxyx())
         h, w = self.get_dims()
-        v_lengths = tui.measures.get_effective_lengths(self.row_defs, h - 1)
-        h_lengths = tui.measures.get_effective_lengths(self.col_defs, w - 1)
+        v_lengths = tui.measures.get_segments(self.row_defs, h - 1)
+        h_lengths = tui.measures.get_segments(self.col_defs, w - 1)
         
         for ch in self.children:
             if ch == None:

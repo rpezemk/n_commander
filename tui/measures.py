@@ -25,29 +25,37 @@ class LenT(Enum):
     ABS = 1
     STAR = 2
 
-class Len():
+class Length():
     def __init__(self, value: int, len_type: LenT = LenT.STAR):
         self.value = value
         self.len_type = len_type
         self.effective = 0
-        
+
+
+def get_length(length: Tuple|Length):
+    tmp_len = None
+    match length:
+        case _ if isinstance(length, Length):
+            tmp_len = length
+        case _ if isinstance(length, tuple):
+            v = length[0]
+            s = length[1]
+            eff_t = LenT.STAR if s == '*' else LenT.ABS
+            tmp_len = Length(v, eff_t)
+        case _:
+            tmp_len = length
+            
+    return tmp_len
     
-def get_effective_lengths(len_coll: list[Len], outer_len: int) -> list[Segment]:
-    tmp_len_coll = []
-    for len in len_coll:
-        tmp_len = None
-        match len:
-            case _ if isinstance(len, Len):
-                tmp_len = len
-            case _ if isinstance(len, tuple):
-                v = len[0]
-                s = len[1]
-                eff_t = LenT.STAR if s == '*' else LenT.ABS
-                tmp_len = Len(v, eff_t)
-            case _:
-                tmp_len = len
+def get_lengths(len_list: list[Tuple|Length]):
+    tmp_len_list = []
+    for length in len_list:
+        tmp_len = get_length(length)
+        tmp_len_list.append(tmp_len)
+    return tmp_len_list
     
-        tmp_len_coll.append(tmp_len)
+def get_segments(len_list: list[Length], outer_len: int) -> list[Segment]:
+    tmp_len_coll = get_lengths(len_list)
     star_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.STAR])
     curr_effective = 0
     res_lengths: list[Segment] = []
