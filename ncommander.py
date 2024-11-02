@@ -43,11 +43,14 @@ vg_children_split_h = [
     ListView(".", columns=dir_table_cols).g_at((2, 1, 0, 2)),
     ]
 
+def soft_close_app():
+    global app_is_running
+    app_is_running = False
 
 input_resolver = InputResolver(None, 
                                get_scr_func=(lambda: signal_resolver.stdscr), 
                                root_obj_func=lambda: vg.get_all_objects(), 
-                               turn_off_func=lambda: sys.exit(0),
+                               turn_off_func=soft_close_app,
                                report_click_func=
                                    lambda key, id, mx, my, mz, bs: 
                                        log_panel.log(f"M: k:{key}, bs:{bs} ({my}, {mx}, {mz})"))
