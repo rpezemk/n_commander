@@ -47,7 +47,7 @@ def init_screen(scr):
     stdscr = scr
     stdscr.refresh()
     stdscr.clear()
-    curses.mousemask(curses.ALL_MOUSE_EVENTS)
+    curses.mousemask(-1)
 
     if curses.has_colors():
         curses.start_color()
