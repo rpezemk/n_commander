@@ -72,6 +72,7 @@ class BaseVisual:
         n_table = TableWindow(h, w, self.area.y0, self.area.x0, columns=cols)
         return n_table
     
+    
     def emit_window(self):
         h, w = self.get_dims()        
         n_win = NWindow(h, w, self.area.y0, self.area.x0)

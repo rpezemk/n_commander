@@ -1,12 +1,13 @@
 from pathlib import Path
 from typing import Callable, List, Tuple, Union
 import os
-    
+import utils.os_utils    
     
 class FsItem():
     def __init__(self, *, abs_path:str=None):
         self.abs_path = abs_path
         self.rel_path = os.path.basename(abs_path)
+        self.ext = ""
         pass
         
 class FileModel(FsItem):
@@ -16,7 +17,8 @@ class FileModel(FsItem):
         pass
         
 class ParentDirModel(FsItem):
-    def __init__(self, *, abs_path:str=None):
+    def __init__(self, abs_path:str=None):
+        self.ext = ""
         if os.path.exists(abs_path):
             self.abs_path = os.path.dirname(os.path.dirname(abs_path))
             self.rel_path = "../"
@@ -45,11 +47,11 @@ class TreeProvider():
         self.dir_content_func = nice_get_dir_content
         pass
 
-    def get_dir_content(self,*, abs_path: Union[str, 'DirModel'] = None) -> Tuple[bool,list['FsItem']]:
+    def get_dir_content(self,*, abs_path: Union[str, 'DirModel'] = None) -> Tuple[bool,list[FsItem]]:
         tmp_path = None
         if isinstance(abs_path, str):
             tmp_path = abs_path
-        elif isinstance(abs_path, 'DirModel'):
+        elif isinstance(abs_path, DirModel):
             tmp_path = abs_path.abs_path
         if tmp_path is None or os.path.isfile(tmp_path) or not os.path.exists(tmp_path):
             return False, []
@@ -62,3 +64,8 @@ class TreeProvider():
         return ok, [*m_dirs, *m_files]    
     
 
+tree_provider = TreeProvider(utils.os_utils.get_nice_dir_content)
+
+def get_tree(dir_model: DirModel) -> Tuple[bool,list[FsItem]]:
+    ok, res = tree_provider.get_dir_content(abs_path=dir_model.abs_path)
+    return ok, res

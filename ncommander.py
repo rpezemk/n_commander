@@ -1,14 +1,15 @@
 import curses
+from pathlib import Path
 import sys
 import asyncio
 
 from tui import signal_resolver
 from tui.visual_grid import MainGrid
 from tui.text_box import TBox
-from tui.controls import Btn, Clock, HPanel, DirP, ListView
+from tui.controls import Btn, Clock, HPanel, DirP, ListView, DirList
 from tui.placements import PPlace, HPosEnum
 import tui.n_window
-from tui.n_window import ColInfo
+from tui.n_window import Col
 from tui.input_resolver import InputResolver
 
 app_is_running = True
@@ -22,25 +23,26 @@ row_defs = [(1, "a"),
             (50, "*"), 
             (50, "*")]
 
-dir_table_cols = [ColInfo("a", (10, "*")), ColInfo("a", (10, "*")), 
-                  ColInfo("b", (10, "*")), ColInfo("c", (10, "*"))]
-
+dir_table_cols = [Col("rel_path", (10, "*")), Col("ext", (5, "a"))]
+curr_path = str(Path(".").resolve())
+dir_list = DirList(curr_path, columns=dir_table_cols).g_at((2, 1))
 vg_children_quad = [
     HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
             Btn("about"), Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
     .g_at((0, 1, 0, 2)),
     
     DirP(".").g_at((1, 0)), log_panel.g_at((1, 1)),
-    DirP(".").g_at((2, 0)), ListView(".", columns=dir_table_cols).g_at((2, 1)),
+    DirP(".").g_at((2, 0)), dir_list,
     ]
 
+list_view = ListView(curr_path, columns=dir_table_cols).g_at((2, 1, 0, 2))
 vg_children_split_h = [
     HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
                      Btn("about"), Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
     .g_at((0, 1, 0, 2)),
     
     DirP(".").g_at((1, 1, 0, 2)),
-    ListView(".", columns=dir_table_cols).g_at((2, 1, 0, 2)),
+    list_view,
     ]
 
 

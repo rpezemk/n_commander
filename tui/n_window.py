@@ -80,14 +80,14 @@ class NWindow(): #h + 1, w + 1, self.area.y0, self.area.x0
         ... 
         
         
-class ColInfo():
+class Col():
     def __init__(self, title="", width=Length(10, LenT.STAR)):
         self.title = title
         self.width = tui.measures.get_length(width)
         pass
         
 class TableWindow(NWindow):
-    def __init__(self, h, w, y0, x0, title="", columns:list[ColInfo]=[]):
+    def __init__(self, h, w, y0, x0, title="", columns:list[Col]=[]):
         super().__init__(h, w, y0, x0, title)    
         self.columns = columns
         self.rows = []
@@ -111,26 +111,43 @@ class TableWindow(NWindow):
         
         res_title = "Files"
         
-        top_line = (TS.s.top_left + TS.s.dash_h * 2 + " " + res_title + " ").ljust(w-1, TS.s.dash_h) + TS.s.top_right
+        top_line = (TS.s.top_left + " " + res_title + " ").ljust(w-1, TS.s.dash_h) + TS.s.top_right
         
         sec_line = TS.s.left_conn \
-                   + TS.s.upper_conn.join([(TS.s.horizontal + "[" + self.columns[idx].title + "]").ljust(seg.v1 - seg.v0, TS.s.horizontal) for idx, seg in enumerate(segments)]) \
+                   + TS.s.upper_conn.join([(self.columns[idx].title).ljust(seg.v1 - seg.v0, TS.s.horizontal) for idx, seg in enumerate(segments)]) \
                    + TS.s.right_conn
-            
-            
+                   
         mid_line = TS.s.vertical \
             + TS.s.vertical.join([" " * (seg.v1 - seg.v0) for idx, seg in enumerate(segments)]) \
             + TS.s.vertical
         btm_line = TS.s.bottom_left + TS.s.lower_conn.join([TS.s.horizontal * (seg.v1 - seg.v0) for seg in segments]) + TS.s.bottom_right
         
         top_len = len(top_line)
-        lines = [top_line, 
+        lines = [top_line,
                  sec_line,
                 *( (h-3) * [mid_line]), 
                 btm_line]
         frame.draw_area(area=self.area, sub_lines=lines)
         return self
+    
+    def get_capacity(self) -> int:
+        h, w = self.area.get_dims()
+        return max(h - 3, 0)
         
+    def draw_object_row(self, row_no=0, row_data:list[str] = []):
+        n_filled_cols = min(len(self.columns), len(row_data))
+        x0 = self.area.x0 + 1
+        y0 = self.area.y0 + 2
+        h, w = self.area.get_dims()
+        if row_no > h - 4:
+            return 
+        for i in range(0, n_filled_cols):
+            seg = self.spacers[i]
+            x_offset = x0 + seg.v0
+            y_offset = y0 + row_no
+            data = row_data[i]
+            frame.draw_area(area=Area(y_offset, x_offset, y_offset, x_offset + len(data)), sub_lines=[data])
+                
     def draw_row(self, row_no=0, row_data:list[str] = []):
         n_filled_cols = min(len(self.columns), len(row_data))
         x0 = self.area.x0 + 1

@@ -1,13 +1,15 @@
 import os
 from pathlib import Path
 from datetime import datetime
-from typing import Callable, Any
+from typing import Callable, Any, List
 
+from tui.n_window import Col
 from utils import os_utils, string_utils
 from tui.placements import GPlace, HPosEnum, PPlace
 from tui.measures import Area
 from tui.base_visual import BaseVisual
 from models.fs_model import DirModel, FileModel, FsItem, TreeProvider
+import models.fs_model
 
 fs_prov = TreeProvider(os_utils.get_nice_dir_content)
 
@@ -184,7 +186,9 @@ class DirP(ItemPanel):
    
         
 class ListView(Panel):
-    def __init__(self, title, parent=None, children = [], area = Area(), g_place = None, p_place = PPlace(), get_items_func: Callable[[None],list[Any]]=None, columns=list[str]):
+    def __init__(self, title, parent=None, children = [], 
+                 area = Area(), g_place = None, p_place = PPlace(), 
+                 get_items_func: Callable[[None],list[Any]]=None, columns=list[str]):
         super().__init__(title, parent, children, area, g_place, p_place)
         self.get_items_func = get_items_func
         self.columns = columns
@@ -193,8 +197,35 @@ class ListView(Panel):
         self.real_title = self.title
         height, width = self.get_dims()
         table = self.emit_table(self.columns).draw_table()
-                
+                  
         items = 4 * [["abc", "def", "ghi", "jkl"]]
+        cap = table.get_capacity()
         for idx, item in enumerate(items):
+            if idx > cap - 1:
+                break
             table.draw_row(idx, item)
-            pass
+
+class DirList(ListView):
+    def __init__(self, title, parent=None, children=[], 
+                 area=Area(), g_place=None, p_place=PPlace(), 
+                 columns: list[Col]=[]):
+        super().__init__(title, parent, children, area, g_place, p_place, None, columns)
+        self.get_items_func = None
+        self.columns = columns
+        
+    def draw(self):
+        self.real_title = self.title
+        height, width = self.get_dims()
+        table = self.emit_table(self.columns).draw_table()
+        dir_m = DirModel(abs_path=self.title)
+        ok, fs_items = models.fs_model.get_tree(dir_m)
+               
+        cap = table.get_capacity()
+        for idx, item in enumerate(fs_items):
+            if idx > cap - 1:
+                break
+            row_data = []
+            for col in self.columns:
+                sub = getattr(item, col.title)
+                row_data.append(sub)
+            table.draw_row(idx, row_data)

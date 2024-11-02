@@ -57,11 +57,14 @@ def get_lengths(len_list: list[Tuple|Length]):
 def get_segments(len_list: list[Length], outer_len: int) -> list[Segment]:
     tmp_len_coll = get_lengths(len_list)
     star_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.STAR])
+    abs_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.ABS])
     curr_effective = 0
     res_lengths: list[Segment] = []
     
+    star_available = max(0, outer_len - abs_sum)
+    
     for length in tmp_len_coll:
-        maybe_eff = length.value if length.len_type == LenT.ABS else int(outer_len * (length.value / star_sum))
+        maybe_eff = length.value if length.len_type == LenT.ABS else int(star_available * (length.value / star_sum))
         length.effective = min(max(0, outer_len - curr_effective), maybe_eff)
         segment = Segment(curr_effective, curr_effective + length.effective)
         res_lengths.append(segment)
