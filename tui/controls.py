@@ -3,10 +3,9 @@ from pathlib import Path
 from datetime import datetime
 from typing import Callable, Any, List
 
-from tui.n_window import Col
 from utils import os_utils, string_utils
 from tui.placements import GPlace, HPosEnum, PPlace
-from tui.measures import Area
+from tui.measures import Area, Col
 from tui.base_visual import BaseVisual
 from models.fs_model import DirModel, FileModel, FsItem, TreeProvider
 import models.fs_model
@@ -229,3 +228,6 @@ class DirList(ListView):
                 sub = getattr(item, col.title)
                 row_data.append(sub)
             table.draw_row(idx, row_data)
+            
+            
+            

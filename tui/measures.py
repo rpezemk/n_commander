@@ -31,7 +31,13 @@ class Length():
         self.len_type = len_type
         self.effective = 0
 
-
+        
+class Col():
+    def __init__(self, title="", width=Length(10, LenT.STAR)):
+        self.title = title
+        self.width = get_length(width)
+        pass
+        
 def get_length(length: Tuple|Length):
     tmp_len = None
     match length:
@@ -75,3 +81,5 @@ def get_segments(len_list: list[Length], outer_len: int) -> list[Segment]:
         last = res_lengths[-1]
         last.v1 += outer_len - v_sum
     return res_lengths
+
+
