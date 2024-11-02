@@ -47,13 +47,14 @@ def soft_close_app():
     global app_is_running
     app_is_running = False
 
+def log_to_panel(key, id, mx, my, mz, bs): 
+    log_panel.log(f"M: k:{key}, bs:{bs} ({my}, {mx}, {mz})")
+    
 input_resolver = InputResolver(None, 
                                get_scr_func=(lambda: signal_resolver.stdscr), 
                                root_obj_func=lambda: vg.get_all_objects(), 
                                turn_off_func=soft_close_app,
-                               report_click_func=
-                                   lambda key, id, mx, my, mz, bs: 
-                                       log_panel.log(f"M: k:{key}, bs:{bs} ({my}, {mx}, {mz})"))
+                               report_click_func=log_to_panel)
 
 
 
