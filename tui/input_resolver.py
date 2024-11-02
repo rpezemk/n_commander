@@ -15,7 +15,7 @@ class InputResolver():
         self.stdscr = stdscr
         self.get_scr_func = get_scr_func
         self.is_running = True
-        self.visual_objects = root_obj_func
+        self.get_root_obj_func = root_obj_func
         self.turn_off_func = turn_off_func
         self.report_click_func = report_click_func
         pass
@@ -35,6 +35,11 @@ class InputResolver():
                     id, mx, my, mz, bs = curses.getmouse()
                     if self.report_click_func is not None:
                         self.report_click_func(key, id, mx, my, mz, bs)
+                    if self.get_root_obj_func is not None:
+                        objs = self.get_root_obj_func().get_all_objects()
+                        for obj in objs:
+                            if obj.check_point_belongs(mx, my):
+                                obj.click()
                 elif key == ord("q") and self.turn_off_func is not None:
                     self.turn_off_func()
             await asyncio.sleep(0.01)

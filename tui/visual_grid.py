@@ -38,7 +38,7 @@ class MainGrid(BaseVisual):
         
         self.input_resolver = InputResolver(None, 
                                get_scr_func=(lambda: tui.signal_resolver.stdscr), 
-                               root_obj_func=None, 
+                               root_obj_func=lambda: self, 
                                turn_off_func=lambda: self.close_app(),
                                report_click_func=log_to_panel)
         
