@@ -1,17 +1,11 @@
 from pathlib import Path
+from typing import Callable, List, Tuple, Union
 import os
 
 def try_get_dir_content(path='.') -> tuple[bool, list[str], list[str], str]:
-    """
-    List the contents of a directory using os.scandir, which is more efficient for large directories.
-    
-    :param path: Directory path to list the contents of. Default is the current directory.
-    :return: List of directory contents.
-    """
-    
-    # path = path + "/"
-    # path = path.replace("//", "/")
     absPath = os.path.abspath(path) + "/"
+    dirs = []
+    files = []
     try:
         entries = list(os.scandir(absPath))
         files = [entry.name for entry in entries if entry.is_file()]
@@ -19,6 +13,6 @@ def try_get_dir_content(path='.') -> tuple[bool, list[str], list[str], str]:
         return (True, dirs, files, None)
     
     except FileNotFoundError:
-        return (False, [str], [str], f"Directory '{path}' not found.")
+        return (False, [*dirs], [*files], f"Directory '{path}' not found.")
     except PermissionError:
-        return (False, [str], [str], f"Permission denied to access '{path}'.")
+        return (False, [*dirs], [*files], f"Permission denied to access '{path}'.")
