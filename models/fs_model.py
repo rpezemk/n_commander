@@ -82,8 +82,6 @@ if __name__ != "__main__":
     exit()
     
 fs_prov = TreeProvider(os_get_dir_content)
-test_path = "/home/przemek/n_commanderfsdf"
-fs_prov.get_dir_content(abs_path=test_path)
 dir_m = DirModel(abs_path="/home")
 dir_m.open()
 children = dir_m.get_children(fs_prov)
