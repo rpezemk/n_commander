@@ -48,7 +48,7 @@ def soft_close_app():
     app_is_running = False
 
 def log_to_panel(key, id, mx, my, mz, bs): 
-    log_panel.log(f"M: k:{key}, bs:{bs} ({my}, {mx}, {mz})")
+    log_panel.log(f"k:{key}, bs:{bs} ({my}, {mx}, {mz})")
     
 input_resolver = InputResolver(None, 
                                get_scr_func=(lambda: signal_resolver.stdscr), 
