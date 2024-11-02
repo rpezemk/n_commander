@@ -2,22 +2,6 @@ from pathlib import Path
 from typing import Callable, List, Tuple, Union
 import os
     
-def os_get_dir_content(path='.') -> tuple[bool, list[str], list[str], str]:
-    absPath = os.path.abspath(path) + "/"
-    dirs = []
-    files = []
-    try:
-        entries = list(os.scandir(absPath))
-        files = [entry.__fspath__() for entry in entries if entry.is_file()]
-        dirs = [*list([entry.__fspath__() for entry in entries if entry.is_dir()])]
-        return (True, dirs, files, None)
-    
-    except FileNotFoundError:
-        return (False, [*dirs], [*files], f"Directory '{path}' not found.")
-    except PermissionError:
-        return (False, [*dirs], [*files], f"Permission denied to access '{path}'.")
-    
-    
     
 class FsItem():
     def __init__(self, *, abs_path:str=None):
@@ -78,12 +62,3 @@ class TreeProvider():
         return ok, [*m_dirs, *m_files]    
     
 
-if __name__ != "__main__":
-    exit()
-    
-fs_prov = TreeProvider(os_get_dir_content)
-dir_m = DirModel(abs_path="/home")
-dir_m.open()
-children = dir_m.get_children(fs_prov)
-for ch in children:
-    print({'abs':ch.abs_path, 'rel':ch.rel_path})

@@ -7,6 +7,10 @@ from utils import os_utils, string_utils
 from tui.placements import GPlace, HPosEnum, PPlace
 from tui.measures import Area
 from tui.base_visual import BaseVisual
+from models.fs_model import DirModel, FileModel, FsItem, TreeProvider
+
+fs_prov = TreeProvider(os_utils.get_nice_dir_content)
+
 
 class Btn(BaseVisual):
     def __init__(
@@ -176,30 +180,20 @@ class DirP(ItemPanel):
         
         return [*list([DirBtn(dir) for dir in dirs]), *list([FileBtn(file) for file in files])]
     
-    
+   
+   
+        
 class ListView(Panel):
     def __init__(self, title, parent=None, children = [], area = Area(), g_place = None, p_place = PPlace(), get_items_func: Callable[[None],list[Any]]=None, columns=list[str]):
         super().__init__(title, parent, children, area, g_place, p_place)
         self.get_items_func = get_items_func
         self.columns = columns
-    
-    def get_items(self):
-        absolute_path = self.title
-        if absolute_path is None or self.title == '' or self.title == '.':
-            absolute_path = str(Path(".").resolve())
-            
-        dirOk, dirs, files, errStr = os_utils.try_get_dir_content(absolute_path)
-        sub_res = [*dirs, *files] 
-        res = [dict(t="a", name=x) for x in sub_res]
-        return res
-    
+        
     def draw(self):
         self.real_title = self.title
         height, width = self.get_dims()
         table = self.emit_table(self.columns).draw_table()
-        
-        self.get_items_func = self.get_items
-            
+                
         items = 4 * [["abc", "def", "ghi", "jkl"]]
         for idx, item in enumerate(items):
             table.draw_row(idx, item)
