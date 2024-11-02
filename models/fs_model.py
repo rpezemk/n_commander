@@ -60,13 +60,7 @@ class TreeProvider():
     def __init__(self, nice_get_dir_content: Callable[[str],tuple[bool, list[str], list[str], str]]):
         self.dir_content_func = nice_get_dir_content
         pass
-    def get_dir_content(self,*, abs_path: Union[str, 'DirModel'] = None) -> Tuple[bool,list['FsItem']]:
-        return False, []
 
-class FsProvider(TreeProvider):
-    def __init__(self, dir_content_func: Callable[[str],tuple[bool, list[str], list[str], str]]):
-        super().__init__(dir_content_func)
-        
     def get_dir_content(self,*, abs_path: Union[str, 'DirModel'] = None) -> Tuple[bool,list['FsItem']]:
         tmp_path = None
         if isinstance(abs_path, str):
@@ -82,12 +76,12 @@ class FsProvider(TreeProvider):
         if par_dir != abs_path:
             m_dirs = [ParentDirModel(abs_path=abs_path), *m_dirs]
         return ok, [*m_dirs, *m_files]    
-
+    
 
 if __name__ != "__main__":
     exit()
     
-fs_prov = FsProvider(os_get_dir_content)
+fs_prov = TreeProvider(os_get_dir_content)
 test_path = "/home/przemek/n_commanderfsdf"
 fs_prov.get_dir_content(abs_path=test_path)
 dir_m = DirModel(abs_path="/home")
