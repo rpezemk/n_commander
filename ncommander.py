@@ -3,7 +3,7 @@ import sys
 import asyncio
 
 from tui import signal_resolver
-from tui.visual_grid import VisualGrid
+from tui.visual_grid import MainGrid
 from tui.text_box import TBox
 from tui.controls import Btn, Clock, HPanel, DirP, ListView
 from tui.placements import PPlace, HPosEnum
@@ -11,9 +11,8 @@ import tui.n_window
 from tui.n_window import ColInfo
 from tui.input_resolver import InputResolver
 
-###### GUI ELEMENTS ######
 app_is_running = True
-vg: VisualGrid = None 
+vg: MainGrid = None 
 
 log_panel = TBox(g_place=(1, 1, 1, 1))
 
@@ -23,7 +22,8 @@ row_defs = [(1, "a"),
             (50, "*"), 
             (50, "*")]
 
-dir_table_cols = [ColInfo("a", (10, "*")), ColInfo("a", (10, "*")), ColInfo("b", (10, "*")), ColInfo("c", (10, "*"))]
+dir_table_cols = [ColInfo("a", (10, "*")), ColInfo("a", (10, "*")), 
+                  ColInfo("b", (10, "*")), ColInfo("c", (10, "*"))]
 
 vg_children_quad = [
     HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
@@ -43,43 +43,16 @@ vg_children_split_h = [
     ListView(".", columns=dir_table_cols).g_at((2, 1, 0, 2)),
     ]
 
-def soft_close_app():
-    global app_is_running
-    app_is_running = False
 
-def log_to_panel(key, id, mx, my, mz, bs): 
-    log_panel.log(f"k:{key}, bs:{bs} ({my}, {mx}, {mz})")
-    
-input_resolver = InputResolver(None, 
-                               get_scr_func=(lambda: signal_resolver.stdscr), 
-                               root_obj_func=lambda: vg.get_all_objects(), 
-                               turn_off_func=soft_close_app,
-                               report_click_func=log_to_panel)
-
-
-
-async def async_grid_refresh(grid: VisualGrid):
-    while app_is_running:
-        grid.draw()
-        tui.n_window.render_frame()
-        await asyncio.sleep(0.1)
-        
-    
-async def run_async_tasks(stdscr):
-    curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
-    stdscr.nodelay(True)  # Non-blocking mode
-    global vg
-    vg = VisualGrid(None, vg_children_quad, row_defs=row_defs, col_defs=col_defs, stdscr=stdscr)
-    input_task = asyncio.create_task(input_resolver.start())
-    tui_task = asyncio.create_task(async_grid_refresh(vg))
-    await tui_task
-    stdscr.clear()
-    stdscr.refresh()
-    
 def main(stdscr):
     curses.curs_set(0)
     signal_resolver.init_screen(stdscr)
-    asyncio.run(run_async_tasks(stdscr))
+    vg = MainGrid(vg_children_quad, row_defs=row_defs, col_defs=col_defs, stdscr=stdscr)
+    vg.input_resolver.report_click_func =    \
+        lambda obj, key, bs, my, mx, mz:     \
+            log_panel.log(f"k:{key}, bs:{bs} ({my}, {mx}, {mz})")
+            
+    asyncio.run(vg.run_async_tasks(stdscr))
 
 if __name__ == "__main__":
     curses.wrapper(main)

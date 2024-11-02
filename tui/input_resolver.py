@@ -1,21 +1,10 @@
 import curses
-import sys
-import os
-from pathlib import Path
-from datetime import datetime
 import asyncio
-from typing import Callable, Any
-
-from utils import os_utils, string_utils
-from tui import signal_resolver
-from tui.visual_grid import VisualGrid
-from tui.measures import Area, Segment, Length, LenT
+from typing import Callable
 from tui.placements import GPlace
 from tui.text_box import TBox
-from tui.controls import Btn, Clock, HPanel, DirP, BaseVisual, ListView
-from tui.placements import PPlace, HPosEnum
+from tui.controls import BaseVisual
 import tui.n_window
-from tui.n_window import NWindow, ColInfo
 
 
 class InputResolver():
