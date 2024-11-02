@@ -17,11 +17,11 @@ vg: VisualGrid = None
 
 log_panel = TBox(g_place=(1, 1, 1, 1))
 
-col_defs = [(30, "*"), (70, "*")]
+col_defs = [(50, "*"), (50, "*")]
 
 row_defs = [(1, "a"), 
-            (30, "*"), 
-            (70, "*")]
+            (50, "*"), 
+            (50, "*")]
 
 dir_table_cols = [ColInfo("a", (10, "*")), ColInfo("a", (10, "*")), ColInfo("b", (10, "*")), ColInfo("c", (10, "*"))]
 
@@ -30,10 +30,8 @@ vg_children_quad = [
             Btn("about"), Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
     .g_at((0, 1, 0, 2)),
     
-    DirP(".").g_at((1, 0)),
-    log_panel.g_at((1, 1)),
-    DirP(".").g_at((2, 0)),
-    ListView(".", columns=dir_table_cols).g_at((2, 1)),
+    DirP(".").g_at((1, 0)), log_panel.g_at((1, 1)),
+    DirP(".").g_at((2, 0)), ListView(".", columns=dir_table_cols).g_at((2, 1)),
     ]
 
 vg_children_split_h = [
