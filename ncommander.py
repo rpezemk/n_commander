@@ -45,7 +45,7 @@ vg_children_quad = [
     
     DirP(".").g_at((1, 0)), log_panel.g_at((1, 1)),
     DirP(".").g_at((2, 0)), dir_list.g_at((2, 1)),
-    DirP(".").g_at((3, 1, 0, 2)),
+    mix_panel.g_at((3, 1, 0, 2)),
     prog_bar.g_at((4, 1, 0, 2))
     ]
 
