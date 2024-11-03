@@ -68,20 +68,27 @@ def get_segments(len_list: list[Length], outer_len: int) -> list[Segment]:
     res_segments: list[Segment] = []
     
     star_available = max(0, outer_len - abs_sum)
-    
+    simple_lengths = []
     for length in tmp_len_coll:
-        maybe_eff = length.value if length.len_type == LenT.ABS else int(star_available * (length.value / star_sum))
+        maybe_eff = length.value if length.len_type == LenT.ABS else int((star_available * length.value) / star_sum)
         length.effective = min(max(0, outer_len - curr_effective), maybe_eff)
-        segment = Segment(curr_effective, curr_effective + length.effective, length.len_type == LenT.ABS)
-        res_segments.append(segment)
+        simple_lengths.append([length.effective, length.len_type == LenT.ABS])
         curr_effective += length.effective
     
+    v_sum = sum([l[0] for l in simple_lengths])
+    simple_stars = [l for l in simple_lengths if l[1] == False]
+    diff = outer_len - v_sum
+    if diff > 0  and len(simple_stars) > 0:
+        last_star = simple_stars[-1]
+        last_star[0] = last_star[0] + diff
     
-    
-    v_sum = sum([s.v1 - s.v0 for s in res_segments])
-    if outer_len > v_sum:
-        last = res_segments[-1]
-        last.v1 += outer_len - v_sum
+
+    curr_effective = 0
+    for simple_len in simple_lengths:
+        segment = Segment(curr_effective, curr_effective + simple_len[0], simple_len[1])
+        res_segments.append(segment)
+        curr_effective += simple_len[0]
+
     return res_segments
 
 
