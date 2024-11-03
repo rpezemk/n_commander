@@ -11,7 +11,7 @@ from tui.elementary.placements import PPlace, HPosEnum
 import tui.n_window
 from tui.n_window import Col
 from tui.input_resolver import InputResolver
-from tui.progress_bar import HProgressBar
+from tui.progress_bar import HProgressBar, VProgressBar
 
 prog_bar_value = 0
 
@@ -25,12 +25,18 @@ col_defs = [(50, "*"), (50, "*")]
 row_defs = [(1, "a"), 
             (50, "*"), 
             (50, "*"), 
+            (50, "*"), 
             (1, "a")]
 
 dir_table_cols = [Col("rel_path", (10, "*")), Col("ext", (5, "a"))]
 curr_path = str(Path(".").resolve())
 dir_list = DirList(curr_path, columns=dir_table_cols)
 prog_bar = HProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100)
+
+mix_panel = HPanel(children= [VProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100, p_place=PPlace(hPos=HPosEnum.LEFT)),
+                              VProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100, p_place=PPlace(hPos=HPosEnum.LEFT)),
+                              VProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100, p_place=PPlace(hPos=HPosEnum.LEFT))])
+
 
 vg_children_quad = [
     HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
@@ -39,25 +45,18 @@ vg_children_quad = [
     
     DirP(".").g_at((1, 0)), log_panel.g_at((1, 1)),
     DirP(".").g_at((2, 0)), dir_list.g_at((2, 1)),
-    prog_bar.g_at((3, 1, 0, 2))
+    mix_panel.g_at((3, 1, 0, 2)),
+    prog_bar.g_at((4, 1, 0, 2))
     ]
 
-list_view = ListView(curr_path, columns=dir_table_cols).g_at((2, 1, 0, 2))
-vg_children_split_h = [
-    HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
-                     Btn("about"), Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
-    .g_at((0, 1, 0, 2)),
-    
-    DirP(".").g_at((1, 1, 0, 2)),
-    list_view,
-    ]
+
 
 
 async def update_progress_bar():
     global prog_bar_value
     while True:
         prog_bar_value = ((prog_bar_value * 10 + 1) % 1000)/10
-        await asyncio.sleep(0.03)
+        await asyncio.sleep(0.01)
         
 async def start_update_progress_bar():
         asyncio.create_task(update_progress_bar())

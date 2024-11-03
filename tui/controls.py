@@ -86,14 +86,20 @@ class HPanel(BaseVisual):
 
     def draw(self):
         curr_x_left = 1
+        h, w = self.area.get_dims()
         curr_x_right = self.area.x1 + 1
         for item in self.children:
             if item.p_place.hPos == HPosEnum.LEFT:
                 item.area.x0 = curr_x_left
+                item.area.x1 = item.area.x0 + item.get_width()
                 curr_x_left += item.get_width() + 1
             if item.p_place.hPos == HPosEnum.RIGHT:
                 curr_x_right -= item.get_width()
                 item.area.x0 = curr_x_right
+            
+            item.area.y0 = self.area.y0
+            item.area.y1 = self.area.y1
+            
             item.draw()
 
 

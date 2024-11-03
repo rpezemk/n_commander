@@ -85,11 +85,11 @@ def get_v_bar(n_chars: int, max_val: float, val: float):
     real_width = n_chars * val/max_val
     n_full = int(real_width)
     if n_full == n_chars:
-        return h_rod_5 * n_full
+        return v_8 * n_full
     n_empty = int(n_chars - real_width)
     fract = real_width - n_full # is segment [0, 1)
-    last = map_fract_to_char(fract, t_v_rods)
-    res = h_rod_5 * n_full + last + ' ' * (n_chars - n_full - 1)
+    last = map_fract_to_char(fract, t_v)
+    res = v_8 * n_full + last + ' ' * (n_chars - n_full - 1)
     return res
 
 for i in range(0, 101):
