@@ -7,7 +7,7 @@ from tui import signal_resolver
 from tui.visual_grid import MainGrid
 from tui.text_box import TBox
 from tui.controls import Btn, Clock, HPanel, DirP, ListView, DirList
-from tui.placements import PPlace, HPosEnum
+from tui.elementary.placements import PPlace, HPosEnum
 import tui.n_window
 from tui.n_window import Col
 from tui.input_resolver import InputResolver

@@ -5,7 +5,7 @@ from datetime import datetime
 import asyncio
 from typing import Tuple
 from tui import signal_resolver
-from tui.measures import Area
+from tui.elementary.measures import Area
 
 
 class Frame():

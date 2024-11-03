@@ -8,11 +8,12 @@ from typing import Any
 from dataclasses import dataclass
 
 
-import tui.measures
-from tui.ts import TS
+import tui.elementary.measures
+
+from tui.elementary.ts import TS
 from tui import signal_resolver
-from tui.measures import Area, Length, Segment, Col, LenT
-from tui.frame import Frame
+from tui.elementary.measures import Area, Length, Segment, Col, LenT
+from tui.frame_buffer.frame import Frame
 
 stdscr = None
 

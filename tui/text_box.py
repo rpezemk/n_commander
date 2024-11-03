@@ -1,7 +1,7 @@
 import textwrap
 from datetime import datetime
 
-from tui.placements import GPlace
+from tui.elementary.placements import GPlace
 from tui.controls import Panel
 
 class TBox(Panel):

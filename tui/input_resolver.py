@@ -1,7 +1,7 @@
 import curses
 import asyncio
 from typing import Callable
-from tui.placements import GPlace
+from tui.elementary.placements import GPlace
 from tui.text_box import TBox
 from tui.controls import BaseVisual
 import tui.n_window

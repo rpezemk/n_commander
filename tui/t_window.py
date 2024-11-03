@@ -1,6 +1,7 @@
 from typing import Any
 import tui
-from tui.measures import Area, Col, Segment
+import tui.elementary
+from tui.elementary.measures import Area, Col, Segment
 from tui.n_window import TS, NWindow
 import tui.n_window
 
@@ -21,7 +22,7 @@ class TableWindow(NWindow):
         blank_width = w - (n_cols - 1) - 2
         filled_width = w - blank_width
         col_widths = list([col.width for col in self.columns])
-        segments = tui.measures.get_segments(col_widths, blank_width)
+        segments = tui.elementary.measures.get_segments(col_widths, blank_width)
         self.segments = segments
         self.spacers = [Segment(seg.v0+idx, seg.v1+idx) for idx, seg in enumerate(segments)]
         

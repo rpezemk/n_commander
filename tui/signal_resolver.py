@@ -1,8 +1,8 @@
 import signal
 import curses
 from curses import endwin
-from tui.frame import Frame
-import tui.frame
+from tui.frame_buffer.frame import Frame
+import tui.frame_buffer.frame
 import tui.n_window
 
 splash_content = """

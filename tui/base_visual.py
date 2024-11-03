@@ -1,5 +1,5 @@
-from tui.measures import Area
-from tui.placements import GPlace, PPlace
+from tui.elementary.measures import Area
+from tui.elementary.placements import GPlace, PPlace
 import curses
 from tui.n_window import NWindow
 from tui.t_window import TableWindow

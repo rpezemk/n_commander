@@ -1,11 +1,11 @@
 import asyncio
 import curses
 from enum import Enum
-from tui.measures import LenT, Length
+from tui.elementary.measures import LenT, Length
 from tui.controls import BaseVisual, HPosEnum
-from tui.placements import GPlace, PPlace
-from tui.measures import Area, Segment
-import tui.measures
+from tui.elementary.placements import GPlace, PPlace
+from tui.elementary.measures import Area, Segment
+import tui.elementary.measures
 import tui.signal_resolver
 from tui.input_resolver import InputResolver
 
@@ -45,8 +45,8 @@ class MainGrid(BaseVisual):
     def draw(self):
         self.area = Area(0, 0, *self.stdscr.getmaxyx())
         h, w = self.get_dims()
-        v_lengths = tui.measures.get_segments(self.row_defs, h - 1)
-        h_lengths = tui.measures.get_segments(self.col_defs, w - 1)
+        v_lengths = tui.elementary.measures.get_segments(self.row_defs, h - 1)
+        h_lengths = tui.elementary.measures.get_segments(self.col_defs, w - 1)
         
         for ch in self.children:
             if ch == None:
