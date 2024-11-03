@@ -1,8 +1,11 @@
+import curses
+
 from tui.elementary.measures import Area
 from tui.elementary.placements import GPlace, PPlace
-import curses
 from tui.n_window import NWindow
 from tui.t_window import TableWindow
+
+
 class BaseVisual:
     def __init__(
         self,
