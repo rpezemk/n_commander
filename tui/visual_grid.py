@@ -1,6 +1,7 @@
 import asyncio
 import curses
 from enum import Enum
+from typing import Callable
 from tui.elementary.measures import LenT, Length
 from tui.controls import BaseVisual, HPosEnum
 from tui.elementary.placements import GPlace, PPlace
@@ -70,10 +71,12 @@ class MainGrid(BaseVisual):
     def close_app(self):
         self.app_is_running = False
     
-    async def run_async_tasks(self, stdscr):
+    async def run_async_tasks(self, stdscr, tasks: list[Callable[[],None]] = []):
         curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
         stdscr.nodelay(True)  # Non-blocking mode
 
+        for t in tasks:
+            asyncio.create_task(t())
         input_task = asyncio.create_task(self.input_resolver.start())
         tui_task = asyncio.create_task(self.async_grid_refresh())
         await tui_task
