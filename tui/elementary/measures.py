@@ -2,10 +2,10 @@ from enum import Enum
 from typing import Tuple
 
 class Segment():
-    def __init__(self, v0 = 0, v1 = 0):
+    def __init__(self, v0 = 0, v1 = 0, is_abs = False):
         self.v0 = v0
         self.v1 = v1
-    
+        self.is_abs = is_abs
     def diff(self) -> int:
         return self.v1 - self.v0
 
