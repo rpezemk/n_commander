@@ -65,21 +65,23 @@ def get_segments(len_list: list[Length], outer_len: int) -> list[Segment]:
     star_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.STAR])
     abs_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.ABS])
     curr_effective = 0
-    res_lengths: list[Segment] = []
+    res_segments: list[Segment] = []
     
     star_available = max(0, outer_len - abs_sum)
     
     for length in tmp_len_coll:
         maybe_eff = length.value if length.len_type == LenT.ABS else int(star_available * (length.value / star_sum))
         length.effective = min(max(0, outer_len - curr_effective), maybe_eff)
-        segment = Segment(curr_effective, curr_effective + length.effective)
-        res_lengths.append(segment)
+        segment = Segment(curr_effective, curr_effective + length.effective, length.len_type == LenT.ABS)
+        res_segments.append(segment)
         curr_effective += length.effective
     
-    v_sum = sum([s.v1 - s.v0 for s in res_lengths])
+    
+    
+    v_sum = sum([s.v1 - s.v0 for s in res_segments])
     if outer_len > v_sum:
-        last = res_lengths[-1]
+        last = res_segments[-1]
         last.v1 += outer_len - v_sum
-    return res_lengths
+    return res_segments
 
 
