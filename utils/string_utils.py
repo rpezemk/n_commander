@@ -1,4 +1,4 @@
-def split_by_n_chars_other_shorter(input_str: str, max_first_width, max_others_width):
+def wrap_lines(input_str: str, max_first_width, max_others_width):
     first = input_str[:max_first_width]
     others = input_str[max_first_width:]
 
@@ -22,6 +22,12 @@ def group_by_n(input_list, n):
         grouped.append(input_list[i : i + n])
     return grouped
 
+def group_elements_by_n(input_list, n):
+    grouped = []
+    for i in range(0, len(input_list), n):
+        sub = list(input_list[i : i + n])
+        grouped.append(sub)
+    return grouped
 
 def list_to_columns(maxH: int, maxW: int, list) -> list[str]:
     groups = group_by_n(list, max(1, maxH))

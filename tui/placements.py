@@ -14,7 +14,7 @@ class VPosEnum(Enum):
     AUTO = 4
     
 
-class PanelPlacement():
+class PPlace():
     def __init__(self, vPos: VPosEnum = VPosEnum.TOP, hPos: HPosEnum = HPosEnum.LEFT):
         self.vPos = vPos
         self.hPos = hPos

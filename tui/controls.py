@@ -1,235 +1,233 @@
 import os
-import curses
-from enum import Enum
+from pathlib import Path
 from datetime import datetime
-from typing import Callable, Tuple
+from typing import Callable, Any, List
 
 from utils import os_utils, string_utils
-from tui.placements import GPlace, HPosEnum, PanelPlacement
-from tui.measures import Area
+from tui.placements import GPlace, HPosEnum, PPlace
+from tui.measures import Area, Col
+from tui.base_visual import BaseVisual
+from models.fs_model import DirModel, FileModel, FsItem, TreeProvider
+import models.fs_model
+
+fs_prov = TreeProvider(os_utils.get_nice_dir_content)
 
 
-
-
-
-        
-class VisualHierarchy:
+class Btn(BaseVisual):
     def __init__(
-        self,
-        parent: "VisualHierarchy",
-        children: list["VisualHierarchy"] = None,
-        
-        area : Area = Area(),
-        grid_placement: GPlace = None, 
-        panel_placement: PanelPlacement = PanelPlacement()
+        self, title: str, parent: BaseVisual = None,
+            g_place: GPlace = None, 
+            p_place: PPlace = PPlace()
     ):
-        self.parent = parent
-        self.children = [] if children is None else children
-        self.area = area
-        self.grid_placement = grid_placement
-        self.panel_placement = panel_placement
-        
-        for child in [ch for ch in self.children if ch is not None]:
-            child.parent = self
-        
-    def append_child(self, child: "VisualHierarchy"):
-        self.children.append(child)
-        child.parent = self
-
-    def get_all_objects(self) -> list['VisualHierarchy']:
-        res = [self]
-        for ch in self.children:
-            ch_objs = ch.get_all_objects()
-            for ch_ob in ch_objs:
-                res.append(ch_ob)
-        
-        return res
-    
-    def draw(self):
-        ...
-        
-    def check_point_belongs(self, x: int, y: int):
-        check_h = self.area.x0 <= x <= self.area.x1
-        check_v = self.area.y0 <= y <= self.area.y1
-        return check_h and check_v
-
-class Button(VisualHierarchy):
-    def __init__(
-        self, title: str, parent: VisualHierarchy = None,
-            grid_placement: GPlace = None, 
-            panel_placement: PanelPlacement = PanelPlacement()
-    ):
-        super().__init__(parent, [], Area(), grid_placement, panel_placement)
+        super().__init__(parent, [], Area(), g_place, p_place)
         self.title = title
         self.real_title = f"[{self.title}]"
 
-    def draw(self, x0):
-        win = curses.newwin(3, len(self.real_title), 0, x0)
-        win.addstr(0, 0, self.real_title)
-        win.refresh()
+    def draw(self):
+        n_win = self.emit_window()
+        n_win.addstr(0, 0, self.real_title)
 
     def get_width(self):
         return len(self.real_title)
+    
+    def get_dims(self):
+        self.area.x1 = self.area.x0 + len(self.real_title)
+        self.area.y1 = self.area.y0
+        return self.area.get_dims()
 
+class FileSystemBtn(Btn):
+    def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
+        
+        super().__init__(title, parent, g_place, p_place)
+        split = [s for s in title.split("/") if s != '']
+        self.title = title
+        self.real_title = self.title
+        
+class DirBtn(FileSystemBtn):
+    def __init__(self, in_path: str, parent = None, g_place = None, p_place = PPlace()):
+        super().__init__(in_path, parent, g_place, p_place)
+    
+    def click(self):
+        if self.parent is not None:
+            if self.title != "../":
+                p = os.path.join(self.parent.title, self.title)
+            else:
+                p = str(Path(self.parent.title).parent)
+            self.parent.title = p
+        # return super().click()
 
-class ClockButton(Button):
-    def __init__(self, title, parent=None,
-                grid_placement: GPlace = None, 
-                panel_placement: PanelPlacement = PanelPlacement()):
-        super().__init__(title, parent, grid_placement, panel_placement)
+class FileBtn(FileSystemBtn):
+    def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
+        super().__init__(title, parent, g_place, p_place)
+    def click(self):
+        return super().click()
 
-    def draw(self, x0):
+class Clock(Btn):
+    def __init__(self, parent=None,
+                g_place: GPlace = None, 
+                p_place: PPlace = PPlace()):
+        self.title = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.real_title = f"[{self.title}]"
-        super().draw(x0)
+        super().__init__(self.title, parent, g_place, p_place)
 
-    def set_time(self, time_str: str):
-        self.title = time_str
+    def draw(self):
+        self.title = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.real_title = f"[{self.title}]"
+        super().draw()
+        
+    def get_width(self):
+        return len(self.real_title)
 
-
-class HStackPanel(VisualHierarchy):
+class HPanel(BaseVisual):
     def __init__(self, parent=None, children=[],
-            grid_placement: GPlace = None, 
-            panel_placement: PanelPlacement = PanelPlacement()):
-        super().__init__(parent, children, panel_placement=panel_placement, grid_placement=grid_placement)
+            g_place: GPlace = None, 
+            p_place: PPlace = PPlace()):
+        super().__init__(parent, children, p_place=p_place, g_place=g_place)
 
     def draw(self):
         curr_x_left = 1
-        curr_x_right = self.area.x1
-
+        curr_x_right = self.area.x1 + 1
         for item in self.children:
-            if item.panel_placement.hPos == HPosEnum.LEFT:
-                item.draw(curr_x_left)
+            if item.p_place.hPos == HPosEnum.LEFT:
+                item.area.x0 = curr_x_left
                 curr_x_left += item.get_width() + 1
-            if item.panel_placement.hPos == HPosEnum.RIGHT:
+            if item.p_place.hPos == HPosEnum.RIGHT:
                 curr_x_right -= item.get_width()
-                item.draw(curr_x_right)
+                item.area.x0 = curr_x_right
+            item.draw()
 
 
-class Panel(VisualHierarchy):
+class Panel(BaseVisual):
     def __init__(
         self,
         title: str,
         parent=None,
-        children: list[VisualHierarchy] = [],
+        children: list[BaseVisual] = [],
         area: Area = Area(),
-        grid_placement: GPlace = None, 
-        panel_placement: PanelPlacement = PanelPlacement(),
-        func: Callable[["Panel"], None] = None,
+        g_place: GPlace = None, 
+        p_place: PPlace = PPlace()
     ):
-        super().__init__(parent, children, area, grid_placement=grid_placement, panel_placement=panel_placement)
+        super().__init__(parent, children, area, g_place=g_place, p_place=p_place)
         self.title = title
-        self.func = func
 
     def draw(self):
-        if self.func:
-            self.func(self)
-
+        ...
 
 class ItemPanel(Panel):
-    def __init__(self, title, func: Callable[["Panel"], None],
-                    grid_placement: GPlace = None, 
-                    panel_placement: PanelPlacement = PanelPlacement(),
-                 ):
-        super().__init__(
-            title, None, [], Area(), panel_placement=panel_placement, grid_placement=grid_placement, func=func
-        )
-
-class DirPanel(ItemPanel):
-    def __init__(self, title,
-                    g_plc: GPlace = None, 
-                    panel_placement: PanelPlacement = PanelPlacement()
-                    ):
-        super().__init__(title, self.fill_window, grid_placement=g_plc, panel_placement=panel_placement)
-
-    def fill_window(self, myWindow: Panel) -> None:
-        h, w = myWindow.area.get_dims()
-        win = curses.newwin(h, w, myWindow.area.y0, myWindow.area.x0)
-        win.border()
-        win.addstr(0, 1, myWindow.title)
-        dirOk, dirs, files, errStr = os_utils.try_get_dir_content(myWindow.title)
-        if dirOk:
-            content = string_utils.list_to_columns(h - 3, w - 1, dirs + files)
-            for idx, line in enumerate(content):
-                if idx <= h - 3:
-                    win.addstr(1 + idx, 3, line)
-        win.refresh()
+    def __init__(self, title, parent=None, children = [], area = Area(), 
+                 g_place = None, p_place = PPlace(), 
+                 get_items_func:Callable[[],list[Btn]]=None,
+                 get_item_width_func:Callable[[],int]=None):
+        super().__init__(title, parent, children, area, g_place, p_place)
+        self.get_items_func = get_items_func
         
-        
-class LogPanel(ItemPanel):
-    def __init__(self, title):
-        super().__init__(title, self.fill_log_window)
-        self.logLines = []
-        
-    def log(self, message):
-        d = datetime.now()
-        ms = int(d.microsecond / 1000)
-        now = d.strftime("%Y-%m-%d %H:%M:%S") + "." + str(ms).rjust(3, "0")
-        self.logLines.append(f"[{now}] {message}")
-  
-    def fill_log_window(self, logPanel: "LogPanel") -> None:
-        h, w = logPanel.area.get_dims()
-        win = curses.newwin(h, w, logPanel.area.y0, logPanel.area.x0)
-        win.border()
-        win.addstr(0, 1, logPanel.title)
-        line_width = w - 3
-        v_capacity = h - 3
-
-        if line_width < 1:
-            win.refresh()
+    def draw(self) -> None:
+        self.real_title = self.title
+        height, width = self.get_dims()
+        win = self.emit_window().draw_table()
+        win.addstr(0, 1, self.title)
+        if self.get_items_func is None:
             return
         
-        curr_line_no = 0
-        last_lines = logPanel.logLines[-v_capacity:]
-
-        for line in last_lines:
-            if curr_line_no > v_capacity:
+        if height - 3 < 0:
+            return
+        
+        self.children = self.get_items_func()
+        
+        y0 = 1 + self.area.y0 
+        x0 = self.area.x0 + 2
+        children_to_draw = []
+        
+        ch_groups: list[DirBtn | FileBtn] = string_utils.group_elements_by_n(self.children, height - 2)
+        
+        n_groups = len(ch_groups)
+        for idx, ch_group in enumerate(ch_groups):
+            gr_width = max([len(ch.real_title) for ch in ch_group]) + 1  
+            if x0 + gr_width > width:
                 break
-            sub_lines = string_utils.split_by_n_chars_other_shorter(line, w - 3, w - 7)
-            if len(sub_lines) == 0:
-                continue
-            first_sub_line = sub_lines[0][:line_width]
-            win.addstr(1 + curr_line_no, 2, first_sub_line)
-            curr_line_no += 1
+            
+            for idx, ch in enumerate(ch_group):    
+                y_offset = y0 + (idx % (height - 2))
+                ch.area = Area(y_offset, x0, y_offset, x0 + len(ch.real_title))
+                ch.parent = self
+                children_to_draw.append(ch)
+            
+            x0 += gr_width
 
-            for sub_line in sub_lines[1:]:
-                win.addstr(1 + curr_line_no, 4, "\\ " + sub_line)
-                curr_line_no += 1
-        win.refresh()
+        for ch in children_to_draw:
+            ch.draw()
 
 
-class MainView(VisualHierarchy):
-    def __init__(self, stdscr, children=[], menuPanel: HStackPanel = None):
-        self.stdscr = stdscr
-        yMax, xMax = self.stdscr.getmaxyx()
-        super().__init__(None, children, Area())
+            
+class DirP(ItemPanel):
+    def __init__(self, title = None,
+                    g_plc: GPlace = None, 
+                    p_place: PPlace = PPlace()
+                    ):
+        absolute_path = title
+        if absolute_path is None or title == '' or title == '.':
+            absolute_path = str(Path(".").resolve())
+        split = [s for s in title.split("/") if s != '']
+        self.title = str(Path(split[-1]).resolve())
+        self.real_title = self.title
+        super().__init__(absolute_path, g_place=g_plc, p_place=p_place, get_items_func=self.get_items)
 
-        self.stdscr = stdscr
-        self.menu_panel = menuPanel
-
+    def get_items(self):
+        absolute_path = self.title
+        if absolute_path is None or self.title == '' or self.title == '.':
+            absolute_path = str(Path(".").resolve())
+            
+        dirOk, dirs, files, errStr = os_utils.try_get_dir_content(absolute_path)
+        
+        return [*list([DirBtn(dir) for dir in dirs]), *list([FileBtn(file) for file in files])]
+    
+   
+   
+        
+class ListView(Panel):
+    def __init__(self, title, parent=None, children = [], 
+                 area = Area(), g_place = None, p_place = PPlace(), 
+                 get_items_func: Callable[[None],list[Any]]=None, columns=list[str]):
+        super().__init__(title, parent, children, area, g_place, p_place)
+        self.get_items_func = get_items_func
+        self.columns = columns
+        
     def draw(self):
-        pts = self.get_quad_points()
-        m = self.quad_matrix(*pts)
-        self.children[0].area = Area(*m[0])
-        self.children[1].area = Area(*m[1])
-        self.children[2].area = Area(*m[2])
-        self.children[3].area = Area(*m[3])
-        self.menu_panel.area.x1 = self.area.x1
-        self.menu_panel.area.y1 = 0
-        self.menu_panel.draw()
+        self.real_title = self.title
+        height, width = self.get_dims()
+        table = self.emit_table(self.columns).draw_table()
+                  
+        items = 4 * [["abc", "def", "ghi", "jkl"]]
+        cap = table.get_capacity()
+        for idx, item in enumerate(items):
+            if idx > cap - 1:
+                break
+            table.draw_row(idx, item)
 
-        for myWin in self.children:
-            myWin.draw()
-
-    def get_quad_points(self):
-        self.area.y1, self.area.x1 = self.stdscr.getmaxyx()
-        y0, x0, y1, x1, y2, x2 = 1, 0, int(self.area.y1 / 2), int(self.area.x1 / 2), self.area.y1, self.area.x1
-        return y0, x0, y1, x1, y2, x2
-
-    def quad_matrix(self, y0, x0, y1, x1, y2, x2):
-        matrix = [
-            [y0, x0, y1, x1],
-            [y0, x1, y1, x2],
-            [y1, x0, y2, x1],
-            [y1, x1, y2, x2],
-        ]
-        return matrix
+class DirList(ListView):
+    def __init__(self, title, parent=None, children=[], 
+                 area=Area(), g_place=None, p_place=PPlace(), 
+                 columns: list[Col]=[]):
+        super().__init__(title, parent, children, area, g_place, p_place, None, columns)
+        self.get_items_func = None
+        self.columns = columns
+        
+    def draw(self):
+        self.real_title = self.title
+        height, width = self.get_dims()
+        table = self.emit_table(self.columns).draw_table()
+        dir_m = DirModel(abs_path=self.title)
+        ok, fs_items = models.fs_model.get_tree(dir_m)
+               
+        cap = table.get_capacity()
+        for idx, item in enumerate(fs_items):
+            if idx > cap - 1:
+                break
+            row_data = []
+            for col in self.columns:
+                sub = getattr(item, col.title)
+                row_data.append(sub)
+            table.draw_row(idx, row_data)
+            
+            
+            

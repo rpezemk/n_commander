@@ -1,107 +1,65 @@
 import curses
-import os
-from utils import os_utils, string_utils
+from pathlib import Path
+import sys
 import asyncio
-from datetime import datetime
+
 from tui import signal_resolver
-from tui.pzgrid import VisualGrid
-from tui.measures import Area, Segment, Len, LenT
-from tui.placements import GPlace
+from tui.visual_grid import MainGrid
+from tui.text_box import TBox
+from tui.controls import Btn, Clock, HPanel, DirP, ListView, DirList
+from tui.placements import PPlace, HPosEnum
+import tui.n_window
+from tui.n_window import Col
+from tui.input_resolver import InputResolver
 
-from tui.controls import (
-    Button, ClockButton, HStackPanel, MainView,
-    ItemPanel, DirPanel, LogPanel, VisualHierarchy
-)
-
-from tui.placements import PanelPlacement, VPosEnum, HPosEnum
-
-
-###### GUI ELEMENTS ######
 app_is_running = True
-vg: VisualGrid = None 
+vg: MainGrid = None 
 
-clock = ClockButton("", panel_placement=PanelPlacement(hPos=HPosEnum.RIGHT))
+log_panel = TBox(g_place=(1, 1, 1, 1))
 
-menu = HStackPanel(None, 
-        children= [Button("edit"), Button("view"), Button("settings"),
-                   Button("help"), Button("about"), clock], 
-        grid_placement=GPlace(0, 1, 0, 2)
-    )
+col_defs = [(50, "*"), (50, "*")]
 
+row_defs = [(1, "a"), 
+            (50, "*"), 
+            (50, "*")]
 
-log_panel = LogPanel("[LOGGER]")
-log_panel.grid_placement = GPlace(1, 1, 1, 1)
+dir_table_cols = [Col("rel_path", (10, "*")), Col("ext", (5, "a"))]
+curr_path = str(Path(".").resolve())
+dir_list = DirList(curr_path, columns=dir_table_cols).g_at((2, 1))
+vg_children_quad = [
+    HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
+            Btn("about"), Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
+    .g_at((0, 1, 0, 2)),
+    
+    DirP(".").g_at((1, 0)), log_panel.g_at((1, 1)),
+    DirP(".").g_at((2, 0)), dir_list,
+    ]
 
-row_defs = [Len(1, LenT.ABS), Len(50, LenT.STAR), Len(50, LenT.STAR)]
-col_defs = [Len(50, LenT.STAR), Len(50, LenT.STAR)]
-
-curr_path = os.path.abspath(".")
-
-vg_children = [
-    menu,
-    DirPanel(curr_path, g_plc=GPlace(1, 1, 0, 1)),
-    log_panel,
-    DirPanel(curr_path, g_plc=GPlace(2, 1, 0, 1)),
-    DirPanel(curr_path, g_plc=GPlace(2, 1, 1, 1)),
+list_view = ListView(curr_path, columns=dir_table_cols).g_at((2, 1, 0, 2))
+vg_children_split_h = [
+    HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
+                     Btn("about"), Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
+    .g_at((0, 1, 0, 2)),
+    
+    DirP(".").g_at((1, 1, 0, 2)),
+    list_view,
     ]
 
 
-async def resolve_input_continous(stdscr, log_panel: LogPanel, vg: VisualHierarchy = None):
-    global app_is_running
-    if log_panel is None:
-        while app_is_running:
-            await asyncio.sleep(0.01)
-            
-    while app_is_running:
-        key = stdscr.getch()
-        if key == -1:
-            pass
-        elif key == curses.KEY_MOUSE:
-            id, mx, my, mz, bs = curses.getmouse()
-            log_panel.log(f"M: k:{key}, bs:{bs} ({my}, {mx}, {mz})")
-            # (mx, my)
-            all_obj = vg.get_all_objects()
-        elif key == ord("q"):
-            app_is_running = False
-        else:
-            log_panel.log(f"K: k:{key}")
-        
-        await asyncio.sleep(0.01)
-
-
-
-
-async def async_grid_refresh(grid: VisualGrid):
-    while app_is_running:
-        grid.draw()
-        await asyncio.sleep(0.1)
-        
-async def async_slow_refresh():
-    while app_is_running:
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        clock.set_time(now)
-        await asyncio.sleep(0.1)
-        
-
-async def run_async_tasks(stdscr):
-    curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
-    stdscr.nodelay(True)  # Non-blocking mode
-    global vg
-    vg = VisualGrid(None, vg_children, row_defs=row_defs, col_defs=col_defs, stdscr=stdscr)
-    slow_task = asyncio.create_task(async_slow_refresh())
-    input_task = asyncio.create_task(resolve_input_continous(stdscr, log_panel, vg))
-    tui_task = asyncio.create_task(async_grid_refresh(vg))
-    await tui_task
-    stdscr.clear()
-    stdscr.refresh()
-    
 def main(stdscr):
+    curses.curs_set(0)
     signal_resolver.init_screen(stdscr)
-    asyncio.run(run_async_tasks(stdscr))
-
+    vg = MainGrid(vg_children_quad, row_defs=row_defs, col_defs=col_defs, stdscr=stdscr)
+    vg.input_resolver.report_click_func =    \
+        lambda obj, key, bs, my, mx, mz:     \
+            log_panel.log(f"k:{key}, bs:{bs} ({my}, {mx}, {mz})")
+            
+    asyncio.run(vg.run_async_tasks(stdscr))
 
 if __name__ == "__main__":
-    try:
-        curses.wrapper(main)
-    except Exception as e:
-        print(f"Error: {e}")
+    curses.wrapper(main)
+    # try:
+    #     #curses.wrapper(main)
+    # except Exception as e:
+    #     print(f"Error: {e}")
+

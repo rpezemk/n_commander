@@ -19,26 +19,58 @@ class Area():
 
     
     def get_dims(self) -> Tuple[int, int]:
-        return self.y1 - self.y0, self.x1 - self.x0
+        return self.y1 - self.y0 + 1, self.x1 - self.x0 + 1
     
 class LenT(Enum):
     ABS = 1
     STAR = 2
 
-class Len():
+class Length():
     def __init__(self, value: int, len_type: LenT = LenT.STAR):
         self.value = value
         self.len_type = len_type
         self.effective = 0
+
         
+class Col():
+    def __init__(self, title="", width=Length(10, LenT.STAR)):
+        self.title = title
+        self.width = get_length(width)
+        pass
+        
+def get_length(length: Tuple|Length):
+    tmp_len = None
+    match length:
+        case _ if isinstance(length, Length):
+            tmp_len = length
+        case _ if isinstance(length, tuple):
+            v = length[0]
+            s = length[1]
+            eff_t = LenT.STAR if s == '*' else LenT.ABS
+            tmp_len = Length(v, eff_t)
+        case _:
+            tmp_len = length
+            
+    return tmp_len
     
-def get_effective_lengths(len_coll: list[Len], outer_len: int) -> list[Segment]:
-    star_sum = sum([l.value for l in len_coll if l.len_type == LenT.STAR])
+def get_lengths(len_list: list[Tuple|Length]):
+    tmp_len_list = []
+    for length in len_list:
+        tmp_len = get_length(length)
+        tmp_len_list.append(tmp_len)
+    return tmp_len_list
+    
+def get_segments(len_list: list[Length], outer_len: int) -> list[Segment]:
+    tmp_len_coll = get_lengths(len_list)
+    star_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.STAR])
+    abs_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.ABS])
     curr_effective = 0
     res_lengths: list[Segment] = []
     
-    for length in len_coll:
-        maybe_eff = length.value if length.len_type == LenT.ABS else int(outer_len * (length.value / star_sum))
+    star_available = max(0, outer_len - abs_sum)
+    
+    for length in tmp_len_coll:
+        maybe_eff = length.value if length.len_type == LenT.ABS else int(star_available * (length.value / star_sum))
         length.effective = min(max(0, outer_len - curr_effective), maybe_eff)
         segment = Segment(curr_effective, curr_effective + length.effective)
         res_lengths.append(segment)
@@ -49,3 +81,5 @@ def get_effective_lengths(len_coll: list[Len], outer_len: int) -> list[Segment]:
         last = res_lengths[-1]
         last.v1 += outer_len - v_sum
     return res_lengths
+
+

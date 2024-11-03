@@ -1,6 +1,9 @@
 import signal
 import curses
 from curses import endwin
+from tui.frame import Frame
+import tui.frame
+import tui.n_window
 
 splash_content = """
 ·································································································
@@ -30,6 +33,7 @@ def resize_handler(signum, frame):
 def redraw_stdscreen(stdscr):
     stdscr.clear()
     stdscr.refresh()
+    tui.n_window.init_frame(stdscr)
 
 
 def handle(stdscr):
@@ -37,20 +41,20 @@ def handle(stdscr):
     stdscr.refresh()
     redraw_stdscreen(stdscr)
 
-
 def init_screen(scr):
     signal.signal(signal.SIGWINCH, resize_handler)
     global stdscr
     stdscr = scr
     stdscr.refresh()
     stdscr.clear()
-    curses.mousemask(curses.ALL_MOUSE_EVENTS)
+    curses.mousemask(-1)
 
     if curses.has_colors():
         curses.start_color()
         curses.use_default_colors()
+    
+    tui.n_window.init_frame(stdscr)
     stdscr.nodelay(True)
-
 
 def show_hello():
     global hello_was_shown
