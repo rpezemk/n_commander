@@ -1,31 +1,9 @@
-# howto
-To start venv type:
-```
-python3 -m venv .venv
-```
-Activate it using 
-```
-source .venv/bin/activate
-```
-NOTE: On MacOS, especially if you use zsh with powerline, activating does not modify your
-PS1 variable so you may not know if you are really inside venv. to do this 
-```
-echo $VIRTUAL_ENV
-```
-You may also check `which python3` - if this shows you system python it means you are not
-inside venv environment.
+# Proba napisania tego w C
+Ponieważ Przemek tak daleko odskoczył w pythonie i stosuje magiczne klasy że nie da się nadążyć.
 
+# TODO:
+ [ ] Makefile / cmake
+ [ ] zainstalować ncurses
+ [ ] Zdecydować się na C lub C++ 
+ [ ] Masa innych rzeczy, których się pewnie nigdy nie zrobi
 
-Then to install requirements:
-```
-pip install -r requirements.txt
-```
-To start ncommander:
-```
-(.venv) john@localjohn:~/.../$ python ncommander.py
-```
-
-# Docker
-In docker environment installing using pip is not advised as python still enforce
-restrictions for package modification. So instead install necessary dependencies using
-distribution's package manager.
