@@ -1,5 +1,6 @@
 # Proba napisania tego w C
 Ponieważ Przemek tak daleko odskoczył w pythonie i stosuje magiczne klasy że nie da się nadążyć.
+Ważne! cały kod na razie robie lokalnie, nie ma synchronizacji między branchami tu i na serwerze.
 
 ## TODO:
  [ ] Makefile / cmake
