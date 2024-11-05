@@ -8,15 +8,13 @@ Ponieważ Przemek tak daleko odskoczył w pythonie i stosuje magiczne klasy że 
  [ ] Masa innych rzeczy, których się pewnie nigdy nie zrobi 
  [ ] Kontrola z klawiatury
 
-## Key bindings
-SUGGESTION - option for user to have some 'vim' key bindings
-SUGGESTION - like in vim, ability to set one key as <leader> 
+## Skróty klawiaturowe
 
-* ? - shows help
-* q - exit 
-* c - copy
-* m - move
-* s - perform sed on file g - grep a - awk b - batch script
+* ? - pomoc
+* q - wyjście
+* c - kopiuj
+* m - przenieś
+* s - wykonaj sed na pliku | g - grep a - awk b - skrypt w bashu
 
 ## Inne przeszkadzajki
 
