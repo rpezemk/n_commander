@@ -11,10 +11,7 @@ class TableWindow(NWindow):
         self.columns = columns
         self.rows = []
         self.segments = []
-    def emit_row(self):
-        row = [*len(self.columns) * []]
-        
-        
+            
     def draw_table(self, title):
         h, w = self.area.get_dims()
         n_cols = len(self.columns)
