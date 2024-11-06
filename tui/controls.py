@@ -234,7 +234,6 @@ class TableView(ListView):
             self.items_by_row_no.append((idx, row_data))
             table.draw_row(idx, vis_row_data)
             
-            
     def click(self, my, mx):
         self.click_func(self, my, mx)
         pass
