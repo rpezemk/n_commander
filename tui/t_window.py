@@ -15,7 +15,7 @@ class TableWindow(NWindow):
         row = [*len(self.columns) * []]
         
         
-    def draw_table(self):
+    def draw_table(self, title):
         h, w = self.area.get_dims()
         n_cols = len(self.columns)
         
@@ -28,7 +28,7 @@ class TableWindow(NWindow):
         
         test_blank_sum = sum([w.v1 - w.v0 for w in segments])
         
-        res_title = "Files"
+        res_title = title
         
         top_line = (TS.s.top_left + " " + res_title + " ").ljust(w-1, TS.s.dash_h) + TS.s.top_right
         

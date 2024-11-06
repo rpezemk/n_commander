@@ -72,7 +72,7 @@ def main(stdscr):
     asyncio.run(vg.run_async_tasks(stdscr, [start_update_progress_bar]))
 
 if __name__ == "__main__":
-    curses.wrapper(main)
+    curses.wrapper(main);
     # try:
     #     #curses.wrapper(main)
     # except Exception as e:

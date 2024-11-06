@@ -220,8 +220,7 @@ class DirList(ListView):
         
     def draw(self):
         self.real_title = self.title
-        height, width = self.get_dims()
-        table = self.emit_table(self.columns).draw_table()
+        table = self.emit_table(self.columns).draw_table(self.real_title)
         dir_m = DirModel(abs_path=self.title)
         ok, fs_items = models.fs_model.get_tree(dir_m)
                
