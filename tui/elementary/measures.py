@@ -33,9 +33,10 @@ class Length():
 
         
 class Col():
-    def __init__(self, title="", width=Length(10, LenT.STAR)):
+    def __init__(self, title="", width=Length(10, LenT.STAR), is_hidden=False):
         self.title = title
         self.width = get_length(width)
+        self.is_hidden = is_hidden
         pass
         
 def get_length(length: Tuple|Length):
@@ -71,6 +72,7 @@ def get_segments(len_list: list[Length], outer_len: int) -> list[Segment]:
     simple_lengths = []
     for length in tmp_len_coll:
         maybe_eff = length.value if length.len_type == LenT.ABS else int((star_available * length.value) / star_sum)
+        
         length.effective = min(max(0, outer_len - curr_effective), maybe_eff)
         simple_lengths.append([length.effective, length.len_type == LenT.ABS])
         curr_effective += length.effective
