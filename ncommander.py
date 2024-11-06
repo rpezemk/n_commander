@@ -31,7 +31,7 @@ row_defs = [(1, "a"),
             (50, "*"), 
             (1, "a")]
 
-dir_table_cols = [Col("abs_path", (15, "*")) ,Col("rel_path", (10, "*")), Col("ext", (5, "a"))]
+dir_table_cols = [Col("abs_path", (15, "*", "h")) ,Col("rel_path", (10, "*")), Col("ext", (5, "a"))]
 
 curr_path = str(Path(".").resolve())
 

@@ -19,7 +19,7 @@ class TableWindow(NWindow):
         inner_width = w - (n_cols - 1) - 2
         filled_width = w - inner_width
         col_widths = list([col.width for col in self.columns])
-        segments = tui.elementary.measures.get_segments(col_widths, inner_width)
+        segments = tui.elementary.measures.get_segments(col_widths, inner_width, self.columns)
         self.segments = segments
         self.spacers = [Segment(seg.v0+idx, seg.v1+idx) for idx, seg in enumerate(segments)]
         

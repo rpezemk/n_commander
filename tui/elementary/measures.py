@@ -2,10 +2,12 @@ from enum import Enum
 from typing import Tuple
 
 class Segment():
-    def __init__(self, v0 = 0, v1 = 0, is_abs = False):
+    def __init__(self, v0 = 0, v1 = 0, is_abs = False, is_hidden = False):
         self.v0 = v0
         self.v1 = v1
         self.is_abs = is_abs
+        self.is_hidden = is_hidden
+        
     def diff(self) -> int:
         return self.v1 - self.v0
 
@@ -26,17 +28,18 @@ class LenT(Enum):
     STAR = 2
 
 class Length():
-    def __init__(self, value: int, len_type: LenT = LenT.STAR):
+    def __init__(self, value: int, len_type: LenT = LenT.STAR, is_hidden=False):
         self.value = value
         self.len_type = len_type
         self.effective = 0
+        self.is_hidden = is_hidden
 
         
 class Col():
     def __init__(self, title="", width=Length(10, LenT.STAR), is_hidden=False):
         self.title = title
         self.width = get_length(width)
-        self.is_hidden = is_hidden
+        self.is_hidden = is_hidden or self.width.is_hidden
         pass
         
 def get_length(length: Tuple|Length):
@@ -47,8 +50,12 @@ def get_length(length: Tuple|Length):
         case _ if isinstance(length, tuple):
             v = length[0]
             s = length[1]
+            hidden = False
+            if len(length) >= 3:
+                h = length[2]
+                hidden = True if h == "h" else False
             eff_t = LenT.STAR if s == '*' else LenT.ABS
-            tmp_len = Length(v, eff_t)
+            tmp_len = Length(v, eff_t, hidden)
         case _:
             tmp_len = length
             
@@ -61,8 +68,9 @@ def get_lengths(len_list: list[Tuple|Length]):
         tmp_len_list.append(tmp_len)
     return tmp_len_list
     
-def get_segments(len_list: list[Length], outer_len: int) -> list[Segment]:
+def get_segments(len_list: list[Length], outer_len: int, test_list = []) -> list[Segment]:
     tmp_len_coll = get_lengths(len_list)
+    col_widths = list([col.width for col in test_list])
     star_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.STAR])
     abs_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.ABS])
     curr_effective = 0
@@ -72,9 +80,10 @@ def get_segments(len_list: list[Length], outer_len: int) -> list[Segment]:
     simple_lengths = []
     for length in tmp_len_coll:
         maybe_eff = length.value if length.len_type == LenT.ABS else int((star_available * length.value) / star_sum)
-        
+        if length.is_hidden:
+            maybe_eff = 0
         length.effective = min(max(0, outer_len - curr_effective), maybe_eff)
-        simple_lengths.append([length.effective, length.len_type == LenT.ABS])
+        simple_lengths.append([length.effective, length.len_type == LenT.ABS, length.is_hidden])
         curr_effective += length.effective
     
     v_sum = sum([l[0] for l in simple_lengths])
