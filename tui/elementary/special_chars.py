@@ -92,7 +92,7 @@ def get_v_bar(n_chars: int, max_val: float, val: float):
     res = v_8 * n_full + last + ' ' * (n_chars - n_full - 1)
     return res
 
-for i in range(0, 101):
-    bar = get_v_bar(5, 100, i)
-    l = len(bar)
-    print(bar + " " + str(l))
+# for i in range(0, 101):
+#     bar = get_v_bar(5, 100, i)
+#     l = len(bar)
+#     print(bar + " " + str(l))
