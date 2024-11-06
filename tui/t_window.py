@@ -14,11 +14,12 @@ class TableWindow(NWindow):
             
     def draw_table(self, title):
         h, w = self.area.get_dims()
-        n_cols = len(self.columns)
+        visible_lengths = list([col.width for col in self.columns if col.is_hidden == False])
+        n_cols = len(visible_lengths)
         
         inner_width = w - (n_cols - 1) - 2
         filled_width = w - inner_width
-        col_widths = list([col.width for col in self.columns if col.is_hidden == False])
+        col_widths = list(visible_lengths)
         segments = tui.elementary.measures.get_segments(col_widths, inner_width, self.columns)
         self.segments = segments
         self.spacers = [Segment(seg.v0+idx, seg.v1+idx) for idx, seg in enumerate(segments)]
@@ -77,7 +78,7 @@ class TableWindow(NWindow):
             x_offset = x0 + seg.v0
             y_offset = y0 + row_no
             data = row_data[i]
-            max_len = min(seg.v1 - seg.v0, len(data))
-            sdf = data[:max_len]
+            max_len = min(seg.v1 - seg.v0, len(str(data)))
+            sdf = str(data)[:max_len]
             tui.n_window.frame.draw_area(area=Area(y_offset, x_offset, y_offset, x_offset + max_len), sub_lines=[sdf])
         

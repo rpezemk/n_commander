@@ -31,9 +31,13 @@ row_defs = [(1, "a"),
             (50, "*"), 
             (1, "a")]
 
-dir_table_cols = [Col("abs_path", (15, "*", "h")) ,Col("rel_path", (10, "*")), Col("ext", (5, "a"))]
+dir_table_cols = [
+    Col("abs_path", (15, "*", "h")),
+    Col("rel_path", (10, "*")), 
+    Col("size", (10, "a")), 
+    Col("ext", (5, "a"))
+    ]
 
-curr_path = str(Path(".").resolve())
 
 def click_tv_method(tv: TableView, my: int, mx: int):
     y0 = tv.area.y0
@@ -50,6 +54,7 @@ def click_tv_method(tv: TableView, my: int, mx: int):
             tv.title = child_abs_path
 
 
+curr_path = str(Path(".").resolve())
 dir_list = TableView(curr_path, columns=dir_table_cols, 
                      get_items_func=lambda dir_list: 
                          models.fs_model.get_tree(

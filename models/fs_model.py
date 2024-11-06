@@ -13,12 +13,18 @@ class FsItem():
 class FileModel(FsItem):
     def __init__(self, *, abs_path:str=None):
         super().__init__(abs_path=abs_path)
-        self.ext = Path("/home/user/project/file.txt").suffix
+        self.ext = Path(abs_path).suffix
+        
+        if os.path.exists(abs_path):
+            self.size = utils.os_utils.get_file_size(abs_path)
+        else:            
+            self.size = 0
         pass
         
 class ParentDirModel(FsItem):
     def __init__(self, abs_path:str=None):
         self.ext = ""
+        self.size = "..."
         if os.path.exists(abs_path):
             self.abs_path = os.path.dirname(abs_path)
             self.rel_path = "../"
@@ -26,6 +32,7 @@ class ParentDirModel(FsItem):
 class DirModel(FsItem):
     def __init__(self, *, abs_path:str=None):
         super().__init__(abs_path=abs_path)
+        self.size = "..."
         self.is_opened = False
         
     def open(self):

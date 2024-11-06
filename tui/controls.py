@@ -227,7 +227,7 @@ class TableView(ListView):
             vis_row_data = []
             row_data = []
             for col in [col1 for col1 in self.columns]:
-                sub = getattr(item, col.title)
+                sub = getattr(item, col.title, "")
                 row_data.append(sub)
                 if col.is_hidden == False:
                     vis_row_data.append(sub)
