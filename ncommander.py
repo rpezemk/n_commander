@@ -1,4 +1,5 @@
 import curses
+import os
 from pathlib import Path
 import sys
 import asyncio
@@ -13,6 +14,7 @@ from tui.n_window import Col
 from tui.input_resolver import InputResolver
 from tui.progress_bar import HProgressBar, VProgressBar
 import models.fs_model
+from utils import os_utils
 
 prog_bar_value = 0
 
@@ -29,14 +31,31 @@ row_defs = [(1, "a"),
             (50, "*"), 
             (1, "a")]
 
-dir_table_cols = [Col("rel_path", (10, "*")), Col("ext", (5, "a"))]
+dir_table_cols = [Col("abs_path", (15, "*")) ,Col("rel_path", (10, "*")), Col("ext", (5, "a"))]
 
 curr_path = str(Path(".").resolve())
+
+def click_tv_method(tv: TableView, my: int, mx: int):
+    y0 = tv.area.y0
+    y1 = tv.area.y1
+    
+    y_min = y0 + 2
+    y_max = y1 - 1
+    row_no = my - y_min
+    
+    if y_min <= my <= y_max and 0 <= row_no <= len(tv.items_by_row_no) - 1:
+        
+        child_abs_path = tv.items_by_row_no[row_no][1][0]
+        if os.path.isdir(child_abs_path):
+            tv.title = child_abs_path
+
+
 dir_list = TableView(curr_path, columns=dir_table_cols, 
                      get_items_func=lambda dir_list: 
                          models.fs_model.get_tree(
                              models.fs_model.DirModel(abs_path=dir_list.title)
-                             )
+                             ),
+                     click_func=click_tv_method
                          )
 
 prog_bar = HProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100)
@@ -51,10 +70,10 @@ vg_children_quad = [
             Btn("about"), Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
     .g_at((0, 1, 0, 2)),
     
-    DirP(".").g_at((1, 0)), log_panel.g_at((1, 1)),
-    DirP(".").g_at((2, 0)), dir_list.g_at((2, 1)),
-    mix_panel.g_at((3, 1, 0, 2)),
-    prog_bar.g_at((4, 1, 0, 2))
+    DirP(".").g_at((1, 0)), dir_list.g_at((1, 4, 1, 1)),
+    log_panel.g_at((2, 0)), 
+    mix_panel.g_at((3, 1, 0, 1)),
+    prog_bar.g_at((4, 1, 0, 1))
     ]
 
 

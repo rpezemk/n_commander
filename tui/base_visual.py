@@ -41,7 +41,7 @@ class BaseVisual:
         
         return res
     
-    def click(self):
+    def click(self, my, mx):
         ...
     
     def draw(self):

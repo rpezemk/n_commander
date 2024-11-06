@@ -79,5 +79,7 @@ class TableWindow(NWindow):
             x_offset = x0 + seg.v0
             y_offset = y0 + row_no
             data = row_data[i]
-            tui.n_window.frame.draw_area(area=Area(y_offset, x_offset, y_offset, x_offset + len(data)), sub_lines=[data])
+            max_len = min(seg.v1 - seg.v0, len(data))
+            sdf = data[:max_len]
+            tui.n_window.frame.draw_area(area=Area(y_offset, x_offset, y_offset, x_offset + max_len), sub_lines=[sdf])
         

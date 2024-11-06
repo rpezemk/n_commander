@@ -39,7 +39,7 @@ class InputResolver():
                         objs = self.get_root_obj_func().get_all_objects()
                         for obj in objs:
                             if obj.check_point_belongs(mx, my):
-                                obj.click()
+                                obj.click(my, mx)
                 elif key == ord("q") and self.turn_off_func is not None:
                     self.turn_off_func()
             await asyncio.sleep(0.01)

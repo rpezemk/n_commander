@@ -47,7 +47,7 @@ class DirBtn(FileSystemBtn):
     def __init__(self, in_path: str, parent = None, g_place = None, p_place = PPlace()):
         super().__init__(in_path, parent, g_place, p_place)
     
-    def click(self):
+    def click(self, my, mx):
         if self.parent is not None:
             if self.title != "../":
                 p = os.path.join(self.parent.title, self.title)
@@ -59,8 +59,8 @@ class DirBtn(FileSystemBtn):
 class FileBtn(FileSystemBtn):
     def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
         super().__init__(title, parent, g_place, p_place)
-    def click(self):
-        return super().click()
+    def click(self, my, mx):
+        return super().click(my, mx)
 
 class Clock(Btn):
     def __init__(self, parent=None,
@@ -200,24 +200,19 @@ class ListView(Panel):
         self.items_by_row_no = []
         
     def draw(self):
-        self.real_title = self.title
-        height, width = self.get_dims()
-        table = self.emit_table(self.columns).draw_table()
-                  
-        items = 4 * [["abc", "def", "ghi", "jkl"]]
-        cap = table.get_capacity()
-        for idx, item in enumerate(items):
-            if idx > cap - 1:
-                break
-            table.draw_row(idx, item)
+        ...
 
 class TableView(ListView):
     def __init__(self, title, parent=None, children=[], 
                  area=Area(), g_place=None, p_place=PPlace(), 
-                 columns: list[Col]=[], get_items_func:Callable[['TableView'], Tuple[bool,list[Any]]] = None):
+                 columns: list[Col]=[], 
+                 get_items_func:Callable[['TableView'], Tuple[bool,list[Any]]] = None,
+                 click_func:Callable[['TableView', int, int], None] = None,):
         super().__init__(title, parent, children, area, g_place, p_place, None, columns)
         self.get_items_func = get_items_func
         self.columns = columns
+        self.click_func = click_func
+        self.items_by_row_no = []
         
     def draw(self):
         self.real_title = self.title
@@ -225,7 +220,7 @@ class TableView(ListView):
         dir_m = DirModel(abs_path=self.title)
         ok, fs_items = self.get_items_func(self)
         cap = table.get_capacity()
-        items_by_row_no = []
+        self.items_by_row_no = []
         for idx, item in enumerate(fs_items):
             if idx > cap - 1:
                 break
@@ -233,8 +228,10 @@ class TableView(ListView):
             for col in self.columns:
                 sub = getattr(item, col.title)
                 row_data.append(sub)
-            items_by_row_no.append((idx, row_data))
+            self.items_by_row_no.append((idx, row_data))
             table.draw_row(idx, row_data)
             
             
-            
+    def click(self, my, mx):
+        self.click_func(self, my, mx)
+        pass

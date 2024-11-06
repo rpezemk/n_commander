@@ -20,7 +20,7 @@ class ParentDirModel(FsItem):
     def __init__(self, abs_path:str=None):
         self.ext = ""
         if os.path.exists(abs_path):
-            self.abs_path = os.path.dirname(os.path.dirname(abs_path))
+            self.abs_path = os.path.dirname(abs_path)
             self.rel_path = "../"
         
 class DirModel(FsItem):
