@@ -6,12 +6,13 @@ import asyncio
 from tui import signal_resolver
 from tui.visual_grid import MainGrid
 from tui.text_box import TBox
-from tui.controls import Btn, Clock, HPanel, DirP, ListView, DirList
+from tui.controls import Btn, Clock, HPanel, DirP, ListView, TableView
 from tui.elementary.placements import PPlace, HPosEnum
 import tui.n_window
 from tui.n_window import Col
 from tui.input_resolver import InputResolver
 from tui.progress_bar import HProgressBar, VProgressBar
+import models.fs_model
 
 prog_bar_value = 0
 
@@ -29,8 +30,15 @@ row_defs = [(1, "a"),
             (1, "a")]
 
 dir_table_cols = [Col("rel_path", (10, "*")), Col("ext", (5, "a"))]
+
 curr_path = str(Path(".").resolve())
-dir_list = DirList(curr_path, columns=dir_table_cols)
+dir_list = TableView(curr_path, columns=dir_table_cols, 
+                     get_items_func=lambda dir_list: 
+                         models.fs_model.get_tree(
+                             models.fs_model.DirModel(abs_path=dir_list.title)
+                             )
+                         )
+
 prog_bar = HProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100)
 
 mix_panel = HPanel(children= [VProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100, p_place=PPlace(hPos=HPosEnum.LEFT)),

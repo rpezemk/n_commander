@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from datetime import datetime
-from typing import Callable, Any, List
+from typing import Callable, Any, List, Tuple
 
 from utils import os_utils, string_utils
 from tui.elementary.placements import GPlace, HPosEnum, PPlace
@@ -197,6 +197,7 @@ class ListView(Panel):
         super().__init__(title, parent, children, area, g_place, p_place)
         self.get_items_func = get_items_func
         self.columns = columns
+        self.items_by_row_no = []
         
     def draw(self):
         self.real_title = self.title
@@ -210,21 +211,21 @@ class ListView(Panel):
                 break
             table.draw_row(idx, item)
 
-class DirList(ListView):
+class TableView(ListView):
     def __init__(self, title, parent=None, children=[], 
                  area=Area(), g_place=None, p_place=PPlace(), 
-                 columns: list[Col]=[]):
+                 columns: list[Col]=[], get_items_func:Callable[['TableView'], Tuple[bool,list[Any]]] = None):
         super().__init__(title, parent, children, area, g_place, p_place, None, columns)
-        self.get_items_func = None
+        self.get_items_func = get_items_func
         self.columns = columns
         
     def draw(self):
         self.real_title = self.title
         table = self.emit_table(self.columns).draw_table(self.real_title)
         dir_m = DirModel(abs_path=self.title)
-        ok, fs_items = models.fs_model.get_tree(dir_m)
-               
+        ok, fs_items = self.get_items_func(self)
         cap = table.get_capacity()
+        items_by_row_no = []
         for idx, item in enumerate(fs_items):
             if idx > cap - 1:
                 break
@@ -232,6 +233,7 @@ class DirList(ListView):
             for col in self.columns:
                 sub = getattr(item, col.title)
                 row_data.append(sub)
+            items_by_row_no.append((idx, row_data))
             table.draw_row(idx, row_data)
             
             
