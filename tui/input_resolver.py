@@ -34,7 +34,7 @@ class InputResolver():
                 elif key == curses.KEY_MOUSE:
                     id, mx, my, mz, bs = curses.getmouse()
                     if self.report_click_func is not None:
-                        self.report_click_func(key, id, mx, my, mz, bs)
+                        self.report_click_func(self, key, mx, my, mz, bs)
                     if self.get_root_obj_func is not None:
                         objs = self.get_root_obj_func().get_all_objects()
                         for obj in objs:

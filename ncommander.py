@@ -93,9 +93,9 @@ def main(stdscr):
     signal_resolver.init_screen(stdscr)
     vg = MainGrid(vg_children_quad, row_defs=row_defs, col_defs=col_defs, stdscr=stdscr)
     vg.input_resolver.report_click_func =    \
-        lambda obj, key, bs, my, mx, mz:     \
+        lambda obj, key, my, mx, mz, bs:     \
             log_panel.log(f"k:{key}, bs:{bs} ({my}, {mx}, {mz})")
-            
+            # (self, id, mx, my, mz, bs)
     asyncio.run(vg.run_async_tasks(stdscr, [start_update_progress_bar]))
 
 if __name__ == "__main__":
