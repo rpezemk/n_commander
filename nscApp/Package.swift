@@ -4,6 +4,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "SwiftNCursesApp"
+    name: "SwiftNCursesApp",
+    platforms: [
+        .macOS(.v10_14)
+    ],
+    dependencies:[]
+    
+    // swiftLanguageVersions: [5.10]
     
 )
