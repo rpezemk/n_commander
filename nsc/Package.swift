@@ -8,8 +8,16 @@ let package = Package(
     platforms: [
         .macOS(.v10_14)
     ],
-    dependencies:[]
+    products: [
+        .executable(name:"SwiftCom",targets:["SwiftCom"])
+    ],
+    dependencies:[
+        // .package(),
+        // .package(),
+    ],
+    targets:[
+        .target(name:"SwiftCom",dependencies:[])
+    ]
     
-    // swiftLanguageVersions: [5.10]
     
 )
