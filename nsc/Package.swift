@@ -4,19 +4,25 @@
 import PackageDescription
 
 let package = Package(
-    name: "SwiftNCursesApp",
+    name: "NCommander",
     platforms: [
         .macOS(.v10_14)
     ],
     products: [
-        .executable(name:"SwiftCom",targets:["SwiftCom"])
+        .executable(name:"NCommander",targets:["ncommander"])
     ],
     dependencies:[
+        .package(url: "https://github.com/apple/example-package-figlet", branch: "main")
         // .package(),
         // .package(),
     ],
     targets:[
-        .target(name:"SwiftCom",dependencies:[])
+        .executableTarget(
+            name:"ncommander",
+            dependencies:[
+                .product(name:"Figlet",package:"example-package-figlet"),
+            ],
+            path:"Sources"),
     ]
     
     
