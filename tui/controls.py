@@ -225,7 +225,7 @@ class TableView(ListView):
             if idx > cap - 1:
                 break
             row_data = []
-            for col in self.columns:
+            for col in [col1 for col1 in self.columns if col1.is_hidden == False]:
                 sub = getattr(item, col.title)
                 row_data.append(sub)
             self.items_by_row_no.append((idx, row_data))

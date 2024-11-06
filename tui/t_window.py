@@ -18,7 +18,7 @@ class TableWindow(NWindow):
         
         inner_width = w - (n_cols - 1) - 2
         filled_width = w - inner_width
-        col_widths = list([col.width for col in self.columns])
+        col_widths = list([col.width for col in self.columns if col.is_hidden == False])
         segments = tui.elementary.measures.get_segments(col_widths, inner_width, self.columns)
         self.segments = segments
         self.spacers = [Segment(seg.v0+idx, seg.v1+idx) for idx, seg in enumerate(segments)]
@@ -28,9 +28,9 @@ class TableWindow(NWindow):
         res_title = title
         
         top_line = (TS.s.top_left + " " + res_title + " ").ljust(w-1, TS.s.dash_h) + TS.s.top_right
-        
+        visible_columns = [col for col in self.columns if col.is_hidden == False]
         sec_line = TS.s.left_conn \
-                   + TS.s.upper_conn.join([(self.columns[idx].title).ljust(seg.v1 - seg.v0, TS.s.horizontal) for idx, seg in enumerate(segments)]) \
+                   + TS.s.upper_conn.join([(visible_columns[idx].title).ljust(seg.v1 - seg.v0, TS.s.horizontal) for idx, seg in enumerate(segments)]) \
                    + TS.s.right_conn
                    
         mid_line = TS.s.vertical \
@@ -65,7 +65,8 @@ class TableWindow(NWindow):
             tui.n_window.frame.draw_area(area=Area(y_offset, x_offset, y_offset, x_offset + len(data)), sub_lines=[data])
                 
     def draw_row(self, row_no=0, row_data:list[str] = []):
-        n_filled_cols = min(len(self.columns), len(row_data))
+        visible_columns = [col for col in self.columns if col.is_hidden == False]
+        n_filled_cols = min(len(visible_columns), len(row_data))
         x0 = self.area.x0 + 1
         y0 = self.area.y0 + 2
         h, w = self.area.get_dims()
