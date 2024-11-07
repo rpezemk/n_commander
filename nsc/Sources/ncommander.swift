@@ -1,7 +1,7 @@
 import Foundation
 import Figlet
 import ArgumentParser
-import Darwin.ncurses
+
 
 @main
 struct FigletTool: ParsableCommand {
