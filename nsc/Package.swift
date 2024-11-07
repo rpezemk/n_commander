@@ -12,7 +12,8 @@ let package = Package(
         .executable(name:"NCommander",targets:["ncommander"])
     ],
     dependencies:[
-        .package(url: "https://github.com/apple/example-package-figlet", branch: "main")
+        .package(url: "https://github.com/apple/example-package-figlet", branch: "main"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
         // .package(),
         // .package(),
     ],
@@ -21,6 +22,7 @@ let package = Package(
             name:"ncommander",
             dependencies:[
                 .product(name:"Figlet",package:"example-package-figlet"),
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ],
             path:"Sources"),
     ]
