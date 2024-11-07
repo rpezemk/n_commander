@@ -9,7 +9,7 @@ let package = Package(
         .macOS(.v10_14)
     ],
     products: [
-        .executable(name:"NCommander",targets:["ncommander"])
+        .executable(name:"nsc",targets:["nsc"])
     ],
     dependencies:[
         .package(url: "https://github.com/apple/example-package-figlet", branch: "main"),
@@ -19,7 +19,7 @@ let package = Package(
     ],
     targets:[
         .executableTarget(
-            name:"ncommander",
+            name:"nsc",
             dependencies:[
                 .product(name:"Figlet",package:"example-package-figlet"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),

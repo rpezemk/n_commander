@@ -1,7 +1,7 @@
 import Foundation
 import Figlet
 import ArgumentParser
-
+import Darwin.ncurses
 
 @main
 struct FigletTool: ParsableCommand {
@@ -10,6 +10,11 @@ struct FigletTool: ParsableCommand {
 
     public func run() throws {
         Figlet.say(self.input)
+       
+
+
+
+
     }
 }
 // main to jest entrypoint w pliku mozna miec tylko jeden taki
