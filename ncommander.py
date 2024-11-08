@@ -81,9 +81,6 @@ vg_children_quad = [
     prog_bar.g_at((4, 1, 0, 1))
     ]
 
-
-
-
 async def update_progress_bar():
     global prog_bar_value
     while True:
