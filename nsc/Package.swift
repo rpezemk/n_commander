@@ -23,13 +23,9 @@ let package = Package(
             dependencies:[
                 .product(name:"Figlet",package:"example-package-figlet"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                "Cncurses"
             ],
             path:"Sources"),
-        .target(
-                name:"Cncurses",
-                path:"Sources/Cncurses"
-            )
+        
     ]
     
     

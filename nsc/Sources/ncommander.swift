@@ -1,7 +1,7 @@
 import Foundation
 import Figlet
 import ArgumentParser
-
+import Cncurses
 
 @main
 struct FigletTool: ParsableCommand {
@@ -10,7 +10,6 @@ struct FigletTool: ParsableCommand {
 
     public func run() throws {
         Figlet.say(self.input)
-       
 
 
 
