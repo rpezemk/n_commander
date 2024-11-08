@@ -32,7 +32,7 @@ row_defs = [(1, "a"),
             (1, "a")]
 
 dir_table_cols = [
-    Col("abs_path", (15, "*")),
+    Col("abs_path", (15, "*", "h")),
     Col("rel_path", (10, "*")), 
     Col("size", (10, "a")), 
     Col("ext", (5, "a"))
