@@ -29,15 +29,7 @@ class Frame():
             begin = dest_line[:area.x0]
             end = dest_line[area.x0 + len(sub_line):]
             self.lines[area.y0 + idx] = begin + sub_line + end
-    
-    def set_line(self, y0, line: str):
-        self.pad.insstr(y0, 0, line)
-        self.pad.refresh(0, 0, 0, 0, y0, self.n_cols-1)
-    
-    def refresh_pad(self):
-        self.pad.refresh(0, 0, 0, 0, self.n_rows - 1, self.n_cols-1)
         
-    
     def render_frame(self):
         if signal_resolver.stdscr is None:
             return
@@ -50,13 +42,10 @@ class Frame():
                     self.prev_lines[idx] = self.lines[idx]
                            
             for idx, line in self.lines_to_refresh:
-                self.set_line(idx, line)
+                self.pad.insstr(idx, 0, line)
             
             if len(self.lines_to_refresh) > 0:
-                self.refresh_pad()    
+                self.pad.refresh(0, 0, 0, 0, self.n_rows - 1, self.n_cols-1)
             
         except Exception as e:
             pass
-
-                  
-
