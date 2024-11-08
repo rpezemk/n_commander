@@ -13,8 +13,8 @@ class Frame():
     """
     def __init__(self, stdscr):
         self.n_rows, self.n_cols = signal_resolver.stdscr.getmaxyx()        
-        self.lines:list[str] = (self.n_rows)  * [(self.n_cols) * " "]      
-        self.prev_lines:list[str] = (self.n_rows)  * [(self.n_cols) * " "]   
+        self.lines: list[str] = (self.n_rows)  * [(self.n_cols) * " "]      
+        self.prev_lines: list[str] = (self.n_rows)  * [(self.n_cols) * " "]   
         self.lines_to_refresh: list[Tuple[int, str]] = []
         self.pad = curses.newpad(self.n_rows, self.n_cols)
         pass
