@@ -35,7 +35,7 @@ def try_get_dir_content(path='.') -> tuple[bool, list[str], list[str], str]:
         return (False, [*dirs], [*files], f"Permission denied to access '{path}'.")
 
 def get_nice_dir_content(path='.') -> tuple[bool, list[str], list[str], str]:
-    absPath = os.path.abspath(path) + "/"
+    absPath = os.path.abspath(path)
     dirs = []
     files = []
     try:
