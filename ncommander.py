@@ -103,7 +103,7 @@ def main(stdscr):
 if __name__ == "__main__":
     curses.wrapper(main);
     # try:
-    #     #curses.wrapper(main)
+    #     curses.wrapper(main)
     # except Exception as e:
     #     print(f"Error: {e}")
 
