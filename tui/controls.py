@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Callable, Any, List, Tuple
 
+from tui.t_window import TableWindow
 from utils import os_utils, string_utils
 from tui.elementary.placements import GPlace, HPosEnum, PPlace
 from tui.elementary.measures import Area, Col
@@ -212,18 +213,24 @@ class TableView(ListView):
         self.get_items_func = get_items_func
         self.columns = columns
         self.click_func = click_func
-        self.items_by_row_no = []
+        self.data_by_row_no = []
+        self.table: TableWindow = None
+        self.needs_redraw = True
         
     def draw(self):
+        # if not self.needs_redraw:
+        #     return
         self.real_title = self.title
-        table = self.emit_table(self.columns).draw_table(self.real_title)
+        self.table = self.emit_table(self.columns).draw_table(self.real_title)
         dir_m = DirModel(abs_path=self.title)
         ok, fs_items = self.get_items_func(self)
-        cap = table.get_capacity()
-        self.items_by_row_no = []
+        cap = self.table.get_capacity()
+        self.data_by_row_no = []
+        self.real_items_by_row_no = []
         for idx, item in enumerate(fs_items):
             if idx > cap - 1:
                 break
+            self.real_items_by_row_no.append((idx, item))
             vis_row_data = []
             row_data = []
             for col in [col1 for col1 in self.columns]:
@@ -231,9 +238,33 @@ class TableView(ListView):
                 row_data.append(sub)
                 if col.is_hidden == False:
                     vis_row_data.append(sub)
-            self.items_by_row_no.append((idx, row_data))
-            table.draw_row(idx, vis_row_data)
-            
+            self.data_by_row_no.append((idx, row_data))
+            self.table.draw_row(idx, vis_row_data)
+        self.needs_redraw = False
+        
     def click(self, my, mx):
-        self.click_func(self, my, mx)
+        # self.click_func(self, my, mx)
+        local_x = mx - self.area.x0
+        if self.table is None:
+            return
+        sel_seg = [seg for seg in self.table.segments if seg.v0 <= local_x <= seg.v1]
+        if len(sel_seg) == 0:
+            return
+        seg = sel_seg[0]
+        vis_idx = self.table.segments.index(seg)
+        visible_columns = [col for col in self.columns if col.is_hidden == False]
+        if len(visible_columns) < vis_idx + 1:
+            return
+        col = visible_columns[vis_idx]
+        if col.click_func is None:
+            return
+        
+        y0 = self.area.y0
+        y1 = self.area.y1
+        
+        y_min = y0 + 2
+        row_no = my - y_min
+        data = self.data_by_row_no[row_no][1]
+        real_item = self.real_items_by_row_no[row_no]
+        col.click_func(self, data, real_item)
         pass

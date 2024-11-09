@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import sys
 import asyncio
+from typing import Any
 
 from tui import signal_resolver
 from tui.visual_grid import MainGrid
@@ -31,14 +32,28 @@ row_defs = [(1, "a"),
             (50, "*"), 
             (1, "a")]
 
+
+def click_sel(tv: TableView, data: list[str], real_idx_item_tup: Any):
+    if real_idx_item_tup is None or len(real_idx_item_tup) < 2:
+        return
+    real_item = real_idx_item_tup[1]
+    real_item.sel = not real_item.sel
+    pass
+
+def click_rel_path(tv: TableView, data: list[str], real_item: Any):
+    child_abs_path = data[1]
+    if os.path.isdir(child_abs_path):
+        tv.title = child_abs_path
+    pass
+    ...
+    
 dir_table_cols = [
-    Col("sel", (3, "a"), show_func=lambda show: "[x]" if show is True else "[ ]"),
+    Col("sel", (3, "a"), show_func=lambda show: "[x]" if show is True else "[ ]", click_func=click_sel),
     Col("abs_path", (15, "*", "h")),
-    Col("rel_path", (10, "*")), 
+    Col("rel_path", (10, "*"), click_func=click_rel_path), 
     Col("size", (10, "a")), 
     Col("ext", (5, "a"))
     ]
-
 
 def click_tv_method(tv: TableView, my: int, mx: int):
     y0 = tv.area.y0
@@ -48,9 +63,9 @@ def click_tv_method(tv: TableView, my: int, mx: int):
     y_max = y1 - 1
     row_no = my - y_min
     
-    if y_min <= my <= y_max and 0 <= row_no <= len(tv.items_by_row_no) - 1:
+    if y_min <= my <= y_max and 0 <= row_no <= len(tv.data_by_row_no) - 1:
         
-        data_tuple = tv.items_by_row_no[row_no]
+        data_tuple = tv.data_by_row_no[row_no]
         child_abs_path = data_tuple[1][1]
         if os.path.isdir(child_abs_path):
             tv.title = child_abs_path
