@@ -37,6 +37,10 @@ def click_sel(tv: TableView, data: list[str], real_idx_item_tup: Any):
     if real_idx_item_tup is None or len(real_idx_item_tup) < 2:
         return
     real_item = real_idx_item_tup[1]
+    
+    if isinstance(real_item, models.fs_model.ParentDirModel):
+        return
+    
     real_item.sel = not real_item.sel
     pass
 
@@ -47,51 +51,25 @@ def click_rel_path(tv: TableView, data: list[str], real_item: Any):
     pass
     ...
     
+def bool_to_bracket(sel):
+    return "[x]" if sel is True else "[ ]"
+
 dir_table_cols = [
-    Col("sel", (3, "a"), show_func=lambda show: "[x]" if show is True else "[ ]", click_func=click_sel),
+    Col("sel", (3, "a"), show_func=bool_to_bracket, click_func=click_sel),
     Col("abs_path", (15, "*", "h")),
     Col("rel_path", (10, "*"), click_func=click_rel_path), 
     Col("size", (10, "a")), 
     Col("ext", (5, "a"))
     ]
 
-def click_tv_method(tv: TableView, my: int, mx: int):
-    y0 = tv.area.y0
-    y1 = tv.area.y1
-    
-    y_min = y0 + 2
-    y_max = y1 - 1
-    row_no = my - y_min
-    
-    if y_min <= my <= y_max and 0 <= row_no <= len(tv.data_by_row_no) - 1:
-        
-        data_tuple = tv.data_by_row_no[row_no]
-        child_abs_path = data_tuple[1][1]
-        if os.path.isdir(child_abs_path):
-            tv.title = child_abs_path
-
-
-class DirProvider():
-    def __init__(self):
-        self.prev_items = []
-        
-    def get_items(self, abs_path: str) -> list[models.fs_model.FsItem]:
-        _, fs_items = models.fs_model.get_tree(models.fs_model.DirModel(abs_path=abs_path))
-        old_items = [prev for prev in self.prev_items if any(fs.abs_path == prev.abs_path for fs in fs_items)]
-        new_items = [fs_i for fs_i in fs_items if not any(pr.abs_path == fs_i.abs_path for pr in self.prev_items)]
-        res = sorted(list([*old_items, *new_items]), key=lambda fs_item: fs_item is models.fs_model.DirModel) 
-        self.prev_items = res
-        return True, res
-
-my_dir_provider = DirProvider()
+my_dir_provider = models.fs_model.DirProvider()
 
 
 
 
 curr_path = str(Path(".").resolve())
 dir_list = TableView(curr_path, columns=dir_table_cols, 
-                     get_items_func=lambda tv: my_dir_provider.get_items(tv.title),
-                     click_func=click_tv_method
+                     get_items_func=lambda tv: my_dir_provider.get_items(tv.title)
                          )
 
 prog_bar = HProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100)
