@@ -36,11 +36,14 @@ class Length():
 
         
 class Col():
-    def __init__(self, title="", width=Length(10, LenT.STAR), is_hidden=False, show_func: Callable[[Any], str] = None):
+    def __init__(self, title="", width=Length(10, LenT.STAR), is_hidden=False, 
+                 show_func: Callable[[Any], str] = None,
+                 click_func: Callable[[Any], None] = None):
         self.title = title
         self.width = get_length(width)
         self.is_hidden = is_hidden or self.width.is_hidden
         self.show_func = show_func
+        self.click_func = click_func
         pass
         
 def get_length(length: Tuple|Length):
