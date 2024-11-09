@@ -50,7 +50,8 @@ def click_tv_method(tv: TableView, my: int, mx: int):
     
     if y_min <= my <= y_max and 0 <= row_no <= len(tv.items_by_row_no) - 1:
         
-        child_abs_path = tv.items_by_row_no[row_no][1][0]
+        data_tuple = tv.items_by_row_no[row_no]
+        child_abs_path = data_tuple[1][1]
         if os.path.isdir(child_abs_path):
             tv.title = child_abs_path
 
