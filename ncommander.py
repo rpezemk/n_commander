@@ -71,12 +71,26 @@ def click_tv_method(tv: TableView, my: int, mx: int):
             tv.title = child_abs_path
 
 
+class DirProvider():
+    def __init__(self):
+        self.prev_items = []
+        
+    def get_items(self, abs_path: str) -> list[models.fs_model.FsItem]:
+        _, fs_items = models.fs_model.get_tree(models.fs_model.DirModel(abs_path=abs_path))
+        old_items = [prev for prev in self.prev_items if any(fs.abs_path == prev.abs_path for fs in fs_items)]
+        new_items = [fs_i for fs_i in fs_items if not any(pr.abs_path == fs_i.abs_path for pr in self.prev_items)]
+        res = sorted(list([*old_items, *new_items]), key=lambda fs_item: fs_item is models.fs_model.DirModel) 
+        self.prev_items = res
+        return True, res
+
+my_dir_provider = DirProvider()
+
+
+
+
 curr_path = str(Path(".").resolve())
 dir_list = TableView(curr_path, columns=dir_table_cols, 
-                     get_items_func=lambda dir_list: 
-                         models.fs_model.get_tree(
-                             models.fs_model.DirModel(abs_path=dir_list.title)
-                             ),
+                     get_items_func=lambda tv: my_dir_provider.get_items(tv.title),
                      click_func=click_tv_method
                          )
 

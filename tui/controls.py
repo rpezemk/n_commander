@@ -216,6 +216,7 @@ class TableView(ListView):
         self.data_by_row_no = []
         self.table: TableWindow = None
         self.needs_redraw = True
+        self.orig_data = []
         
     def draw(self):
         # if not self.needs_redraw:
@@ -227,6 +228,7 @@ class TableView(ListView):
         cap = self.table.get_capacity()
         self.data_by_row_no = []
         self.real_items_by_row_no = []
+        
         for idx, item in enumerate(fs_items):
             if idx > cap - 1:
                 break

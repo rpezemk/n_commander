@@ -78,3 +78,16 @@ tree_provider = TreeProvider(utils.os_utils.get_nice_dir_content)
 def get_tree(dir_model: DirModel) -> Tuple[bool,list[FsItem]]:
     ok, res = tree_provider.get_dir_content(abs_path=dir_model.abs_path)
     return ok, res
+
+
+class DirProvider():
+    def __init__(self):
+        self.prev_items = []
+        
+    def get_items(self, abs_path: str) -> list[FsItem]:
+        _, fs_items = get_tree(DirModel(abs_path=abs_path))
+        old_items = [prev for prev in self.prev_items if any(fs.abs_path == prev.abs_path for fs in fs_items)]
+        new_items = [fs_i for fs_i in fs_items if not any(pr.abs_path == fs_i.abs_path for pr in self.prev_items)]
+        res = sorted(list([*old_items, *new_items]), key=lambda fs_item: fs_item is DirModel) 
+        self.prev_items = res
+        return True, res
