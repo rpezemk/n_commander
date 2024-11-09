@@ -8,7 +8,7 @@ class FsItem():
         self.abs_path = abs_path
         self.rel_path = os.path.basename(abs_path)
         self.ext = ""
-        self.sel = "[ ]"
+        self.sel = False
         pass
         
 class FileModel(FsItem):

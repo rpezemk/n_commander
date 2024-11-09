@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Tuple
+from typing import Any, Callable, Tuple
 
 class Segment():
     def __init__(self, v0 = 0, v1 = 0, is_abs = False, is_hidden = False):
@@ -36,10 +36,11 @@ class Length():
 
         
 class Col():
-    def __init__(self, title="", width=Length(10, LenT.STAR), is_hidden=False):
+    def __init__(self, title="", width=Length(10, LenT.STAR), is_hidden=False, show_func: Callable[[Any], str] = None):
         self.title = title
         self.width = get_length(width)
         self.is_hidden = is_hidden or self.width.is_hidden
+        self.show_func = show_func
         pass
         
 def get_length(length: Tuple|Length):

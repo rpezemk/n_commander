@@ -74,10 +74,13 @@ class TableWindow(NWindow):
         if row_no > h - 4:
             return 
         for i in range(0, n_filled_cols):
+            col = visible_columns[i]
             seg = self.spacers[i]
             x_offset = x0 + seg.v0
             y_offset = y0 + row_no
             data = row_data[i]
+            if col.show_func is not None:
+                data = col.show_func(data)
             max_len = min(seg.v1 - seg.v0, len(str(data)))
             sdf = str(data)[:max_len]
             tui.n_window.frame.draw_area(area=Area(y_offset, x_offset, y_offset, x_offset + max_len), sub_lines=[sdf])
