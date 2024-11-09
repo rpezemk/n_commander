@@ -249,6 +249,11 @@ class TableView(ListView):
         local_x = mx - self.area.x0
         if self.table is None:
             return
+        y0 = self.area.y0        
+        y_min = y0 + 2
+        row_no = my - y_min
+        if len(self.data_by_row_no) < row_no + 1:
+            return
         sel_seg = [seg for seg in self.table.segments if seg.v0 <= local_x <= seg.v1]
         if len(sel_seg) == 0:
             return
@@ -261,11 +266,6 @@ class TableView(ListView):
         if col.click_func is None:
             return
         
-        y0 = self.area.y0
-        y1 = self.area.y1
-        
-        y_min = y0 + 2
-        row_no = my - y_min
         data = self.data_by_row_no[row_no][1]
         real_item = self.real_items_by_row_no[row_no]
         col.click_func(self, data, real_item)
