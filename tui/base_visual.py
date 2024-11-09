@@ -21,7 +21,7 @@ class BaseVisual:
         
         self.g_at(g_place)
         self.p_place = p_place
-        
+        self.is_selected = False
         for child in [ch for ch in self.children if ch is not None]:
             child.parent = self
         

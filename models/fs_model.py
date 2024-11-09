@@ -8,6 +8,7 @@ class FsItem():
         self.abs_path = abs_path
         self.rel_path = os.path.basename(abs_path)
         self.ext = ""
+        self.sel = "[ ]"
         pass
         
 class FileModel(FsItem):
@@ -23,6 +24,7 @@ class FileModel(FsItem):
         
 class ParentDirModel(FsItem):
     def __init__(self, abs_path:str=None):
+        super().__init__(abs_path=abs_path)
         self.ext = ""
         self.size = "..."
         if os.path.exists(abs_path):
