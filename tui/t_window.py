@@ -14,6 +14,7 @@ class TableWindow(NWindow):
             
     def draw_table(self, title):
         h, w = self.area.get_dims()
+        w = w - 1
         visible_lengths = list([col.width for col in self.columns if col.is_hidden == False])
         n_cols = len(visible_lengths)
         
@@ -32,17 +33,17 @@ class TableWindow(NWindow):
         visible_columns = [col for col in self.columns if col.is_hidden == False]
         sec_line = TS.s.left_conn \
                    + TS.s.upper_conn.join([(visible_columns[idx].title).ljust(seg.v1 - seg.v0, TS.s.horizontal) for idx, seg in enumerate(segments)]) \
-                   + TS.s.right_conn
+                   + TS.s.right_conn + TS.d.arr_u
                    
         mid_line = TS.s.vertical \
             + TS.s.vertical.join([" " * (seg.v1 - seg.v0) for idx, seg in enumerate(segments)]) \
             + TS.s.vertical
-        btm_line = TS.s.bottom_left + TS.s.lower_conn.join([TS.s.horizontal * (seg.v1 - seg.v0) for seg in segments]) + TS.s.bottom_right
+        btm_line = TS.s.bottom_left + TS.s.lower_conn.join([TS.s.horizontal * (seg.v1 - seg.v0) for seg in segments]) + TS.s.bottom_right + TS.d.arr_d
         
-        top_len = len(top_line)
+        mid_lines = (h-3) * [mid_line]
         lines = [top_line,
                  sec_line,
-                *( (h-3) * [mid_line]), 
+                *mid_lines, 
                 btm_line]
         tui.n_window.frame.draw_area(area=self.area, sub_lines=lines)
         return self

@@ -269,4 +269,5 @@ class TableView(ListView):
         data = self.data_by_row_no[row_no][1]
         real_item = self.real_items_by_row_no[row_no]
         col.click_func(self, data, real_item)
+
         pass
