@@ -28,19 +28,19 @@ class TableWindow(NWindow):
         test_blank_sum = sum([w.v1 - w.v0 for w in segments])
         
         res_title = title
-        
-        top_line = (TS.s.top_left + " " + res_title + " ").ljust(w-1, TS.s.dash_h) + TS.s.top_right
         visible_columns = [col for col in self.columns if col.is_hidden == False]
+        
+        top_line = (TS.s.top_left + " " + res_title + " ").ljust(w-1, TS.s.dash_h) + TS.s.top_right + TS.d.arr_u
         sec_line = TS.s.left_conn \
                    + TS.s.upper_conn.join([(visible_columns[idx].title).ljust(seg.v1 - seg.v0, TS.s.horizontal) for idx, seg in enumerate(segments)]) \
-                   + TS.s.right_conn + TS.d.arr_u
+                   + TS.s.right_conn
                    
         mid_line = TS.s.vertical \
             + TS.s.vertical.join([" " * (seg.v1 - seg.v0) for idx, seg in enumerate(segments)]) \
             + TS.s.vertical
         btm_line = TS.s.bottom_left + TS.s.lower_conn.join([TS.s.horizontal * (seg.v1 - seg.v0) for seg in segments]) + TS.s.bottom_right + TS.d.arr_d
         
-        mid_lines = (h-3) * [mid_line]
+        mid_lines = (h-3) * [mid_line]    
         lines = [top_line,
                  sec_line,
                 *mid_lines, 

@@ -217,6 +217,7 @@ class TableView(ListView):
         self.table: TableWindow = None
         self.needs_redraw = True
         self.orig_data = []
+        self.idx_offset = 1
         
     def draw(self):
         # if not self.needs_redraw:
@@ -225,11 +226,21 @@ class TableView(ListView):
         self.table = self.emit_table(self.columns).draw_table(self.real_title)
         dir_m = DirModel(abs_path=self.title)
         ok, fs_items = self.get_items_func(self)
+        self.orig_data = fs_items
         cap = self.table.get_capacity()
         self.data_by_row_no = []
         self.real_items_by_row_no = []
+        n_items = len(fs_items)
+        n_overflow_items = n_items - cap
+        max_idx_offset = max(0, n_overflow_items)
+        real_idx_offset =  min(self.idx_offset, max_idx_offset)
         
-        for idx, item in enumerate(fs_items):
+        if n_overflow_items < 1:
+            shown_items = fs_items
+        else:
+            shown_items = fs_items[real_idx_offset:][:cap]
+            
+        for idx, item in enumerate(shown_items):
             if idx > cap - 1:
                 break
             self.real_items_by_row_no.append((idx, item))
@@ -249,7 +260,24 @@ class TableView(ListView):
         local_x = mx - self.area.x0
         if self.table is None:
             return
-        y0 = self.area.y0        
+        
+        
+        y0 = self.area.y0
+        y1 = self.area.y1
+        x1 = self.area.x1
+        cap = self.table.get_capacity()
+        
+        if mx == x1 and my == y0 and self.idx_offset -1 >= 0:
+            self.idx_offset -= 1
+            return
+        
+        n_items = len(self.orig_data)
+        n_overflow_items = n_items - cap
+        max_idx_offset = max(0, n_overflow_items)
+        if mx == x1 and my == y1 and self.idx_offset + 1 <= max_idx_offset:
+            self.idx_offset += 1
+            return 
+        
         y_min = y0 + 2
         row_no = my - y_min
         if len(self.data_by_row_no) < row_no + 1:
