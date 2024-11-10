@@ -35,11 +35,19 @@ class InputResolver():
                     id, mx, my, mz, bs = curses.getmouse()
                     if self.report_click_func is not None:
                         self.report_click_func(self, key, mx, my, mz, bs)
+                    
                     if self.get_root_obj_func is not None:
                         objs = self.get_root_obj_func().get_all_objects()
                         for obj in objs:
                             if obj.check_point_belongs(mx, my):
-                                obj.click(my, mx)
+                                if bs in [2, 4]:
+                                    obj.simple_click(my, mx, bs)
+                                elif bs == 65536:
+                                    obj.wheel_up(my, mx, bs)
+                                elif bs == 2097152:
+                                    obj.wheel_down(my, mx, bs)
                 elif key == ord("q") and self.turn_off_func is not None:
                     self.turn_off_func()
             await asyncio.sleep(0.01)
+            # 65536   UP
+            # 2097152 DOWN

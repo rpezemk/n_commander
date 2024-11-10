@@ -41,9 +41,15 @@ class BaseVisual:
         
         return res
     
-    def click(self, my, mx):
+    def simple_click(self, my, mx, bs):
         ...
     
+    def wheel_up(self, my, mx, bs):
+        ...
+        
+    def wheel_down(self, my, mx, bs):
+        ...
+        
     def draw(self):
         ...
         

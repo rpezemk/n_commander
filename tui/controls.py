@@ -48,7 +48,7 @@ class DirBtn(FileSystemBtn):
     def __init__(self, in_path: str, parent = None, g_place = None, p_place = PPlace()):
         super().__init__(in_path, parent, g_place, p_place)
     
-    def click(self, my, mx):
+    def simple_click(self, my, mx, bs):
         if self.parent is not None:
             if self.title != "../":
                 p = os.path.join(self.parent.title, self.title)
@@ -60,8 +60,8 @@ class DirBtn(FileSystemBtn):
 class FileBtn(FileSystemBtn):
     def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
         super().__init__(title, parent, g_place, p_place)
-    def click(self, my, mx):
-        return super().click(my, mx)
+    def simple_click(self, my, mx, bs):
+        return super().simple_click(my, mx, bs)
 
 class Clock(Btn):
     def __init__(self, parent=None,
@@ -217,7 +217,7 @@ class TableView(ListView):
         self.table: TableWindow = None
         self.needs_redraw = True
         self.orig_data = []
-        self.idx_offset = 1
+        self.idx_offset = 0
         
     def draw(self):
         # if not self.needs_redraw:
@@ -255,7 +255,7 @@ class TableView(ListView):
             self.table.draw_row(idx, vis_row_data)
         self.needs_redraw = False
         
-    def click(self, my, mx):
+    def simple_click(self, my, mx, bs):
         # self.click_func(self, my, mx)
         local_x = mx - self.area.x0
         if self.table is None:
@@ -274,6 +274,7 @@ class TableView(ListView):
         n_items = len(self.orig_data)
         n_overflow_items = n_items - cap
         max_idx_offset = max(0, n_overflow_items)
+        
         if mx == x1 and my == y1 and self.idx_offset + 1 <= max_idx_offset:
             self.idx_offset += 1
             return 
@@ -299,3 +300,24 @@ class TableView(ListView):
         col.click_func(self, data, real_item)
 
         pass
+    
+    
+    def wheel_up(self, my, mx, bs):
+        y0 = self.area.y0
+        y1 = self.area.y1
+        x1 = self.area.x1
+        
+        if self.idx_offset -1 >= 0:
+            self.idx_offset -= 1
+
+    
+        
+    def wheel_down(self, my, mx, bs):
+        cap = self.table.get_capacity()
+        n_items = len(self.orig_data)
+        n_overflow_items = n_items - cap
+        max_idx_offset = max(0, n_overflow_items)
+        
+        if self.idx_offset + 1 <= max_idx_offset:
+            self.idx_offset += 1
+            return 
