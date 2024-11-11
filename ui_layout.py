@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import time
 from typing import Any
 from tui.visual_grid import MainGrid
 from tui.text_box import TBox
@@ -85,3 +86,12 @@ vg = MainGrid(vg_children_quad, row_defs=row_defs, col_defs=col_defs)
 vg.input_resolver.report_click_func =    \
     lambda obj, key, my, mx, mz, bs:     \
         log_panel.log(f"k:{key}, bs:{bs} ({my}, {mx}, {mz})")
+        
+        
+def update_progress_bar():
+    while True:
+        global prog_bar_value
+        prog_bar_value = ((prog_bar_value * 10 + 10) % 1000)/10
+        time.sleep(0.05)        
+        
+non_ui_tasks = [update_progress_bar]
