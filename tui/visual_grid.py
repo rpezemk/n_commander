@@ -43,6 +43,10 @@ class MainGrid(BaseVisual):
                                turn_off_func=lambda: self.close_app(),
                                report_click_func=log_to_panel)
         
+    def set_stdscr(self, stdscr):
+        self.stdscr = stdscr
+        return self
+        
     def draw(self):
         self.area = Area(0, 0, *self.stdscr.getmaxyx())
         h, w = self.get_dims()

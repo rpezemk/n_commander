@@ -80,3 +80,8 @@ vg_children_quad = [
     mix_panel.g_at((3, 1, 0, 1)),
     prog_bar.g_at((4, 1, 0, 1))
     ]
+
+vg = MainGrid(vg_children_quad, row_defs=row_defs, col_defs=col_defs)
+vg.input_resolver.report_click_func =    \
+    lambda obj, key, my, mx, mz, bs:     \
+        log_panel.log(f"k:{key}, bs:{bs} ({my}, {mx}, {mz})")

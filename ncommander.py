@@ -20,16 +20,8 @@ async def start_update_progress_bar():
 
 def main(stdscr):
     try:
-        curses.curs_set(0)
         signal_resolver.init_screen(stdscr)
-        vg = MainGrid(ui_layout.vg_children_quad, row_defs=ui_layout.row_defs, col_defs=ui_layout.col_defs, stdscr=stdscr)
-        vg.input_resolver.report_click_func =    \
-            lambda obj, key, my, mx, mz, bs:     \
-                ui_layout.log_panel.log(f"k:{key}, bs:{bs} ({my}, {mx}, {mz})")
-
-
-        asyncio.run(vg.run_async_tasks(stdscr, [start_update_progress_bar]))
-    
+        asyncio.run(ui_layout.vg.set_stdscr(stdscr).run_async_tasks(stdscr, [start_update_progress_bar]))
     except:
         ...
 

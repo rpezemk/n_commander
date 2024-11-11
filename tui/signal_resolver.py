@@ -42,6 +42,7 @@ def handle(stdscr):
     redraw_stdscreen(stdscr)
 
 def init_screen(scr):
+    curses.curs_set(0)
     signal.signal(signal.SIGWINCH, resize_handler)
     global stdscr
     stdscr = scr
