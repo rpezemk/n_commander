@@ -21,7 +21,7 @@ async def start_update_progress_bar():
 def main(stdscr):
     try:
         signal_resolver.init_screen(stdscr)
-        asyncio.run(ui_layout.vg.set_stdscr(stdscr).run_async_tasks(stdscr, [start_update_progress_bar]))
+        asyncio.run(ui_layout.vg.set_stdscr(stdscr).run_async_tasks([start_update_progress_bar]))
     except:
         ...
 
