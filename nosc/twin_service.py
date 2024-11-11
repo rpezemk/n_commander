@@ -1,12 +1,12 @@
-from concurrent.futures import ThreadPoolExecutor
-import select
-import signal
 from typing import Callable, Tuple
-from pythonosc import udp_client
-import time
+import signal
 import asyncio
+import select
+
+from pythonosc import udp_client
 from pythonosc import osc_server
 from pythonosc import dispatcher
+from pythonosc.osc_server import OSCUDPServer
 
 def server_message_handler(address, *args):
     print(f"Received message at {address}: {args}")
@@ -18,7 +18,8 @@ class TwinService():
         self.handlers = handlers
         self.client = None
         self.messages = []
-    
+        self.server: OSCUDPServer = None
+        
     def push_message(self, message: Tuple[str, list]):
         self.messages.append(message)
         
@@ -49,6 +50,9 @@ class TwinService():
                 self.server.handle_request()  
             await asyncio.sleep(0.005)  
 
+    def gently_close(self):
+        self.server.server_close()
+        print("server gently closed")
     
 
 async def run_async_tasks():
@@ -57,6 +61,7 @@ async def run_async_tasks():
         asyncio.create_task(my_service.start_client())
         await server_task
     except:
+        my_service.gently_close()
         ...
 
 if __name__ == "__main__":
