@@ -6,7 +6,7 @@ from typing import Any
 
 from tui import signal_resolver
 from tui.visual_grid import MainGrid
-from nosc.twin_service import TwinService
+from utils.twin_service import TwinService
 import ui_layout
 from utils.async_processor import AsyncProcessor
         

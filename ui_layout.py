@@ -71,9 +71,18 @@ mix_panel = HPanel(children= [VProgressBar(None, get_val_func=lambda: prog_bar_v
                               VProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100, p_place=PPlace(hPos=HPosEnum.LEFT))])
 
 
+def start_csd(btn: Btn):
+    ...
+
+def stop_csd(btn: Btn):
+    ...
+
 vg_children_quad = [
     HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
-            Btn("about"), Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
+            Btn("about"), 
+            Btn("start csd", click_func=start_csd), 
+            Btn("stop csd", click_func=stop_csd), 
+            Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
     .g_at((0, 1, 0, 2)),
     
     DirP(".").g_at((1, 0)), dir_list.g_at((1, 4, 1, 1)),

@@ -18,11 +18,13 @@ class Btn(BaseVisual):
     def __init__(
         self, title: str, parent: BaseVisual = None,
             g_place: GPlace = None, 
-            p_place: PPlace = PPlace()
+            p_place: PPlace = PPlace(),
+            click_func: Callable[['Btn'], None] = None
     ):
         super().__init__(parent, [], Area(), g_place, p_place)
         self.title = title
         self.real_title = f"[{self.title}]"
+        self.click_func = click_func
 
     def draw(self):
         n_win = self.emit_window()
@@ -36,6 +38,13 @@ class Btn(BaseVisual):
         self.area.y1 = self.area.y0
         return self.area.get_dims()
 
+    def simple_click(self, my, mx, bs):
+        # super().simple_click(my, mx, bs)
+        if self.click_func is None:
+            return
+        self.click_func(self)
+        ...
+        
 class FileSystemBtn(Btn):
     def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
         
