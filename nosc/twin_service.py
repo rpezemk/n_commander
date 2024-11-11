@@ -1,6 +1,7 @@
-from typing import Callable, Tuple
+import time
+from typing import Callable, NoReturn, Tuple
 import signal
-import asyncio
+import threading
 import select
 
 from pythonosc import udp_client
@@ -9,7 +10,7 @@ from pythonosc import dispatcher
 from pythonosc.osc_server import OSCUDPServer
 
 def server_message_handler(address, *args):
-    print(f"Received message at {address}: {args}")
+    ...
 
 class TwinService():
     def __init__(self, ip, port, handlers: list[(str, Callable)]):
@@ -23,49 +24,26 @@ class TwinService():
     def push_message(self, message: Tuple[str, list]):
         self.messages.append(message)
         
-    async def start(self):
-        asyncio.create_task(self.start_server())    
-        asyncio.create_task(self.start_client())
-        
-    async def start_client(self):
+    def start_client(self) -> NoReturn:
         client = udp_client.SimpleUDPClient(self.ip, self.port)
         while True:
             if any(self.messages):
                 m = self.messages[-1]
                 client.send_message(m[0], m[1])
-                print("message sent!")
-            await asyncio.sleep(1)
+            time.sleep(1)
         
-    async def start_server(self):
+    def start_server(self) -> NoReturn:
         disp = dispatcher.Dispatcher()
         for handler in self.handlers:
             disp.map(*handler)  
         self.server = osc_server.ThreadingOSCUDPServer((self.ip, self.port), disp)
-        self.server.timeout = 0.005
+        self.server.timeout = 0.01
         sock = self.server.socket
-        print(f"Serving on {self.server.server_address}")
         while True:
             ready_to_read, _, _ = select.select([sock], [], [], 0.1)  
             if ready_to_read:    
                 self.server.handle_request()  
-            await asyncio.sleep(0.005)  
+            time.sleep(0.11)  
 
     def gently_close(self):
         self.server.server_close()
-        print("server gently closed")
-    
-
-async def run_async_tasks():
-    try:
-        server_task = asyncio.create_task(my_service.start_server())
-        asyncio.create_task(my_service.start_client())
-        await server_task
-    except:
-        my_service.gently_close()
-        ...
-
-if __name__ == "__main__":
-    my_service = TwinService("127.0.0.1", 8001, [("/*", server_message_handler)])
-    my_service.push_message(("/test", [99, "Hello OSC!"]))
-    signal.signal(signal.SIGTSTP, signal.SIG_IGN)
-    asyncio.run(run_async_tasks())
