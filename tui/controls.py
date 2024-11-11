@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from datetime import datetime
+import threading
 from typing import Callable, Any, List, Tuple
 
 from tui.t_window import TableWindow
@@ -42,7 +43,9 @@ class Btn(BaseVisual):
         # super().simple_click(my, mx, bs)
         if self.click_func is None:
             return
-        self.click_func(self)
+        t1 = threading.Thread(target=self.click_func, args=[self])
+        t1.start() 
+        #self.click_func(self)
         ...
         
 class FileSystemBtn(Btn):
