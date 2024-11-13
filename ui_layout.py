@@ -10,6 +10,7 @@ from tui.n_window import Col
 from tui.progress_bar import HProgressBar, VProgressBar
 import models.fs_model
 import csound_tweaking.examples.csound_py_test as examples
+from utils.wrapped_job import WrappedJob
 
 prog_bar_value = 0
 
@@ -77,10 +78,12 @@ def start_csd(btn: Btn):
 def stop_csd(btn: Btn):
     ...
 
+wrapped_job = WrappedJob(job_func=examples.run_example_2)
+
 vg_children_quad = [
     HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
             Btn("about"), 
-            Btn("start csd", click_func=examples.run_example), 
+            Btn("start csd", click_func=lambda btn: wrapped_job.try_run()), 
             Btn("stop csd", click_func=stop_csd), 
             Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
     .g_at((0, 1, 0, 2)),
