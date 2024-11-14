@@ -49,5 +49,3 @@ class InputResolver():
                 elif key == ord("q") and self.turn_off_func is not None:
                     self.turn_off_func()
             await asyncio.sleep(0.01)
-            # 65536   UP
-            # 2097152 DOWN

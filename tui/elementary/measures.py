@@ -19,13 +19,14 @@ class Area():
         self.y1 = y1
         self.x1 = x1
 
-    
     def get_dims(self) -> Tuple[int, int]:
         return self.y1 - self.y0 + 1, self.x1 - self.x0 + 1
+    
     
 class LenT(Enum):
     ABS = 1
     STAR = 2
+
 
 class Length():
     def __init__(self, value: int, len_type: LenT = LenT.STAR, is_hidden=False):
@@ -45,6 +46,9 @@ class Col():
         self.show_func = show_func
         self.click_func = click_func
         pass
+        
+        
+        
         
 def get_length(length: Tuple|Length):
     tmp_len = None
@@ -74,7 +78,6 @@ def get_lengths(len_list: list[Tuple|Length]):
     
 def get_segments(len_list: list[Length], outer_len: int, test_list = []) -> list[Segment]:
     tmp_len_coll = get_lengths(len_list)
-    col_widths = list([col.width for col in test_list])
     star_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.STAR])
     abs_sum = sum([l.value for l in tmp_len_coll if l.len_type == LenT.ABS])
     curr_effective = 0

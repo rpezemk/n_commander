@@ -29,12 +29,10 @@ stdscr = None
 def resize_handler(signum, frame):
     handle(stdscr)
 
-
 def redraw_stdscreen(stdscr):
     stdscr.clear()
     stdscr.refresh()
     tui.n_window.init_frame(stdscr)
-
 
 def handle(stdscr):
     endwin()

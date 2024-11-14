@@ -19,13 +19,10 @@ class TableWindow(NWindow):
         n_cols = len(visible_lengths)
         
         inner_width = w - (n_cols - 1) - 2
-        filled_width = w - inner_width
         col_widths = list(visible_lengths)
         segments = tui.elementary.measures.get_segments(col_widths, inner_width, self.columns)
         self.segments = segments
         self.spacers = [Segment(seg.v0+idx, seg.v1+idx) for idx, seg in enumerate(segments)]
-        
-        test_blank_sum = sum([w.v1 - w.v0 for w in segments])
         
         res_title = title
         visible_columns = [col for col in self.columns if col.is_hidden == False]

@@ -12,13 +12,11 @@ class HProgressBar(BaseVisual):
         self.max_val = max_val
         self.get_val_func = get_val_func
         
-        
     def draw(self):
         h, w = self.area.get_dims()
         if self.get_val_func is None or w - 2 < 0:
             return
-        
-        y0, x0 = self.area.y0, self.area.x0
+
         val = self.get_val_func()
         bar_str = "*" + tui.elementary.special_chars.get_h_bar(w - 2, self.max_val, val) + "*"
         win = self.emit_window()
@@ -39,8 +37,7 @@ class VProgressBar(BaseVisual):
         h, w = self.area.get_dims()
         if self.get_val_func is None or w < 0:
             return
-        
-        y0, x0 = self.area.y0, self.area.x0
+
         val = self.get_val_func()
         bar_str = "*" + tui.elementary.special_chars.get_v_bar(h - 2, self.max_val, val) + "*"
         win = self.emit_window()

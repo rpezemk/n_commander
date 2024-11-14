@@ -9,9 +9,6 @@ from pythonosc import osc_server
 from pythonosc import dispatcher
 from pythonosc.osc_server import OSCUDPServer
 
-def server_message_handler(address, *args):
-    ...
-
 class TwinService():
     def __init__(self, ip, port, handlers: list[(str, Callable)]):
         self.ip = ip

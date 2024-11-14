@@ -35,7 +35,7 @@ def click_sel(tv: TableView, data: list[str], real_idx_item_tup: Any):
         return
     real_item.sel = not real_item.sel
 
-def click_rel_path(tv: TableView, data: list[str], real_item: Any):
+def click_rel_path(tv: TableView, data: list[str]):
     child_abs_path = data[1]
     if os.path.isdir(child_abs_path):
         tv.title = child_abs_path
