@@ -47,7 +47,7 @@ class Btn(BaseVisual):
         #self.click_func(self)
         ...
      
-class RadioChoice(BaseVisual):
+class ToggleButton(BaseVisual):
     def __init__(self, parent = None, g_place = None, p_place = PPlace(), label = "<>"):
         super().__init__(parent, None, Area(), g_place, p_place)
         self.label = label
@@ -71,11 +71,13 @@ class RadioChoice(BaseVisual):
 class RadioPanel(BaseVisual):
     def __init__(self, children = None, g_place = None, 
                  select_func: Callable[[int],None] = None, 
-                 choices: list[str] = []):
+                 choices: list[str] = [], label = ""):
         super().__init__(None, children, Area(), g_place, PPlace())
         self.choices = choices
+        self.label = label
+        
         for choice in self.choices:
-            self.children.append(RadioChoice(label=choice))
+            self.children.append(ToggleButton(label=choice))
         
     def get_width(self):
         return 4
@@ -88,8 +90,7 @@ class RadioPanel(BaseVisual):
     def draw(self):
         x0 = self.area.x0
         y0 = self.area.y0
-        curr_x_left = 1
-        curr_x_right = self.area.x1 + 1
+        curr_x_left = 2 + len(self.label)
         last_width = 0
         widths = [0]
         for item in self.children:
@@ -102,11 +103,11 @@ class RadioPanel(BaseVisual):
             item.area.y1 = self.area.y1
             item.draw() 
             
-        res_width = sum(widths) + len(widths) - 2
+        res_width = sum(widths) + len(widths) - 2 + len(self.label)
         self.area.x1 = self.area.x0 + res_width
         h, w = self.area.get_dims()
         n_win = self.emit_window()
-        n_win.addstr(0, 0, "[")
+        n_win.addstr(0, 0, f"[{self.label}")
         n_win.addstr(0, w-1, "]")
         
     def simple_click(self, my, mx, bs):
