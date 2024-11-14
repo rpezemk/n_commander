@@ -299,6 +299,7 @@ class ListView(Panel):
     def draw(self):
         ...
 
+
 class TableView(ListView):
     def __init__(self, title, parent=None, children=[], 
                  area=Area(), g_place=None, p_place=PPlace(), 
@@ -391,16 +392,12 @@ class TableView(ListView):
             return
         
         data = self.data_by_row_no[row_no][1]
-        real_item = self.real_items_by_row_no[row_no]
         col.click_func(self, data)
 
-    
     def wheel_up(self, my, mx, bs):        
         if self.idx_offset -1 >= 0:
             self.idx_offset -= 1
 
-    
-        
     def wheel_down(self, my, mx, bs):
         cap = self.table.get_capacity()
         n_items = len(self.orig_data)
