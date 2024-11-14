@@ -11,7 +11,7 @@ from tui.elementary.measures import Area, Col
 from tui.base_visual import BaseVisual
 from models.fs_model import DirModel, FileModel, FsItem, TreeProvider
 import models.fs_model
-
+from models.items_provider import ItemsProvider
 fs_prov = TreeProvider(os_utils.get_nice_dir_content)
 
 class Btn(BaseVisual):
@@ -39,13 +39,11 @@ class Btn(BaseVisual):
         return self.area.get_dims()
 
     def simple_click(self, my, mx, bs):
-        # super().simple_click(my, mx, bs)
         if self.click_func is None:
             return
         t1 = threading.Thread(target=self.click_func, args=[self])
-        t1.start() 
-        #self.click_func(self)
-        ...
+        t1.start()
+     
      
 class ToggleButton(BaseVisual):
     def __init__(self, parent = None, g_place = None, p_place = PPlace(), label = "<>"):
@@ -75,8 +73,7 @@ class ToggleButton(BaseVisual):
             return
         parent: RadioPanel = self.parent
         parent.child_click(self)
-        # super().simple_click(my, mx, bs)
-        ...
+
 
 class RadioPanel(BaseVisual):
     def __init__(self, children = None, g_place = None, 
@@ -93,11 +90,14 @@ class RadioPanel(BaseVisual):
             toggle.parent = self
             self.children.append(toggle)
         
-    def get_width(self):
-        return 4
     
     def get_dims(self):
         return self.area.get_dims()
+    
+    def get_width(self):
+        width = sum([ch.get_width() for ch in self.children]) + len(self.children) + len(self.label) + 1
+        return width
+    
     
     def draw(self):
         x0 = self.area.x0
@@ -132,8 +132,8 @@ class RadioPanel(BaseVisual):
         self.select_func(toggle, idx)
         
     def simple_click(self, my, mx, bs):
-        # super().simple_click(my, mx, bs)
         ...
+        
         
 class FileSystemBtn(Btn):
     def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
@@ -142,6 +142,7 @@ class FileSystemBtn(Btn):
         split = [s for s in title.split("/") if s != '']
         self.title = title
         self.real_title = self.title
+     
         
 class DirBtn(FileSystemBtn):
     def __init__(self, in_path: str, parent = None, g_place = None, p_place = PPlace()):
@@ -156,11 +157,13 @@ class DirBtn(FileSystemBtn):
             self.parent.title = p
         # return super().click()
 
+
 class FileBtn(FileSystemBtn):
     def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
         super().__init__(title, parent, g_place, p_place)
     def simple_click(self, my, mx, bs):
         return super().simple_click(my, mx, bs)
+
 
 class Clock(Btn):
     def __init__(self, parent=None,
@@ -177,6 +180,7 @@ class Clock(Btn):
         
     def get_width(self):
         return len(self.real_title)
+
 
 class HPanel(BaseVisual):
     def __init__(self, parent=None, children=[],
@@ -218,6 +222,7 @@ class Panel(BaseVisual):
 
     def draw(self):
         ...
+
 
 class ItemPanel(Panel):
     def __init__(self, title, parent=None, children = [], area = Area(), 
@@ -263,8 +268,7 @@ class ItemPanel(Panel):
         for ch in children_to_draw:
             ch.draw()
 
-
-            
+   
 class DirP(ItemPanel):
     def __init__(self, title = None,
                     g_plc: GPlace = None, 
@@ -287,9 +291,7 @@ class DirP(ItemPanel):
         
         return [*list([DirBtn(dir) for dir in dirs]), *list([FileBtn(file) for file in files])]
     
-   
-   
-        
+     
 class ListView(Panel):
     def __init__(self, title, parent=None, children = [], 
                  area = Area(), g_place = None, p_place = PPlace(), 
@@ -307,7 +309,8 @@ class TableView(ListView):
                  area=Area(), g_place=None, p_place=PPlace(), 
                  columns: list[Col]=[], 
                  get_items_func:Callable[['TableView'], Tuple[bool,list[Any]]] = None,
-                 click_func:Callable[['TableView', int, int], None] = None,):
+                 click_func:Callable[['TableView', int, int], None] = None,
+                 provider_type: type[ItemsProvider] = None):
         super().__init__(title, parent, children, area, g_place, p_place, None, columns)
         self.get_items_func = get_items_func
         self.columns = columns
@@ -317,14 +320,14 @@ class TableView(ListView):
         self.needs_redraw = True
         self.orig_data = []
         self.idx_offset = 0
+        self.provider_type = provider_type
+        if self.provider_type is not None:
+            self.provider = self.provider_type()
         
     def draw(self):
-        # if not self.needs_redraw:
-        #     return
         self.real_title = self.title
         self.table = self.emit_table(self.columns).draw_table(self.real_title)
-        dir_m = DirModel(abs_path=self.title)
-        ok, fs_items = self.get_items_func(self)
+        _, fs_items = self.provider.get_items(self.title) # self.get_items_func(self)
         self.orig_data = fs_items
         cap = self.table.get_capacity()
         self.data_by_row_no = []
@@ -355,11 +358,9 @@ class TableView(ListView):
         self.needs_redraw = False
         
     def simple_click(self, my, mx, bs):
-        # self.click_func(self, my, mx)
         local_x = mx - self.area.x0
         if self.table is None:
             return
-        
         
         y0 = self.area.y0
         y1 = self.area.y1
@@ -398,14 +399,8 @@ class TableView(ListView):
         real_item = self.real_items_by_row_no[row_no]
         col.click_func(self, data, real_item)
 
-        pass
     
-    
-    def wheel_up(self, my, mx, bs):
-        y0 = self.area.y0
-        y1 = self.area.y1
-        x1 = self.area.x1
-        
+    def wheel_up(self, my, mx, bs):        
         if self.idx_offset -1 >= 0:
             self.idx_offset -= 1
 

@@ -9,6 +9,7 @@ from tui.elementary.placements import PPlace, HPosEnum
 from tui.n_window import Col
 from tui.progress_bar import HProgressBar, VProgressBar
 import models.fs_model
+from models.fs_model import DirProvider
 import csound_tweaking.examples.csound_py_test as examples
 from utils.wrapped_job import WrappedJob
 import tui.signal_resolver
@@ -63,17 +64,10 @@ my_dir_provider1 = models.fs_model.DirProvider()
 my_dir_provider2 = models.fs_model.DirProvider()
 
 curr_path = str(Path(".").resolve())
-dir_list = TableView(curr_path, columns=dir_table_cols, 
-                     get_items_func=lambda tv: my_dir_provider0.get_items(tv.title)
-                         )
 
-dir_list_2 = TableView(curr_path, columns=dir_table_cols, 
-                     get_items_func=lambda tv: my_dir_provider1.get_items(tv.title)
-                         )
-
-dir_list_3 = TableView(curr_path, columns=dir_table_cols, 
-                     get_items_func=lambda tv: my_dir_provider2.get_items(tv.title)
-                         )
+dir_list = TableView(curr_path, columns=dir_table_cols, provider_type=DirProvider)
+dir_list_2 = TableView(curr_path, columns=dir_table_cols, provider_type=DirProvider)
+dir_list_3 = TableView(curr_path, columns=dir_table_cols, provider_type=DirProvider)
 
 prog_bar = HProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100)
 
@@ -93,14 +87,13 @@ def select_layout(_, a):
     tui.signal_resolver.init_screen(None)
     
 wrapped_job = WrappedJob(job_func=examples.run_example_2)
-radio = ToggleButton(label="abc")
+
 radio_panel = RadioPanel(label="layout:", choices=["a", "b", "c"], select_func=select_layout)
 vg_children_quad = [
-    HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
+    HPanel(children=[radio_panel, Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
             Btn("about"), 
             Btn("start csd", click_func=lambda btn: wrapped_job.try_run()), 
             Btn("stop csd", click_func=stop_csd), 
-            radio_panel,
             Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
     .g_at((0, 1, 0, 2)),
     
@@ -112,8 +105,7 @@ vg_children_quad = [
 
 
 vg_children_quad_1 = [
-    HPanel(children=[Btn("edit"), Btn("view"),
-            radio_panel,
+    HPanel(children=[radio_panel, Btn("edit"), Btn("view"),
             Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
     .g_at((0, 1, 0, 2)),
     dir_list_2.g_at((1, 4, 0, 1)),
@@ -121,11 +113,10 @@ vg_children_quad_1 = [
     ]
 
 vg_children_quad_2 = [
-    HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
+    HPanel(children=[radio_panel, Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
             Btn("about"), 
             Btn("start csd", click_func=lambda btn: wrapped_job.try_run()), 
             Btn("stop csd", click_func=stop_csd), 
-            radio_panel,
             Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
     .g_at((0, 1, 0, 2)),
     
