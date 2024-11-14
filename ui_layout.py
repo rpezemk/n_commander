@@ -26,7 +26,7 @@ def get_prog_bar_value():
     return prog_bar_value
 
 
-def click_sel(tv: TableView, data: list[str], real_idx_item_tup: Any):
+def click_sel(tv: TableView, real_idx_item_tup: Any):
     if real_idx_item_tup is None or len(real_idx_item_tup) < 2:
         return
     real_item = real_idx_item_tup[1]
@@ -35,10 +35,11 @@ def click_sel(tv: TableView, data: list[str], real_idx_item_tup: Any):
         return
     real_item.sel = not real_item.sel
 
+
 def click_rel_path(tv: TableView, data: list[str]):
     child_abs_path = data[1]
-    if os.path.isdir(child_abs_path):
-        tv.title = child_abs_path
+    if os.path.isdir(child_abs_path.abs_path):
+        tv.title = child_abs_path.abs_path
         tv.idx_offset = 0
 
     

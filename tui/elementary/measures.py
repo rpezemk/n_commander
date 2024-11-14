@@ -44,7 +44,7 @@ class Col():
         self.width = get_length(width)
         self.is_hidden = is_hidden or self.width.is_hidden
         self.show_func = show_func
-        self.click_func = click_func
+        self.col_click_func = click_func
         pass
         
         
