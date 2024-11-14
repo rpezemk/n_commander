@@ -2,17 +2,14 @@ import os
 from pathlib import Path
 from datetime import datetime
 import threading
-from typing import Callable, Any, List, Tuple
+from typing import Callable, Any, Tuple
 
 from tui.t_window import TableWindow
 from utils import os_utils, string_utils
 from tui.elementary.placements import GPlace, HPosEnum, PPlace
 from tui.elementary.measures import Area, Col
 from tui.base_visual import BaseVisual
-from models.fs_model import DirModel, FileModel, FsItem, TreeProvider
-import models.fs_model
 from models.items_provider import ItemsProvider
-fs_prov = TreeProvider(os_utils.get_nice_dir_content)
 
 class Btn(BaseVisual):
     def __init__(
