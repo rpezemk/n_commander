@@ -4,7 +4,7 @@ import time
 from typing import Any
 from tui.visual_grid import MainGrid
 from tui.text_box import TBox
-from tui.controls import Btn, Clock, HPanel, DirP, TableView
+from tui.controls import Btn, Clock, HPanel, DirP, RadioPanel, RadioChoice, TableView
 from tui.elementary.placements import PPlace, HPosEnum
 from tui.n_window import Col
 from tui.progress_bar import HProgressBar, VProgressBar
@@ -79,12 +79,14 @@ def stop_csd(btn: Btn):
     ...
 
 wrapped_job = WrappedJob(job_func=examples.run_example_2)
-
+radio = RadioChoice(label="abc")
+radio_panel = RadioPanel(choices=["a"])
 vg_children_quad = [
     HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
             Btn("about"), 
             Btn("start csd", click_func=lambda btn: wrapped_job.try_run()), 
             Btn("stop csd", click_func=stop_csd), 
+            radio_panel,
             Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
     .g_at((0, 1, 0, 2)),
     

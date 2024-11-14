@@ -14,7 +14,6 @@ import models.fs_model
 
 fs_prov = TreeProvider(os_utils.get_nice_dir_content)
 
-
 class Btn(BaseVisual):
     def __init__(
         self, title: str, parent: BaseVisual = None,
@@ -46,6 +45,72 @@ class Btn(BaseVisual):
         t1 = threading.Thread(target=self.click_func, args=[self])
         t1.start() 
         #self.click_func(self)
+        ...
+     
+class RadioChoice(BaseVisual):
+    def __init__(self, parent = None, g_place = None, p_place = PPlace(), label = "<>"):
+        super().__init__(parent, None, Area(), g_place, p_place)
+        self.label = label
+        
+    def get_width(self):
+        return len(self.label) + 4
+    
+    def get_dims(self):
+        self.area.x1 = self.area.x0 + len(self.label) + 6
+        self.area.y1 = self.area.y0
+        return self.area.get_dims()
+    
+    def draw(self):
+        n_win = self.emit_window()
+        n_win.addstr(0, 0, "[ ]" + self.label)
+        
+    def simple_click(self, my, mx, bs):
+        # super().simple_click(my, mx, bs)
+        ...
+
+class RadioPanel(BaseVisual):
+    def __init__(self, children = None, g_place = None, 
+                 select_func: Callable[[int],None] = None, 
+                 choices: list[str] = []):
+        super().__init__(None, children, Area(), g_place, PPlace())
+        self.choices = choices
+        for choice in self.choices:
+            self.children.append(RadioChoice(label=choice))
+        
+    def get_width(self):
+        return 4
+    
+    def get_dims(self):
+        self.area.x1 = self.area.x0 + 4
+        self.area.y1 = self.area.y0
+        return self.area.get_dims()
+    
+    def draw(self):
+        x0 = self.area.x0
+        y0 = self.area.y0
+        curr_x_left = 1
+        curr_x_right = self.area.x1 + 1
+        last_width = 0
+        widths = [0]
+        for item in self.children:
+            item.area.x0 = curr_x_left + x0
+            item.area.x1 = item.area.x0 + item.get_width()
+            last_width = item.get_width()
+            widths.append(last_width)
+            curr_x_left += last_width + 1
+            item.area.y0 = self.area.y0
+            item.area.y1 = self.area.y1
+            item.draw() 
+            
+        res_width = sum(widths) + len(widths) - 2
+        self.area.x1 = self.area.x0 + res_width
+        h, w = self.area.get_dims()
+        n_win = self.emit_window()
+        n_win.addstr(0, 0, "[")
+        n_win.addstr(0, w-1, "]")
+        
+    def simple_click(self, my, mx, bs):
+        # super().simple_click(my, mx, bs)
         ...
         
 class FileSystemBtn(Btn):
