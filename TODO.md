@@ -1,5 +1,8 @@
 # TODOs
 
+## KNOWN ISSUES
+* refreshing large directories takes (in ex. "/bin") takes too much time, it slows (T)UI
+
 The order is totally random:
 ## VISUAL STUFF
 
