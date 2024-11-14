@@ -2,7 +2,8 @@ from pathlib import Path
 from typing import Callable, List, Tuple, Union
 import os
 import utils.os_utils    
-    
+from models.items_provider import ItemsProvider
+
 class FsItem():
     def __init__(self, *, abs_path:str=None):
         self.abs_path = abs_path
@@ -51,7 +52,7 @@ class DirModel(FsItem):
         
         
     
-class TreeProvider():
+class TreeProvider(ItemsProvider):
     def __init__(self, nice_get_dir_content: Callable[[str],tuple[bool, list[str], list[str], str]]):
         self.dir_content_func = nice_get_dir_content
         pass
@@ -80,11 +81,11 @@ def get_tree(dir_model: DirModel) -> Tuple[bool,list[FsItem]]:
     return ok, res
 
 
-class DirProvider():
+class DirProvider(ItemsProvider):
     def __init__(self):
         self.prev_items = []
         
-    def get_items(self, abs_path: str) -> list[FsItem]:
+    def get_items(self, abs_path: str) -> Tuple[bool, list[FsItem]]:
         _, fs_items = get_tree(DirModel(abs_path=abs_path))
         old_items = [prev for prev in self.prev_items if any(fs.abs_path == prev.abs_path for fs in fs_items)]
         new_items = [fs_i for fs_i in fs_items if not any(pr.abs_path == fs_i.abs_path for pr in self.prev_items)]
