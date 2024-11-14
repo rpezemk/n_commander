@@ -152,7 +152,6 @@ class DirBtn(FileSystemBtn):
             else:
                 p = str(Path(self.parent.title).parent)
             self.parent.title = p
-        # return super().click()
 
 
 class FileBtn(FileSystemBtn):
@@ -248,7 +247,6 @@ class ItemPanel(Panel):
         
         ch_groups: list[DirBtn | FileBtn] = string_utils.group_elements_by_n(self.children, height - 2)
         
-        n_groups = len(ch_groups)
         for idx, ch_group in enumerate(ch_groups):
             gr_width = max([len(ch.real_title) for ch in ch_group]) + 1  
             if x0 + gr_width > width:
@@ -284,7 +282,7 @@ class DirP(ItemPanel):
         if absolute_path is None or self.title == '' or self.title == '.':
             absolute_path = str(Path(".").resolve())
             
-        dirOk, dirs, files, errStr = os_utils.try_get_dir_content(absolute_path)
+        _, dirs, files, errStr = os_utils.try_get_dir_content(absolute_path)
         
         return [*list([DirBtn(dir) for dir in dirs]), *list([FileBtn(file) for file in files])]
     
