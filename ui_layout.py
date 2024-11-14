@@ -11,7 +11,7 @@ from tui.progress_bar import HProgressBar, VProgressBar
 import models.fs_model
 import csound_tweaking.examples.csound_py_test as examples
 from utils.wrapped_job import WrappedJob
-
+import tui.signal_resolver
 prog_bar_value = 0
 
 app_is_running = True
@@ -58,11 +58,21 @@ dir_table_cols = [
     Col("ext", (5, "a"))
     ]
 
-my_dir_provider = models.fs_model.DirProvider()
+my_dir_provider0 = models.fs_model.DirProvider()
+my_dir_provider1 = models.fs_model.DirProvider()
+my_dir_provider2 = models.fs_model.DirProvider()
 
 curr_path = str(Path(".").resolve())
 dir_list = TableView(curr_path, columns=dir_table_cols, 
-                     get_items_func=lambda tv: my_dir_provider.get_items(tv.title)
+                     get_items_func=lambda tv: my_dir_provider0.get_items(tv.title)
+                         )
+
+dir_list_2 = TableView(curr_path, columns=dir_table_cols, 
+                     get_items_func=lambda tv: my_dir_provider1.get_items(tv.title)
+                         )
+
+dir_list_3 = TableView(curr_path, columns=dir_table_cols, 
+                     get_items_func=lambda tv: my_dir_provider2.get_items(tv.title)
                          )
 
 prog_bar = HProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100)
@@ -78,9 +88,13 @@ def start_csd(btn: Btn):
 def stop_csd(btn: Btn):
     ...
 
+def select_layout(_, a):
+    vg.children = all_layouts[a]
+    tui.signal_resolver.init_screen(None)
+    
 wrapped_job = WrappedJob(job_func=examples.run_example_2)
 radio = ToggleButton(label="abc")
-radio_panel = RadioPanel(label="layout:", choices=["a", "b", "c"])
+radio_panel = RadioPanel(label="layout:", choices=["a", "b", "c"], select_func=select_layout)
 vg_children_quad = [
     HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
             Btn("about"), 
@@ -95,6 +109,33 @@ vg_children_quad = [
     mix_panel.g_at((3, 1, 0, 1)),
     prog_bar.g_at((4, 1, 0, 1))
     ]
+
+
+vg_children_quad_1 = [
+    HPanel(children=[Btn("edit"), Btn("view"),
+            radio_panel,
+            Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
+    .g_at((0, 1, 0, 2)),
+    dir_list_2.g_at((1, 4, 0, 1)),
+    dir_list_3.g_at((1, 4, 1, 1)),
+    ]
+
+vg_children_quad_2 = [
+    HPanel(children=[Btn("edit"), Btn("view"), Btn("settings"), Btn("help"), 
+            Btn("about"), 
+            Btn("start csd", click_func=lambda btn: wrapped_job.try_run()), 
+            Btn("stop csd", click_func=stop_csd), 
+            radio_panel,
+            Clock(p_place=PPlace(hPos=HPosEnum.RIGHT))])
+    .g_at((0, 1, 0, 2)),
+    
+    DirP(".").g_at((1, 0)), dir_list.g_at((1, 4, 1, 1)),
+    log_panel.g_at((2, 0)), 
+    mix_panel.g_at((3, 1, 0, 1)),
+    prog_bar.g_at((4, 1, 0, 1))
+    ]
+
+all_layouts = [vg_children_quad, vg_children_quad_1, vg_children_quad_2]
 
 vg = MainGrid(vg_children_quad, row_defs=row_defs, col_defs=col_defs)
 vg.input_resolver.report_click_func =    \

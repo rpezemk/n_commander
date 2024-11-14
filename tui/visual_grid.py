@@ -89,3 +89,6 @@ class MainGrid(BaseVisual):
             self.draw()
             tui.n_window.render_frame()
             await asyncio.sleep(0.1)
+            
+
+        

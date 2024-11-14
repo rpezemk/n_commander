@@ -51,6 +51,7 @@ class ToggleButton(BaseVisual):
     def __init__(self, parent = None, g_place = None, p_place = PPlace(), label = "<>"):
         super().__init__(parent, None, Area(), g_place, p_place)
         self.label = label
+        self.state = False
         
     def get_width(self):
         return len(self.label) + 4
@@ -62,29 +63,40 @@ class ToggleButton(BaseVisual):
     
     def draw(self):
         n_win = self.emit_window()
-        n_win.addstr(0, 0, "[ ]" + self.label)
+        res = "[X]" if self.state else "[ ]"
+        n_win.addstr(0, 0, res + self.label)
         
     def simple_click(self, my, mx, bs):
+        local_x = mx - self.area.x0
+        if not (0 <= local_x <= 2):
+            return
+        self.state = not self.state
+        if not isinstance(self.parent, RadioPanel):
+            return
+        parent: RadioPanel = self.parent
+        parent.child_click(self)
         # super().simple_click(my, mx, bs)
         ...
 
 class RadioPanel(BaseVisual):
     def __init__(self, children = None, g_place = None, 
-                 select_func: Callable[[int],None] = None, 
+                 select_func: Callable[['ToggleButton',int],None] = None, 
                  choices: list[str] = [], label = ""):
         super().__init__(None, children, Area(), g_place, PPlace())
         self.choices = choices
         self.label = label
-        
-        for choice in self.choices:
-            self.children.append(ToggleButton(label=choice))
+        self.select_func = select_func
+        self.sel_idx = 0            
+        for idx, choice in enumerate(self.choices):
+            toggle = ToggleButton(label=choice)
+            toggle.state = (idx == self.sel_idx)
+            toggle.parent = self
+            self.children.append(toggle)
         
     def get_width(self):
         return 4
     
     def get_dims(self):
-        self.area.x1 = self.area.x0 + 4
-        self.area.y1 = self.area.y0
         return self.area.get_dims()
     
     def draw(self):
@@ -108,7 +120,16 @@ class RadioPanel(BaseVisual):
         h, w = self.area.get_dims()
         n_win = self.emit_window()
         n_win.addstr(0, 0, f"[{self.label}")
-        n_win.addstr(0, w-1, "]")
+        n_win.addstr(0, w, "]")
+    
+    def child_click(self, toggle: ToggleButton):
+        others = [ch for ch in self.children if ch is not toggle]
+        for ch in others:
+            ch.state = False
+        if self.select_func is None:
+            return
+        idx = self.children.index(toggle)
+        self.select_func(toggle, idx)
         
     def simple_click(self, my, mx, bs):
         # super().simple_click(my, mx, bs)
