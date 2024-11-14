@@ -1,5 +1,6 @@
 from tui.base_visual import BaseVisual
 from tui.elementary.measures import Area
+from tui.elementary.placements import HPosEnum, PPlace
 import tui.elementary.special_chars
 
 from typing import Callable, Tuple
@@ -25,9 +26,9 @@ class HProgressBar(BaseVisual):
         
 
 class VProgressBar(BaseVisual):
-    def __init__(self, parent, children = None, area = ..., g_place = None, p_place = ...,
+    def __init__(self, children = None, area = ..., g_place = None, p_place = PPlace(hPos=HPosEnum.LEFT),
                  max_val: float = 100, get_val_func: Callable[[], float] = None):
-        super().__init__(parent, children, Area(), g_place, p_place)
+        super().__init__(None, children, Area(), g_place, p_place)
         self.max_val = max_val
         self.get_val_func = get_val_func
     
