@@ -97,13 +97,11 @@ class RadioPanel(BaseVisual):
     
     
     def draw(self):
-        x0 = self.area.x0
-        y0 = self.area.y0
         curr_x_left = 2 + len(self.label)
         last_width = 0
         widths = [0]
         for item in self.children:
-            item.area.x0 = curr_x_left + x0
+            item.area.x0 = curr_x_left + self.area.x0
             item.area.x1 = item.area.x0 + item.get_width()
             last_width = item.get_width()
             widths.append(last_width)
@@ -136,7 +134,6 @@ class FileSystemBtn(Btn):
     def __init__(self, title, parent = None, g_place = None, p_place = PPlace()):
         
         super().__init__(title, parent, g_place, p_place)
-        split = [s for s in title.split("/") if s != '']
         self.title = title
         self.real_title = self.title
      
@@ -186,7 +183,6 @@ class HPanel(BaseVisual):
 
     def draw(self):
         curr_x_left = 1
-        h, w = self.area.get_dims()
         curr_x_right = self.area.x1 + 1
         for item in self.children:
             if item.p_place.hPos == HPosEnum.LEFT:
@@ -310,10 +306,10 @@ class TableView(ListView):
         super().__init__(title, parent, children, area, g_place, p_place, None, columns)
         self.get_items_func = get_items_func
         self.columns = columns
+        self.vis_columns = [col1 for col1 in self.columns if col1.is_hidden == False]
         self.click_func = click_func
         self.data_by_row_no = []
         self.table: TableWindow = None
-        self.needs_redraw = True
         self.orig_data = []
         self.idx_offset = 0
         self.provider_type = provider_type
@@ -323,75 +319,71 @@ class TableView(ListView):
     def draw(self):
         self.real_title = self.title
         self.table = self.emit_table(self.columns).draw_table(self.real_title)
-        _, fs_items = self.provider.get_items(self.title) # self.get_items_func(self)
-        self.orig_data = fs_items
+        _, all_items = self.provider.get_items(self.title)
+        self.orig_data = all_items
         cap = self.table.get_capacity()
         self.data_by_row_no = []
         self.real_items_by_row_no = []
-        n_items = len(fs_items)
+        n_items = len(all_items)
         n_overflow_items = n_items - cap
         max_idx_offset = max(0, n_overflow_items)
         real_idx_offset =  min(self.idx_offset, max_idx_offset)
         
-        if n_overflow_items < 1:
-            shown_items = fs_items
-        else:
-            shown_items = fs_items[real_idx_offset:][:cap]
+        shown_items = all_items[real_idx_offset:][:cap]
             
-        for idx, item in enumerate(shown_items):
-            if idx > cap - 1:
-                break
-            self.real_items_by_row_no.append((idx, item))
-            vis_row_data = []
-            row_data = []
-            for col in [col1 for col1 in self.columns]:
-                sub = getattr(item, col.title, "")
-                row_data.append(sub)
-                if col.is_hidden == False:
-                    vis_row_data.append(sub)
+        self.real_items_by_row_no = list(enumerate(shown_items))
+        
+        for idx, item in self.real_items_by_row_no:
+            row_data = [getattr(item, col1.title, "") for col1 in self.columns]
             self.data_by_row_no.append((idx, row_data))
+
+        for idx, item in self.real_items_by_row_no:
+            vis_row_data = [getattr(item, col1.title, "") for col1 in self.vis_columns]
             self.table.draw_row(idx, vis_row_data)
-        self.needs_redraw = False
-        
-    def simple_click(self, my, mx, bs):
-        local_x = mx - self.area.x0
-        if self.table is None:
-            return
-        
+    
+    def resolve_arrow(self, my, mx, bs):
         y0 = self.area.y0
         y1 = self.area.y1
         x1 = self.area.x1
         cap = self.table.get_capacity()
         
         if mx == x1 and my == y0 and self.idx_offset -1 >= 0:
-            self.idx_offset -= 1
-            return
+            return -1
         
         n_items = len(self.orig_data)
         n_overflow_items = n_items - cap
         max_idx_offset = max(0, n_overflow_items)
         
         if mx == x1 and my == y1 and self.idx_offset + 1 <= max_idx_offset:
-            self.idx_offset += 1
-            return 
+            return 1
         
-        y_min = y0 + 2
-        row_no = my - y_min
-        if len(self.data_by_row_no) < row_no + 1:
+        return 0
+    
+    def simple_click(self, my, mx, bs):
+        local_x = mx - self.area.x0
+        if self.table is None:
+            return
+        
+        arr = self.resolve_arrow(my, mx, bs)
+        if arr != 0:
+            self.idx_offset += arr
+        vis_row_no = my - self.area.y0 - 2
+
+        if len(self.data_by_row_no) < vis_row_no + 1:
             return
         sel_seg = [seg for seg in self.table.segments if seg.v0 <= local_x <= seg.v1]
         if len(sel_seg) == 0:
             return
         seg = sel_seg[0]
-        vis_idx = self.table.segments.index(seg)
+        vis_col_idx = self.table.segments.index(seg)
         visible_columns = [col for col in self.columns if col.is_hidden == False]
-        if len(visible_columns) < vis_idx + 1:
+        if len(visible_columns) < vis_col_idx + 1:
             return
-        col = visible_columns[vis_idx]
+        col = visible_columns[vis_col_idx]
         if col.col_click_func is None:
             return
         
-        real_idx = self.idx_offset + row_no
+        real_idx = self.idx_offset + vis_row_no
         orig = self.orig_data[real_idx]
         col.col_click_func(self, (real_idx, orig))
 

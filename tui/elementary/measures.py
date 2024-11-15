@@ -22,6 +22,22 @@ class Area():
     def get_dims(self) -> Tuple[int, int]:
         return self.y1 - self.y0 + 1, self.x1 - self.x0 + 1
     
+    def belongs(self, y0, x0, padding: Tuple = None):
+        if padding == None:
+            return self.x0 <= x0 <= self.x1 and self.y0 <= y0 <= self.y1
+
+        p_L = self.x0 + padding[0]
+        p_T = self.y0 + padding[1]
+        p_R = self.x1 - padding[2]
+        p_B = self.y1 - padding[3]
+        
+        return p_L <= x0 <= p_R and p_T <= y0 <= p_B
+    
+    def sub_area(self, y_off, x_off, h, w):
+        max_y = min(self.y1, self.y0 + h - 1)
+        max_x = min(self.x1, self.x0 + w - 1)
+        sub = Area(self.y0 + y_off, self.x0 + x_off, max_y, max_x)
+        return sub
     
 class LenT(Enum):
     ABS = 1
