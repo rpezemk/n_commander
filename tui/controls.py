@@ -391,7 +391,6 @@ class TableView(ListView):
         if col.col_click_func is None:
             return
         
-        data = self.data_by_row_no[row_no][1]
         real_idx = self.idx_offset + row_no
         orig = self.orig_data[real_idx]
         col.col_click_func(self, (real_idx, orig))

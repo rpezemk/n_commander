@@ -84,8 +84,13 @@ def get_tree(dir_model: DirModel) -> Tuple[bool,list[FsItem]]:
 class DirProvider(ItemsProvider):
     def __init__(self):
         self.prev_items = []
+        self.prev_path = None
         
     def get_items(self, abs_path: str) -> Tuple[bool, list[FsItem]]:
+        if self.prev_path == abs_path:
+            return True, self.prev_items
+        self.prev_path = abs_path
+        
         _, fs_items = get_tree(DirModel(abs_path=abs_path))
         old_items = [prev for prev in self.prev_items if any(fs.abs_path == prev.abs_path for fs in fs_items)]
         new_items = [fs_i for fs_i in fs_items if not any(pr.abs_path == fs_i.abs_path for pr in self.prev_items)]
