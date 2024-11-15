@@ -11,7 +11,7 @@ import msg_handlers
         
 def main(stdscr):
     signal_resolver.init_screen(stdscr)
-    asyncio.run(ui_layout.vg.set_stdscr(stdscr).run_async_tasks())
+    asyncio.run(ui_layout.main_vg.set_stdscr(stdscr).run_async_tasks())
 
         
 def wrap():

@@ -17,7 +17,7 @@ import tui.signal_resolver
 ############# global variables ##############
 prog_bar_value = 0
 app_is_running = True
-vg: MainGrid = None 
+main_vg: MainGrid = None 
 
 
 ############# mvc methods #############
@@ -48,7 +48,7 @@ def bool_to_bracket(sel):
 
 
 def select_layout(_, a):
-    vg.children = all_layouts[a]
+    main_vg.children = all_layouts[a]
     tui.signal_resolver.init_screen(None)
     
 def update_progress_bar():
@@ -59,7 +59,7 @@ def update_progress_bar():
 
 
 ############################# TUI DEFINITIONS ############################### 
-log_panel = TBox(g_place=(1, 1, 1, 1))
+log_panel = TBox()
 
 col_defs = [(50, "*"), (50, "*")]
 
@@ -78,11 +78,11 @@ dir_table_cols = [
     Col("ext", (5, "a"))
     ]
 
-curr_path = str(Path(".").resolve())
+dot = str(Path(".").resolve())
 
-dir_list = TableView(curr_path, columns=dir_table_cols, provider_type=DirProvider)
-dir_list_2 = TableView(curr_path, columns=dir_table_cols, provider_type=DirProvider)
-dir_list_3 = TableView(curr_path, columns=dir_table_cols, provider_type=DirProvider)
+dir_list = TableView(dot, columns=dir_table_cols, provider_type=DirProvider)
+dir_list_2 = TableView(dot, columns=dir_table_cols, provider_type=DirProvider)
+dir_list_3 = TableView(dot, columns=dir_table_cols, provider_type=DirProvider)
 
 prog_bar = HProgressBar(None, get_val_func=lambda: prog_bar_value, max_val=100)
 
@@ -126,8 +126,8 @@ all_layouts = [vg_children_quad, vg_children_quad_1, vg_children_quad_2]
 
 
 ################## MAIN OBJECT ###################
-vg = MainGrid(vg_children_quad, row_defs=row_defs, col_defs=col_defs)
-vg.input_resolver.report_click_func =    \
+main_vg = MainGrid(vg_children_quad, row_defs=row_defs, col_defs=col_defs)
+main_vg.input_resolver.report_click_func =    \
     lambda obj, key, my, mx, mz, bs:     \
         log_panel.log(f"k:{key}, bs:{bs} ({my}, {mx}, {mz})")
         
